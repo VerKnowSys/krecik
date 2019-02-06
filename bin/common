@@ -1,0 +1,23 @@
+#!/bin/sh
+# blame: @dmilith
+# 2019-01-29-1540-1548772806
+
+
+clear
+
+_params="${*}"
+
+_uname="$(uname 2>/dev/null)"
+_cargo_project_dir="$(pwd 2>/dev/null)"
+_release_type="${1:-release}"
+_project_name="TravMole"
+_bin_name="travmole"
+_travmole_dest_bin="/usr/bin/${_bin_name}"
+_travmole_logfile="/var/log/travmole.log"
+_travmole_supervisor_pidfile="/var/run/travmole.pid"
+_bin_product_target="target/${_release_type}/${_bin_name}"
+
+_cargo_release_flag="--release"
+if [ "release" != "${_release_type}" ]; then
+    unset _cargo_release_flag
+fi

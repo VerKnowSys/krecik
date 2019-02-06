@@ -1,0 +1,36 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-11-22-0129-1542846591
+
+
+. bin/common "${*}"
+
+
+echo
+echo
+echo "Project directory: ${_cargo_project_dir}"
+echo "Project product: ${_bin_name}"
+echo "Project release type: ${_release_type}"
+echo "System type: ${_uname}"
+echo
+echo
+
+
+bin/update
+
+printf "\n\nBuilding: Library: ${_project_name}\n"
+cargo build \
+    --lib "${_cargo_release_flag}"
+if [ "0" != "${?}" ]; then
+    echo "Build: Library: Failed!" \
+        && exit 1
+fi
+
+printf "\n\nBuilding: Binary: ${_project_name}\n"
+cargo build \
+    --bin "${_bin_name}" \
+    "${_cargo_release_flag}"
+if [ "0" != "${?}" ]; then
+    echo "Build: Binary: Failed!" \
+        && exit 1
+fi

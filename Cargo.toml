@@ -1,0 +1,122 @@
+[package]
+name = "travmole"
+version = "0.1.0"
+authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
+edition = '2018'
+build = "build.rs"
+
+
+[lib]
+name = "travmole"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+
+[[bin]]
+name = "travmole"
+path = "src/travmole.rs"
+
+
+[dependencies]
+curl = "0.4"
+failure = "0.1"
+
+gotham = "0.3"
+gotham_derive = "0.3"
+hyper = { version = "0.12", features = [] }
+
+log = "0.4"
+fern = { version = "0.5", features = ["colored"] }
+colored = "1.6"
+
+serde = "1"
+serde_derive = "1"
+serde_json = "1"
+
+futures = "0.1"
+tokio = "0.1"
+mime = "0.3"
+
+domain = "0.2"
+abstract-ns = "0.4"
+ns-std-threaded = "0.3"
+
+lazy_static = "1.1"
+
+uuid = { version = "0.6", features = ["v4"] }
+rand = "0.4"
+regex = "0.2"
+chrono = "0.4"
+glob = "0.2"
+hostname = "0.1"
+atomicwrites = "0.2"
+libc = "0.2"
+
+bencher = "0.1"
+jemallocator = "0.1.8"
+
+#
+# Explicit Project Setup details:
+#
+
+
+# The release profile, used for `cargo build --release`.
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+incremental = false
+overflow-checks = true
+
+
+# The benchmarking profile, used for `cargo bench` and `cargo test --release`.
+[profile.bench]
+opt-level = 3
+debug = false
+rpath = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+incremental = false
+overflow-checks = true
+
+
+# The testing profile, used for `cargo test`.
+[profile.test]
+opt-level = 1
+debug = 2
+rpath = false
+lto = false
+debug-assertions = true
+codegen-units = 12
+incremental = true
+overflow-checks = true
+
+
+# The development (default) profile, used for `cargo build`.
+[profile.dev]
+opt-level = 0                 # controls the `--opt-level` the compiler builds with.
+                              # 0-1 is good for debugging. 2 is well-optimized. Max is 3.
+                              # 's' attempts to reduce size, 'z' reduces size even more.
+debug = 2                     # (u32 or bool) Include debug information (debug symbols).
+                              # Equivalent to `-C debuginfo=2` compiler flag.
+debug-assertions = true       # controls whether debug assertions are enabled
+                              # (e.g. debug_assert!() and arithmetic overflow checks)
+rpath = false                 # controls whether compiler should set loader paths.
+                              # If true, passes `-C rpath` flag to the compiler.
+lto = true                    # Link Time Optimization usually reduces size of binaries
+                              # and static libraries. Increases compilation time.
+                              # If true, passes `-C lto` flag to the compiler, and if a
+                              # string is specified like 'thin' then `-C lto=thin` will
+                              # be passed.
+codegen-units = 4             # if > 1 enables parallel code generation which improves
+                              # compile times, but prevents some optimizations.
+                              # Passes `-C codegen-units`.
+panic = 'unwind'              # panic strategy (`-C panic=...`), can also be 'abort'
+incremental = false           # whether or not incremental compilation is enabled
+overflow-checks = true        # use overflow checks for integer arithmetic.
+                              # Passes the `-C overflow-checks=...` flag to the compiler.

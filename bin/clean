@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo "Cleaning release build dir of project: SysAPI"
+cargo clean --release
+
+if [ "purge" = "${1}" ]; then
+    echo "Purging all build dirs and *.lock of project: SysAPI"
+    rm -vf Cargo.lock
+    cargo clean
+fi
