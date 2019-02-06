@@ -14,7 +14,12 @@
     unused_qualifications
 )]
 
-#![allow(dead_code)]
+// For development:
+#![allow(
+    dead_code,
+    unused_imports,
+)]
+
 
 /// Use Jemalloc as default allocator:
 #[global_allocator]
@@ -23,15 +28,12 @@ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 // Load all useful macros:
 
-#[allow(unused_imports)]
 #[macro_use]
 pub extern crate log;
 
-#[allow(unused_imports)]
 #[macro_use]
 pub extern crate failure;
 
-#[allow(unused_imports)]
 #[macro_use]
 pub extern crate serde_derive;
 
