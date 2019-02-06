@@ -54,8 +54,8 @@ pub mod inputs;
 /// Check products:
 pub mod products;
 
-/// Web router:
-pub mod webrouter;
+/// Web:
+pub mod web;
 
 
 //

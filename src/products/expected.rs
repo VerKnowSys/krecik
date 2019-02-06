@@ -49,5 +49,6 @@ impl Default for DomainExpectation {
     }
 }
 
+
 /// Domain expectations type
 pub type DomainExpectations = Vec<DomainExpectation>;

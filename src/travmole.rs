@@ -40,7 +40,7 @@ use travmole::configuration::*;
 // use travmole::checks::*;
 // use travmole::inputs::*;
 // use travmole::products::*;
-use travmole::webrouter::router;
+use travmole::web::router;
 
 
 /// Start a server and use a `Router` to dispatch requests
