@@ -1,3 +1,10 @@
+use hyper::*;
+use gotham::helpers::http::response::create_response;
+use gotham::state::State;
+use mime::APPLICATION_JSON;
+use gotham::handler::IntoResponse;
+use chrono::Local;
+
 use crate::products::expected::*;
 
 
@@ -25,7 +32,7 @@ pub enum Unexpected {
 pub struct Story {
 
     /// Story - timestamp
-    timestamp: u64,
+    timestamp: i64,
 
     /// Story - failure count
     count: u64,
@@ -36,5 +43,51 @@ pub struct Story {
 }
 
 
-/// History type
-pub type History = Vec<Story>;
+impl Story {
+
+    /// New story
+    pub fn new(count: u64, error: Unexpected) -> Story {
+        Story {
+            timestamp: Local::now().timestamp(),
+            count,
+            error,
+        }
+    }
+
+}
+
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+/// History is list of Stories
+pub struct History {
+
+    /// Stories list
+    pub list: Vec<Story>,
+
+}
+
+
+impl History {
+
+    /// New History
+    pub fn new(first: Story) -> History {
+        History {
+            list: vec!(first)
+        }
+    }
+
+}
+
+
+/// Implement Gotham response for History:
+impl IntoResponse for History {
+    fn into_response(self, state: &State) -> Response<Body> {
+        create_response(
+            state,
+            StatusCode::OK,
+            APPLICATION_JSON,
+            serde_json::to_string(&self.list)
+                .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}")),
+        )
+    }
+}
