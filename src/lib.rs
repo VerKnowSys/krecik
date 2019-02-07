@@ -45,6 +45,9 @@ pub extern crate serde_derive;
 /// Configuration defaults:
 pub mod configuration;
 
+/// Utilities and helpers:
+pub mod utilities;
+
 /// Checks:
 pub mod checks;
 
