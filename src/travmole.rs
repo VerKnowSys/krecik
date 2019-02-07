@@ -96,7 +96,7 @@ pub fn main() {
     // Perform sanity checks:
     // sanity_checks();
 
-    let gotham = gotham::init_server("172.16.1.15:60666", router());
+    let gotham = gotham::init_server(LISTEN_ADDRESS, router());
     // Spawn the server task
     runtime
         .block_on_all(gotham) // Block forever on "serving duties"
