@@ -1,6 +1,3 @@
-/// Check:
-pub mod check;
-
 /// Domain checks:
 pub mod domain;
 

@@ -1,3 +1,6 @@
+/// Check:
+pub mod check;
+
 /// JSON file input:
 pub mod file;
 
