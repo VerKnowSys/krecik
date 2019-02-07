@@ -1,15 +1,10 @@
 use std::io::Error;
 
-use crate::checks::domain::*;
-use crate::checks::page::*;
-use crate::products::expected::*;
-use crate::products::unexpected::*;
 
+/// Checks trait
+pub trait Checks<T> {
 
-/// generic Check, specialized via defined inputs
-pub trait Check<T> {
-
-    /// Load check from json
+    /// Load check from any source
     fn load(name: &str) -> Result<T, Error>;
 
 }
