@@ -16,8 +16,6 @@ echo
 echo
 
 
-bin/update
-
 printf "\n\nBuilding: Library: ${_project_name}\n"
 cargo build \
     --lib "${_cargo_release_flag}"

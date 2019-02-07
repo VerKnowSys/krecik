@@ -30,7 +30,8 @@ pub fn router() -> Router {
             .associate(
                 &"/json/execute/all".to_string(), |handler| {
                     handler.get().to(handler_check_execute_all);
-                });
+                }
+            );
 
         // route
         //     .get("/")
