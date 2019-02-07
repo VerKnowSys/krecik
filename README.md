@@ -15,9 +15,13 @@
 
 * Supports all protocols supported by Curl (file, ftp, ftps, gopher, http, https, imap, imaps, ldap, ldaps, pop3, pop3s, rtsp, smb, smbs, smtp, smtps, telnet, tftp, sftp, scp)
 
-* Supports all Curl features (AsynchDNS, IPv6, NTLM, NTLM_WB, SSL, libz, UnixSockets, HTTPS-proxy, IDN)
+* Supports International Domain Names (libIDN2)
 
-* Web API control and panel.
+* Supports HTTP2 (ngHTTP2)
+
+* Supports modern and most secure TLS implementation (libreSSL)
+
+* Web API with 'call "anything" from "anywhere"' approach.
 
 
 ## Build:
