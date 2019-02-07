@@ -76,6 +76,14 @@ impl History {
         }
     }
 
+
+    /// Append Story to History
+    pub fn append(&self, story: Story) -> History {
+        History {
+            list: [self.list.clone(), vec!(story)].concat()
+        }
+    }
+
 }
 
 
