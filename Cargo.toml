@@ -65,7 +65,7 @@ jemallocator = "0.1.8"
 [profile.release]
 opt-level = 3
 debug = false
-rpath = false
+rpath = true
 lto = true
 debug-assertions = false
 codegen-units = 1
@@ -78,7 +78,7 @@ overflow-checks = true
 [profile.bench]
 opt-level = 3
 debug = false
-rpath = false
+rpath = true
 lto = true
 debug-assertions = false
 codegen-units = 1
@@ -90,7 +90,7 @@ overflow-checks = true
 [profile.test]
 opt-level = 1
 debug = 2
-rpath = false
+rpath = true
 lto = false
 debug-assertions = true
 codegen-units = 12
@@ -107,7 +107,7 @@ debug = 2                     # (u32 or bool) Include debug information (debug s
                               # Equivalent to `-C debuginfo=2` compiler flag.
 debug-assertions = true       # controls whether debug assertions are enabled
                               # (e.g. debug_assert!() and arithmetic overflow checks)
-rpath = false                 # controls whether compiler should set loader paths.
+rpath = true                  # controls whether compiler should set loader paths.
                               # If true, passes `-C rpath` flag to the compiler.
 lto = true                    # Link Time Optimization usually reduces size of binaries
                               # and static libraries. Increases compilation time.
