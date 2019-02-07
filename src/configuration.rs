@@ -16,7 +16,7 @@ pub const DEFAULT_LOG_FILE: &str = "logs/travmole.log";
 pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
 
 /// Default listen address and port:
-pub const LISTEN_ADDRESS: &str = "172.16.1.15:60666";
+pub const LISTEN_ADDRESS: &str = "127.0.0.1:60666";
 
 /// Check timeout in seconds
 pub const CHECK_TIMEOUT: u64 = 15;
