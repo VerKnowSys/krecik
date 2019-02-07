@@ -6,10 +6,10 @@ use crate::products::expected::*;
 pub struct Domain {
 
     /// Domain name
-    name: String,
+    pub name: String,
 
     /// Domain expectations
-    expects: DomainExpectations,
+    pub expects: Option<DomainExpectations>,
 
 }
 

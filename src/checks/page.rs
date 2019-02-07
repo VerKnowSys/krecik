@@ -7,13 +7,13 @@ use crate::products::expected::*;
 pub struct Page {
 
     /// Page URL
-    url: String,
+    pub url: String,
 
     /// Page expectations
-    expects: Option<PageExpectations>,
+    pub expects: Option<PageExpectations>,
 
     /// Curl options
-    options: Option<PageOptions>,
+    pub options: Option<PageOptions>,
 
 }
 
