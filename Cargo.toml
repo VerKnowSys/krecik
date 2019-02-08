@@ -18,7 +18,7 @@ path = "src/travmole.rs"
 
 
 [dependencies]
-curl = "0.4"
+curl = { version = "0.4", features = ["ssl", "http2"] }
 failure = "0.1"
 ssl-expiration = "0.1"
 
