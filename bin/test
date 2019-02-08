@@ -1,0 +1,27 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-12-20-1942-1545331365
+
+
+. bin/common "${*}"
+
+
+echo
+echo
+echo "Project directory: ${_cargo_project_dir}"
+echo "Project product: ${_bin_name}"
+echo "System type: ${_uname}"
+echo
+echo
+
+
+failure () {
+    printf "FAILURE: %b\n" "${@}"
+    exit 1
+}
+
+
+cargo test --verbose
+if [ "0" != "${?}" ]; then
+    failure "Test: Library: Failed!"
+fi
