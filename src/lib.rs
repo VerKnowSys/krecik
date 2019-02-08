@@ -66,5 +66,5 @@ pub mod web;
 // Private modules:
 //
 
-// /// Tests:
-// mod tests;
+/// Tests:
+mod tests;
