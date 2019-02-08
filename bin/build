@@ -20,7 +20,8 @@ export PKG_CONFIG_PATH="${_curl_software}/lib/pkgconfig"
 
 printf "\n\nBuilding: Library: ${_project_name}\n"
 cargo build \
-    --lib "${_cargo_release_flag}"
+    --verbose \
+    --lib ${_cargo_release_flag}
 if [ "0" != "${?}" ]; then
     echo "Build: Library: Failed!" \
         && exit 1
@@ -28,8 +29,9 @@ fi
 
 printf "\n\nBuilding: Binary: ${_project_name}\n"
 cargo build \
+    --verbose \
     --bin "${_bin_name}" \
-    "${_cargo_release_flag}"
+    ${_cargo_release_flag}
 if [ "0" != "${?}" ]; then
     echo "Build: Binary: Failed!" \
         && exit 1
