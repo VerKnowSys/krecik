@@ -43,12 +43,13 @@ pub fn handler_check_execute_all(state: State) -> (State, History) {
 
     let mut easy = Easy2::new(Collector(Vec::new()));
     easy.get(true).unwrap();
+    easy.verbose(true).unwrap();
     easy.url("https://www.rust-lang.org/").unwrap();
     easy.perform().unwrap();
 
     assert_eq!(easy.response_code().unwrap(), 200);
-    let contents = easy.get_ref();
-    println!("{}", String::from_utf8_lossy(&contents.0));
+    let _contents = easy.get_ref();
+    // println!("{}", String::from_utf8_lossy(&contents.0));
 
 
     (state, history.append(story))
