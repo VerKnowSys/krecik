@@ -21,7 +21,7 @@ failure () {
 }
 
 
-cargo test --verbose
+cargo test -- --color always --nocapture
 if [ "0" != "${?}" ]; then
     failure "Test: Library: Failed!"
 fi
