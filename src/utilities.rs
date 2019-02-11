@@ -52,14 +52,5 @@ pub fn list_check_files() -> Vec<String> {
 
 /// Read text file
 pub fn read_text_file(name: &str) -> Result<String, Error> {
-    File::open(&name)
-        .and_then(|file| {
-            let mut line = String::new();
-            BufReader::new(file)
-                .read_line(&mut line)
-                .and_then(|_| {
-                    // trim newlines and other whitespaces:
-                    Ok(str::trim(&line).to_string())
-                })
-        })
+    fs::read_to_string(name)
 }
