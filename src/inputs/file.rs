@@ -18,19 +18,19 @@ use crate::products::expected::*;
 pub struct FileCheck {
 
     /// Unique check name
-    name: String,
+    pub name: Option<String>,
 
     /// Domains to check
-    domains: Option<Domains>,
+    pub domains: Option<Domains>,
 
     /// Pages to check
-    pages: Option<Pages>,
+    pub pages: Option<Pages>,
 
     /// Slack Webhook
-    alert_webhook: Option<String>,
+    pub alert_webhook: Option<String>,
 
     /// Slack alert channel
-    alert_channel: Option<String>,
+    pub alert_channel: Option<String>,
 
 }
 
