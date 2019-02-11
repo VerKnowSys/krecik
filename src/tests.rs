@@ -85,10 +85,6 @@ mod tests {
 
         let mut multi = Multi::new();
         multi.pipelining(true, true).unwrap();
-        multi.messages(|msg| {
-            println!("MESSAGE: {:?}", msg.result().unwrap().unwrap());
-            assert!(false);
-        });
         let easy1handle = multi.add2(easy1).unwrap();
         let easy2handle = multi.add2(easy2).unwrap();
         let easy3handle = multi.add2(easy3).unwrap();
