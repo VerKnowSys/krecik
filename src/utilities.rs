@@ -5,7 +5,7 @@ use hyper::{StatusCode, Body, Response};
 use serde_json;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::fs::File;
+use std::fs;
 use glob::glob;
 
 use crate::products::expected::*;

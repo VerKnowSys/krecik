@@ -3,16 +3,25 @@
 mod tests {
 
     // Load all internal modules:
-    // use hyper::*;
     use gotham::test::TestServer;
     use regex::Regex;
     use ssl_expiration::SslExpiration;
-
+    use std::io::{Error, ErrorKind};
     use curl::easy::{Easy, Easy2, Handler, WriteError};
     use curl::multi::{Easy2Handle, Multi};
     use std::time::Duration;
+    use serde_json;
 
     use crate::*;
+    use crate::configuration::*;
+    use crate::utilities::*;
+    use crate::inputs::file::*;
+    use crate::checks::domain::*;
+    use crate::inputs::check::*;
+    use crate::checks::page::*;
+    use crate::products::*;
+    use crate::products::expected::*;
+    use crate::products::unexpected::*;
     use crate::web::router;
 
 
