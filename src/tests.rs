@@ -113,12 +113,15 @@ mod tests {
 
         let mut handler1after = multi.remove2(easy1handle).unwrap();
         assert!(handler1after.response_code().unwrap() == 200);
+        assert!(handler1after.download_size().unwrap() > 0f64);
 
         let mut handler2after = multi.remove2(easy2handle).unwrap();
         assert!(handler2after.response_code().unwrap() == 200);
+        assert!(handler2after.download_size().unwrap() > 0f64);
 
         let mut handler3after = multi.remove2(easy3handle).unwrap();
         assert!(handler3after.response_code().unwrap() == 0); // NOTE: 0 since no connection is possible to non existing server
+        assert!(handler2after.download_size().unwrap() > 0f64); // even if connection failed, we sent some bytes
 
         multi.close().unwrap();
     }
