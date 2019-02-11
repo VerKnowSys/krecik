@@ -40,13 +40,7 @@ impl Checks<FileCheck> for FileCheck {
 
     /// Load check from JSON file
     fn load(name: &str) -> Result<FileCheck, Error> {
-        Self::load_from(name, CHECKS_DIR)
-    }
-
-
-    /// Load check from JSON file by name
-    fn load_from(name: &str, checks_dir: &str) -> Result<FileCheck, Error> {
-        let check_file = format!("{}/{}.json", &checks_dir, &name);
+        let check_file = format!("{}/{}.json", CHECKS_DIR, &name);
         read_text_file(&check_file)
             .and_then(|file_contents| {
                 serde_json::from_str(&file_contents.to_string())

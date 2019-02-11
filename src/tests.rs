@@ -200,7 +200,7 @@ mod tests {
 
     #[test]
     fn test_check_json_to_filecheck_deserialization() {
-        let check = FileCheck::load_from("test1", CHECKS_TEST_DIR).unwrap();
+        let check = FileCheck::load("tests/test1").unwrap();
         assert!(check.name.unwrap() == "Testcheck");
     }
 }

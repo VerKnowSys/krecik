@@ -9,9 +9,6 @@ pub const PROJECT_DIRECTORY: &str = "/Projects/travmole";
 /// Checks directory:
 pub const CHECKS_DIR: &str = "checks/on";
 
-/// Checks test directory:
-pub const CHECKS_TEST_DIR: &str = "checks/test";
-
 /// Default log file:
 pub const DEFAULT_LOG_FILE: &str = "logs/travmole.log";
 
