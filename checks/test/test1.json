@@ -1,0 +1,33 @@
+{
+    "name": "Testcheck",
+    "domains": [
+        {
+            "name": "rust-lang.org",
+            "expects": [
+                "ValidResolvable"
+            ]
+        }
+    ],
+    "pages": [
+        {
+            "url": "http://rust-lang.org/",
+            "expects": [
+                {
+                    "ValidCode": 200
+                }
+            ],
+            "options": {
+                "cookies": null,
+                "headers": null,
+                "data": null,
+                "follow_redirects": true,
+                "method": "GET",
+                "agent": null,
+                "timeout":15,
+                "connection_timeout":30
+            }
+        }
+    ],
+    "alert_webhook": null,
+    "alert_channel": null
+}

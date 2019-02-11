@@ -170,4 +170,37 @@ mod tests {
         assert!(raw_page.contains("<head>"));
         assert!(raw_page.contains("<body>"));
     }
+
+
+    #[test]
+    fn test_filecheck_to_json_serialization() {
+        let check = FileCheck {
+            name: Some("Testcheck".to_string()),
+            domains: Some(vec!(
+               Domain {
+                   name: "rust-lang.org".to_string(),
+                   expects: Some(vec!(DomainExpectation::ValidResolvable)),
+               }
+            )),
+            pages: Some(vec!(
+                Page {
+                    url: "http://rust-lang.org/".to_string(),
+                    expects: Some(vec!(PageExpectation::ValidCode(200))),
+                    options: Some(PageOptions::default())
+                }
+            )),
+            alert_webhook: None,
+            alert_channel: None,
+        };
+        let output = serde_json::to_string(&check).unwrap();
+        println!("Output: {}", output.to_string());
+        assert!(output.len() > 100);
+    }
+
+
+    #[test]
+    fn test_check_json_to_filecheck_deserialization() {
+        let check = FileCheck::load_from("test1", CHECKS_TEST_DIR).unwrap();
+        assert!(check.name.unwrap() == "Testcheck");
+    }
 }
