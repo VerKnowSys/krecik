@@ -4,7 +4,10 @@
         {
             "name": "rust-lang.org",
             "expects": [
-                "ValidResolvable"
+                "ValidResolvable",
+                {
+                    "ValidExpiryPeriod": 14
+                }
             ]
         }
     ],
@@ -14,6 +17,15 @@
             "expects": [
                 {
                     "ValidCode": 200
+                },
+                {
+                    "ValidContent": "Rust"
+                },
+                {
+                    "ValidContent": "<title"
+                },
+                {
+                    "ValidAddress": "https://rust-lang.org/"
                 }
             ],
             "options": {
