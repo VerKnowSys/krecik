@@ -44,7 +44,13 @@ pub fn produce_list(glob_pattern: &str) -> Vec<String> {
 
 /// List all check files found in default checks dir
 pub fn list_check_files() -> Vec<String> {
-    let glob_pattern = format!("{}/*.json", CHECKS_DIR);
+    list_check_files_from(CHECKS_DIR)
+}
+
+
+/// List all check files from given dir
+pub fn list_check_files_from(checks_dir: &str) -> Vec<String> {
+    let glob_pattern = format!("{}/*.json", checks_dir);
     debug!("list_check_files(): {}", glob_pattern);
     produce_list(&glob_pattern)
 }
