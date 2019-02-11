@@ -124,4 +124,38 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_curl_all_options_test() {
+        let mut easy = Easy2::new(CollectorForTests(Vec::new()));
+        easy.get(true).unwrap();
+        easy.follow_location(true).unwrap();
+        easy.ssl_verify_peer(true).unwrap();
+        easy.ssl_verify_host(true).unwrap();
+        easy.connect_timeout(Duration::from_secs(30)).unwrap();
+        easy.timeout(Duration::from_secs(30)).unwrap();
+        easy.max_connects(10).unwrap();
+        easy.max_redirections(10).unwrap();
+
+        let url = "http://rust-lang.org/";
+        easy.url(&url).unwrap();
+        easy.perform().unwrap();
+
+        println!("URL: {}", &url);
+        println!("Redirect count: {:?}", easy.redirect_count().unwrap());
+        println!("Final URL: {:?}", easy.redirect_url().unwrap());
+        println!("Local IPv4: {:?}", easy.local_ip().unwrap());
+        println!("Remote IPv4: {:?}", easy.primary_ip().unwrap());
+        println!("Content type: {:?}", easy.content_type().unwrap());
+        println!("Cookies: {:?}", easy.cookies().unwrap());
+        println!("TIMINGS: Connect time: {:?}, Name lookup time: {:?}, Redirect time: {:?}, Total time: {:?}",
+                 easy.connect_time().unwrap(), easy.namelookup_time().unwrap(), easy.redirect_time().unwrap(), easy.total_time().unwrap());
+
+        assert_eq!(easy.response_code().unwrap(), 200);
+        let contents = easy.get_ref();
+        let raw_page = String::from_utf8_lossy(&contents.0);
+        assert!(raw_page.contains("Rust"));
+        assert!(raw_page.contains("<meta "));
+        assert!(raw_page.contains("<head>"));
+        assert!(raw_page.contains("<body>"));
+    }
 }
