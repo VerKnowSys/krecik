@@ -47,7 +47,7 @@ pub enum DomainExpectation {
 
     /// Domain expiry minimum period in days
     #[fail(display = "Passed ValidExpiryPeriod: '{}'", _0)]
-    ValidExpiryPeriod (u64),
+    ValidExpiryPeriod (i32),
 
 }
 
