@@ -3,13 +3,13 @@ use failure::Error;
 use crate::products::unexpected::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Fail)]
+#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq)]
 /// Describes all supported page expectations
 pub enum PageExpectation {
 
     /// Valid error code
     #[fail(display = "Passed ValidCode: '{}'", _0)]
-    ValidCode (i64),
+    ValidCode (u32),
 
     /// Valid content regex match
     #[fail(display = "Passed ValidContent: '{}'", _0)]
@@ -21,7 +21,7 @@ pub enum PageExpectation {
 
     /// Valid content length
     #[fail(display = "Passed ValidLength: '{}'", _0)]
-    ValidLength (u64),
+    ValidLength (i64),
 
 }
 
