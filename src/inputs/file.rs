@@ -87,6 +87,9 @@ impl Checks<FileCheck> for FileCheck {
                                                         if &ssl_validator.days() < days
                                                         || ssl_validator.is_expired() {
                                                             error!("Expired domain: {}.", domain_name);
+                                                        } else {
+                                                            debug!("Requested domain: {} to be valid for: {} days. Domain will remain valid for {} days.",
+                                                                   domain_name, days, ssl_validator.days());
                                                         }
                                                         Ok(())
                                                     },
