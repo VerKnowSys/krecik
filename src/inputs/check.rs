@@ -1,5 +1,7 @@
 use std::io::Error;
 
+use crate::products::unexpected::*;
+
 
 /// Checks trait
 pub trait Checks<T> {
