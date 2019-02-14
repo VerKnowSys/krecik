@@ -9,4 +9,7 @@ pub trait Checks<T> {
     /// Load check from any source
     fn load(name: &str) -> Result<T, Error>;
 
+    /// Execute loaded checks
+    fn execute(&self) -> Result<(), History>;
+
 }
