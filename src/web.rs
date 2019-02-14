@@ -1,22 +1,12 @@
 use gotham::router::Router;
 use gotham::state::State;
 
-use ssl_expiration::SslExpiration;
-use curl::easy::{Easy2, Handler, WriteError};
-
 use crate::configuration::*;
 use crate::products::expected::*;
 use crate::products::unexpected::*;
-
-
-struct Collector(Vec<u8>);
-
-impl Handler for Collector {
-    fn write(&mut self, data: &[u8]) -> Result<usize, WriteError> {
-        self.0.extend_from_slice(data);
-        Ok(data.len())
-    }
-}
+use crate::utilities::*;
+use crate::inputs::check::*;
+use crate::inputs::file::*;
 
 
 /// Execute all checks
