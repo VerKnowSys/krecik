@@ -84,7 +84,7 @@ impl Checks<FileCheck> for FileCheck {
                                                 match domain_expectation {
                                                     DomainExpectation::ValidExpiryPeriod(days) => {
                                                         debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name);
-                                                        if days < &ssl_validator.days()
+                                                        if &ssl_validator.days() < days
                                                         || ssl_validator.is_expired() {
                                                             error!("Expired domain: {}.", domain_name);
                                                         }
