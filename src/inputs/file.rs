@@ -72,7 +72,7 @@ impl Checks<FileCheck> for FileCheck {
                     .iter()
                     .for_each(|defined_check| {
                         let domain_check = defined_check.clone();
-                        let domain_name = domain_check.name.unwrap_or_default();
+                        let domain_name = domain_check.name;
                         domain_check
                             .expects
                             .and_then(|domain_expectations| {
