@@ -22,25 +22,11 @@ pub fn handler_check_execute_all(state: State) -> (State, History) {
         )
     );
 
-
-    let expiration = SslExpiration::from_domain_name("google.com").unwrap();
-    if expiration.is_expired() {
-        // do something if SSL certificate expired
-        panic!("Oh expired domain. So shame. I will die now cuz nothing really matters ;)");
-    }
-    info!("Domain: {} - Total days before expiration: {}. Total seconds before expiration: {}", "google.com", expiration.days(), expiration.secs());
-
-
-    let mut easy = Easy2::new(Collector(Vec::new()));
-    easy.get(true).unwrap();
-    easy.verbose(true).unwrap();
-    easy.url("https://www.rust-lang.org/").unwrap();
-    easy.perform().unwrap();
-
-    assert_eq!(easy.response_code().unwrap(), 200);
-    let _contents = easy.get_ref();
-    // println!("{}", String::from_utf8_lossy(&contents.0));
-
+    FileCheck::load("tests/test1")
+        .and_then(|check| {
+            Ok(check.execute().unwrap())
+        })
+        .unwrap_or_default();
 
     (state, history.append(story))
 }
