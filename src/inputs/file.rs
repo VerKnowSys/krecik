@@ -103,6 +103,123 @@ impl Checks<FileCheck> for FileCheck {
             }
         }
 
+        match &self.pages {
+            Some(pages) => {
+                pages
+                    .iter()
+                    .for_each(|defined_page| {
+                        let page_check = defined_page.clone();
+                        let page_url = page_check.url.clone();
+                        page_check
+                            .clone()
+                            .expects
+                            .and_then(|page_expectations| {
+                                let mut multi = Multi::new();
+                                multi.pipelining(true, true).unwrap();
+                                let handlers: Vec<_> = page_expectations
+                                    .iter()
+                                    .map(|page_expectation| {
+                                        let mut curl = Easy2::new(Collector(Vec::new()));
+                                        // todo: use options field to set wanted options, leaving default for now:
+                                        curl.url(&page_url).unwrap();
+                                        curl.get(true).unwrap();
+                                        curl.follow_location(true).unwrap();
+                                        curl.ssl_verify_peer(true).unwrap();
+                                        curl.ssl_verify_host(true).unwrap();
+                                        curl.connect_timeout(Duration::from_secs(30)).unwrap();
+                                        curl.timeout(Duration::from_secs(30)).unwrap();
+                                        curl.max_connects(10).unwrap();
+                                        curl.max_redirections(10).unwrap();
+                                        multi.add2(curl)
+                                    })
+                                    .collect();
+
+                                // perform async multicheck
+                                while multi.perform().unwrap() > 0 {
+                                    multi.wait(&mut [], Duration::from_secs(1)).unwrap();
+                                }
+
+                                for handler in handlers {
+                                    let a_handler = handler.unwrap();
+                                    let handle = a_handler.get_ref();
+                                    let expectations = page_check
+                                        .clone()
+                                        .expects
+                                        .unwrap_or_default();
+
+                                    let expected_code = expectations
+                                        .iter()
+                                        .find(|exp| {
+                                            let the_code = match exp {
+                                                PageExpectation::ValidCode(code) => code,
+                                                _ => &0u32,
+                                            };
+                                            the_code != &0u32
+                                        })
+                                        .unwrap();
+
+                                    let expected_content = expectations
+                                        .iter()
+                                        .find(|exp| {
+                                            let the_content = match exp {
+                                                PageExpectation::ValidContent(content) => content,
+                                                _ => "",
+                                            };
+                                            the_content != ""
+                                        })
+                                        .unwrap();
+
+                                    let raw_page_content = String::from_utf8_lossy(&handle.0);
+                                    match expected_content {
+                                        &PageExpectation::ValidContent(ref content) => {
+                                            if content != "" {
+                                                if raw_page_content.contains(content) {
+                                                    info!("Got expected content: {} from URL: {}", content, page_url);
+                                                } else {
+                                                    error!("Failed to find content: {} from URL: {}", content, page_url);
+                                                }
+                                            } else {
+                                                debug!("Skipped page content expectation for URL: {}", page_url);
+                                            }
+                                        },
+
+                                        _ => {
+                                            debug!("Some other case");
+                                        },
+                                    }
+
+                                    let mut result_handler = multi.remove2(a_handler).unwrap();
+                                    match result_handler.response_code() {
+                                        Ok(0) => {
+                                            error!("Error connecting to URL: {}", page_url);
+                                        },
+
+                                        Ok(code) => {
+                                            if &PageExpectation::ValidCode(code) == expected_code {
+                                                info!("Got expected code: {} from URL: {}", code, page_url);
+                                            } else {
+                                                error!("Got UNexpected code: {} from URL: {}", code, page_url);
+                                            }
+                                        },
+
+                                        Err(err) => {
+                                            error!("Got unexpected error: {}", err);
+                                        }
+                                    }
+                                }
+
+                                Some(())
+                            })
+                            .unwrap_or_default();
+                        }
+                    )
+            },
+
+            None => {
+                debug!("Execute: No domains to check.");
+            }
+        }
+
         Ok(())
     }
 
