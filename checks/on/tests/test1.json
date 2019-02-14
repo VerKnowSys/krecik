@@ -2,10 +2,10 @@
     "name": "Testcheck",
     "domains": [
         {
-            "name": "rust-lang.org",
+            "name": "google.com",
             "expects": [
                 {
-                    "ValidExpiryPeriod": 14
+                    "ValidExpiryPeriod": 100
                 }
             ]
         }
