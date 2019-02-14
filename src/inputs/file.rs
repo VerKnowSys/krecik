@@ -1,6 +1,8 @@
+use curl::multi::{Easy2Handle, Multi};
 use ssl_expiration::SslExpiration;
 use curl::easy::{Easy2, Handler, WriteError};
 use std::io::{Error, ErrorKind};
+use std::time::Duration;
 
 use crate::configuration::*;
 use crate::utilities::*;
@@ -9,6 +11,18 @@ use crate::checks::page::*;
 use crate::checks::domain::*;
 use crate::products::expected::*;
 use crate::products::unexpected::*;
+
+
+/// Collects async content from Curl:
+struct Collector(Vec<u8>);
+
+
+impl Handler for Collector {
+    fn write(&mut self, data: &[u8]) -> Result<usize, WriteError> {
+        self.0.extend_from_slice(data);
+        Ok(data.len())
+    }
+}
 
 
 /// NOTE: Pigeon (previous implementation) supported list of checks per file. TravMole will require each JSON to be separate file.
