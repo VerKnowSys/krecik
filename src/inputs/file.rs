@@ -104,7 +104,7 @@ impl Checks<FileCheck> for FileCheck {
                                                 }
                                             })
                                             .unwrap_or_else(|_| {
-                                                error!("Internal/ Protocol error on validating domain: {}!", domain_name);
+                                                error!("Internal OpenSSL/ Protocol error for domain: {}!", domain_name);
                                             });
                                     });
 
