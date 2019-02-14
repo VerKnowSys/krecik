@@ -4,7 +4,6 @@
         {
             "name": "rust-lang.org",
             "expects": [
-                "ValidResolvable",
                 {
                     "ValidExpiryPeriod": 14
                 }
@@ -13,7 +12,61 @@
     ],
     "pages": [
         {
-            "url": "http://rust-lang.org/",
+            "url": "http://centra.com/",
+            "expects": [
+                {
+                    "ValidCode": 200
+                },
+                {
+                    "ValidContent": "Centra"
+                },
+                {
+                    "ValidContent": "<title"
+                },
+                {
+                    "ValidAddress": "https://centra.com/"
+                }
+            ],
+            "options": {
+                "cookies": null,
+                "headers": null,
+                "data": null,
+                "follow_redirects": true,
+                "method": "GET",
+                "agent": null,
+                "timeout":15,
+                "connection_timeout":30
+            }
+        },
+        {
+            "url": "http://google.com/",
+            "expects": [
+                {
+                    "ValidCode": 200
+                },
+                {
+                    "ValidContent": "google"
+                },
+                {
+                    "ValidContent": "<title"
+                },
+                {
+                    "ValidAddress": "https://google.com/"
+                }
+            ],
+            "options": {
+                "cookies": null,
+                "headers": null,
+                "data": null,
+                "follow_redirects": true,
+                "method": "GET",
+                "agent": null,
+                "timeout":15,
+                "connection_timeout":30
+            }
+        },
+        {
+            "url": "https://rust-lang.org/",
             "expects": [
                 {
                     "ValidCode": 200
@@ -23,9 +76,6 @@
                 },
                 {
                     "ValidContent": "<title"
-                },
-                {
-                    "ValidAddress": "https://rust-lang.org/"
                 }
             ],
             "options": {
