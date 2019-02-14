@@ -170,8 +170,9 @@ impl Checks<FileCheck> for FileCheck {
                                             };
                                             the_code != &0u32
                                         })
-                                        .unwrap();
+                                        .unwrap_or_else(|| &PageExpectation::ValidCode(0)); // code 0 means connection error - we may want to check if page just fails
 
+                                    let empty_content = PageExpectation::ValidContent("".to_string());
                                     let expected_content = expectations
                                         .iter()
                                         .find(|exp| {
@@ -181,19 +182,15 @@ impl Checks<FileCheck> for FileCheck {
                                             };
                                             the_content != ""
                                         })
-                                        .unwrap();
+                                        .unwrap_or_else(|| &empty_content);
 
                                     let raw_page_content = String::from_utf8_lossy(&handle.0);
                                     match expected_content {
                                         &PageExpectation::ValidContent(ref content) => {
-                                            if content != "" {
-                                                if raw_page_content.contains(content) {
-                                                    info!("Got expected content: {} from URL: {}", content, page_url);
-                                                } else {
-                                                    error!("Failed to find content: {} from URL: {}", content, page_url);
-                                                }
+                                            if raw_page_content.contains(content) {
+                                                info!("Got expected content: '{}' from URL: '{}'", content, page_url);
                                             } else {
-                                                debug!("Skipped page content expectation for URL: {}", page_url);
+                                                error!("Failed to find content: '{}' from URL: '{}'", content, page_url);
                                             }
                                         },
 
