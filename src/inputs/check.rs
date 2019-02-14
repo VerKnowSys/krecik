@@ -12,4 +12,10 @@ pub trait Checks<T> {
     /// Execute loaded checks
     fn execute(&self) -> Result<(), History>;
 
+    /// Check domains
+    fn check_domains(&self) -> Result<(), History>;
+
+    /// Check pages
+    fn check_pages(&self) -> Result<(), History>;
+
 }

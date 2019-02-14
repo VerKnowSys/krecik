@@ -65,7 +65,7 @@ impl Checks<FileCheck> for FileCheck {
     }
 
 
-    fn execute(&self) -> Result<(), History> {
+    fn check_domains(&self) -> Result<(), History> {
         match &self.domains {
             Some(domains) => {
                 domains
@@ -120,6 +120,11 @@ impl Checks<FileCheck> for FileCheck {
             }
         }
 
+        Ok(())
+    }
+
+
+    fn check_pages(&self) -> Result<(), History> {
         match &self.pages {
             Some(pages) => {
                 pages
@@ -237,5 +242,11 @@ impl Checks<FileCheck> for FileCheck {
         Ok(())
     }
 
+
+    fn execute(&self) -> Result<(), History> {
+        self
+            .check_pages()
+            .and_then(|_| self.check_domains())
+    }
 
 }
