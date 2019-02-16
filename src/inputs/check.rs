@@ -145,13 +145,17 @@ pub trait Checks<T> {
 
                         // Setup Curl configuration based on given options
                         match curl_options.method {
-                            Some(Method::PUT) => {
-                                debug!("Curl method: PUT");
-                                curl.put(true).unwrap();
-                            },
-                            Some(Method::POST) => {
-                                debug!("Curl method: POST");
-                                curl.post(true).unwrap();
+                            Some(Method::PUT) | Some(Method::POST) => {
+                                debug!("Curl method: PUT / POST");
+                                let post_data = curl_options
+                                                    .post_data
+                                                    .unwrap_or_default();
+                                curl
+                                    .post(true)
+                                    .unwrap();
+                                curl
+                                    .post_field_size(post_data.len() as u64)
+                                    .unwrap();
                             },
 
                             // fallbacks to GET
