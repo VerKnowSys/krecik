@@ -220,6 +220,44 @@ pub trait Checks<T> {
                                 debug!("Skipping validation of match for empty content!");
                             }
                         },
+                        _ => {
+                            let other_msg = "Expected content: Other case".to_string();
+                            debug!("{}", other_msg);
+                            history = history.append(Story::new(Some(other_msg)))
+                        },
+                    }
+
+                    let expected_content_length = expectations
+                        .iter()
+                        .find(|exp| {
+                            let the_content = match exp {
+                                PageExpectation::ValidLength(length) => length,
+                                _ => &0usize,
+                            };
+                            the_content != &0usize
+                        })
+                        .unwrap_or_else(|| &PageExpectation::ValidLength(0usize));
+
+                    match expected_content_length {
+                        &PageExpectation::ValidLength(0) => {
+                            let err_msg = format!("Got Unexpected zero-length content for URL: '{}'. ValidLength(0) will be ignored.", page_url);
+                            warn!("{}", err_msg);
+                            // history = history.append(Story::new_error(Some(Unexpected::FailedContent(err_msg))));
+                        },
+
+                        &PageExpectation::ValidLength(ref requested_length) => {
+                            if &raw_page_content.len() >= requested_length {
+                                let ok_msg = format!("Expected content length is at least: '{}' bytes long for URL: '{}'",
+                                                     requested_length, page_url);
+                                info!("{}", ok_msg);
+                                history = history.append(Story::new(Some(ok_msg)))
+                            } else {
+                                let err_msg = format!("Unexpected content length, requested to be at least: '{}' bytes long, yet got: '{}' bytes instead for URL: '{}'",
+                                                      requested_length, raw_page_content.len(), page_url);
+                                error!("{}", err_msg);
+                                history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                            }
+                        },
 
                         _ => {
                             let other_msg = "Expected content length: Other case".to_string();
