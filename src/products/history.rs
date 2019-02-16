@@ -90,7 +90,20 @@ impl History {
 
     /// Append Story to History
     pub fn append(&self, story: Story) -> History {
-        History([self.0.clone(), vec!(story)].concat())
+        match self.0.iter().find(|elem| elem.message == story.message) {
+            Some(found) => {
+                let count = found.count + 1;
+                let a_story = Story {
+                    count: count,
+                    .. found.clone()
+                };
+                History([self.0.clone(), vec!(a_story)].concat())
+            },
+
+            None => {
+                History([self.0.clone(), vec!(story)].concat())
+            },
+        }
     }
 
 
