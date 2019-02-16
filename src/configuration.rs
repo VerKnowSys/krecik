@@ -30,3 +30,5 @@ pub const CHECK_MAX_CONNECTIONS: u32 = 10;
 /// Check max redirections
 pub const CHECK_MAX_REDIRECTIONS: u32 = 10;
 
+/// Minimum SSL certificate validity in days
+pub const CHECK_SSL_DAYS_EXPIRATION: i32 = 14;
