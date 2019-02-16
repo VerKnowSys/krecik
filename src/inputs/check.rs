@@ -1,6 +1,6 @@
 use curl::multi::{Easy2Handle, Multi};
 use ssl_expiration::SslExpiration;
-use curl::easy::{Easy2, Handler, WriteError};
+use curl::easy::{Easy2, List, Handler, WriteError};
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 
@@ -160,6 +160,23 @@ pub trait Checks<T> {
                                 curl.get(true).unwrap();
                             },
                         };
+
+                        //
+                        // Build List of HTTP headers
+                        //
+                        // ex. header:
+                        //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
+                        let mut list = List::new();
+                        for header in curl_options
+                                        .headers
+                                        .unwrap_or_default() {
+                            list
+                                .append(&header.to_owned())
+                                .unwrap();
+                        }
+                        curl
+                            .http_headers(list)
+                            .unwrap();
 
                         // Set connection and request timeout with default fallback to 30s for each
                         curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
