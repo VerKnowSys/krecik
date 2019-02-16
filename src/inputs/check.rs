@@ -119,6 +119,7 @@ pub trait Checks<T> {
                         // Initialize Curl, set URL
                         let mut curl = Easy2::new(Collector(Vec::new()));
                         curl.url(&page_url).unwrap();
+                        debug!("Curl URL: {}", page_url);
 
                         // Load Curl request options from check:
                         let curl_options = page_check.clone().options.unwrap_or_default();
@@ -135,12 +136,20 @@ pub trait Checks<T> {
 
                         // Setup Curl configuration based on given options
                         match curl_options.method {
-                            Some(Method::PUT) => curl.put(true).unwrap(),
-                            Some(Method::POST) => curl.post(true).unwrap(),
+                            Some(Method::PUT) => {
+                                debug!("Curl method: PUT");
+                                curl.put(true).unwrap();
+                            },
+                            Some(Method::POST) => {
+                                debug!("Curl method: POST");
+                                curl.post(true).unwrap();
+                            },
 
                             // fallbacks to GET
-                            Some(_) => curl.get(true).unwrap(),
-                            None => curl.get(true).unwrap(),
+                            Some(_) | None => {
+                                debug!("Curl method: GET");
+                                curl.get(true).unwrap();
+                            },
                         };
 
                         // Set connection and request timeout with default fallback to 30s for each
