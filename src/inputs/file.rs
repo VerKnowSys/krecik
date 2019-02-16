@@ -58,9 +58,6 @@ impl Checks<FileCheck> for FileCheck {
         let mut history = History::empty();
 
         let page_check = FileCheck::check_pages(self.pages.clone())
-            .and_then(|page_check| {
-                Ok(page_check)
-            })
             .unwrap_or_else(|_| {
                 warn!("No pages to check!");
                 History::empty()
@@ -68,11 +65,8 @@ impl Checks<FileCheck> for FileCheck {
         history = history.merge(page_check);
 
         let domain_check = FileCheck::check_domains(self.domains.clone())
-            .and_then(|domain_check| {
-                Ok(domain_check)
-            })
             .unwrap_or_else(|_| {
-                debug!("No domains to check");
+                debug!("No domains to check!");
                 History::empty()
             });
         history = history.merge(domain_check);
