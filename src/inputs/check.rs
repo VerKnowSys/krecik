@@ -150,8 +150,8 @@ pub trait Checks<T> {
                         };
 
                         // Set connection and request timeout with default fallback to 30s for each
-                        curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| 30))).unwrap();
-                        curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| 30))).unwrap();
+                        curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
+                        curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT))).unwrap();
 
                         // Verify SSL peer and host by default:
                         curl.ssl_verify_peer(true).unwrap();
