@@ -125,6 +125,7 @@ pub trait Checks<T> {
 
                         // Load Curl request options from check:
                         let curl_options = page_check.clone().options.unwrap_or_default();
+                        debug!("Curl options: {:?}", curl_options);
 
                         // Setup Curl configuration based on given options
                         if curl_options.follow_redirects.unwrap_or_default() {

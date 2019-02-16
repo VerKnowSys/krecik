@@ -1,0 +1,17 @@
+{
+    "name": "Testcheck3",
+    "pages": [
+        {
+            "url": "http://centra.com/",
+            "expects": [
+                {
+                    "ValidCode": 301
+                }
+            ],
+            "options": {
+                "follow_redirects": false,
+                "method": "GET"
+            }
+        }
+    ]
+}

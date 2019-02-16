@@ -12,7 +12,7 @@ use crate::products::history::*;
 
 /// Execute all checks
 pub fn handler_check_execute_all(state: State) -> (State, History) {
-    let check = FileCheck::load("tests/test1").unwrap();
+    let check = FileCheck::load("tests/test2").unwrap();
     let history = check.execute().unwrap();
     (state, history)
 }

@@ -230,4 +230,16 @@ mod tests {
         assert!(first.message.clone().unwrap_or_default().contains("Got expected "));
     }
 
+
+    #[test]
+    fn test_redirect_no_follow() {
+        let check = FileCheck::load("tests/test3").unwrap();
+        let history = check.execute().unwrap();
+        assert!(history.length() == 2);
+        let first = history.head();
+        assert!(first.count == 1);
+        assert!(first.timestamp > 1550287754);
+    }
+
+
 }
