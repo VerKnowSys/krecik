@@ -211,8 +211,8 @@ pub trait Checks<T> {
                         },
 
                         &PageExpectation::ValidContent(ref content) if content.is_empty() => {
-                            let warn_msg = format!("Validation of an empty content from URL: '{}'", page_url);
-                            warn!("{}", warn_msg);
+                            let dbg_msg = format!("Validation of an empty content from URL: '{}'", page_url);
+                            debug!("{}", dbg_msg);
                         },
 
                         edge_case => {
@@ -236,8 +236,8 @@ pub trait Checks<T> {
 
                     match expected_content_length {
                         &PageExpectation::ValidLength(0) => {
-                            let warn_msg = format!("Got Unexpected zero-length content for URL: '{}'. ValidLength(0) will be ignored.", page_url);
-                            warn!("{}", warn_msg);
+                            let dbg_msg = format!("Got Unexpected zero-length content for URL: '{}'. ValidLength(0) will be ignored.", page_url);
+                            debug!("{}", dbg_msg);
                         },
 
                         &PageExpectation::ValidLength(ref requested_length) => {
