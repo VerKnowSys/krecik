@@ -1,0 +1,26 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-11-22-0129-1542846591
+
+
+. bin/common "${*}"
+
+
+if [ -z "${_cargo_release_flag}" ]; then
+
+    echo "Development mode"
+    bin/build dev \
+        && \
+        RUST_BACKTRACE=1 \
+        DEBUG=1 \
+            target/debug/travmole
+
+else
+
+    echo "Release mode"
+    bin/build \
+        && \
+        RUST_BACKTRACE=1 \
+            target/debug/travmole
+
+fi
