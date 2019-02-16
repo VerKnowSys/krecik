@@ -56,9 +56,10 @@ pub trait Checks<T> {
                             error!("{}", err_msg);
                             Err(err_msg.into())
                          } else {
-                            debug!("Requested domain: {} to be valid for: {} days. Domain will remain valid for {} days.",
-                                    domain_name, days, ssl_validator.days());
-                            Ok(Story::new(Some(format!("SSL for domain: {} is valid for {} days", domain_name, ssl_validator.days()))))
+                            let info_msg = format!("TLS certificate for domain: {} will be valid for: {} days. Check requested minimum: {} days.",
+                                                    domain_name, ssl_validator.days(), days);
+                            info!("{}", info_msg);
+                            Ok(Story::new(Some(info_msg)))
                          }
                      }
                  }
