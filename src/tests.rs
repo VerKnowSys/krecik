@@ -210,7 +210,7 @@ mod tests {
     fn test_domain_check_history_length() {
         let check = FileCheck::load("tests/test1").unwrap();
         let history = FileCheck::check_domains(check.domains).unwrap();
-        println!("HISTORY(of length: {}): {:#?}", history.length(), history);
+        println!("DOMAIN-HISTORY(of length: {}): {:#?}", history.length(), history);
         assert!(history.length() > 0);
         assert!(history.length() == 1);
 
@@ -218,7 +218,7 @@ mod tests {
         assert!(first.count == 1);
         assert!(first.timestamp > 1550287754);
         assert!(first.message.clone().unwrap_or_default().contains("is valid for "));
-        println!("HISTORY_FIRST: {:?}", first);
+        println!("DOMAIN-HISTORY_FIRST: {:?}", first);
     }
 
 
