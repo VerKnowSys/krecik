@@ -18,8 +18,8 @@ pub enum Unexpected {
     FailedDomain (String),
 
     /// Failed to pass page expectation
-    #[fail(display = "Page expectation: {} has failed for page: {}", _1, _0)]
-    FailedPage (String, PageExpectation),
+    #[fail(display = "Page expectation has failed for page: {}", _0)]
+    FailedPage (String),
 
     /// Failed to read/parse JSON
     #[fail(display = "JSON parse failure for: {}", _0)]
