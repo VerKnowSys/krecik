@@ -100,11 +100,6 @@ pub trait Checks<T> {
 
             None => {
                 debug!("Execute: No domains to check.");
-                history = history.append(
-                    Story::new(
-                        Some("No domains to check".to_string())
-                    )
-                );
             }
         };
 
