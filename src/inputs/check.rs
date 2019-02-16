@@ -206,14 +206,18 @@ pub trait Checks<T> {
                     let raw_page_content = String::from_utf8_lossy(&handle.0);
                     match expected_content {
                         &PageExpectation::ValidContent(ref content) => {
-                            if raw_page_content.contains(content) {
-                                let ok_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
-                                info!("{}", ok_msg);
-                                history = history.append(Story::new(Some(ok_msg)))
+                            if content.len() > 0 {
+                                if raw_page_content.contains(content) {
+                                    let ok_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
+                                    info!("{}", ok_msg);
+                                    history = history.append(Story::new(Some(ok_msg)))
+                                } else {
+                                    let err_msg = format!("Failed to find content: '{}' from URL: '{}'", content, page_url);
+                                    error!("{}", err_msg);
+                                    history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                                }
                             } else {
-                                let err_msg = format!("Failed to find content: '{}' from URL: '{}'", content, page_url);
-                                error!("{}", err_msg);
-                                history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                                debug!("Skipping validation of match for empty content!");
                             }
                         },
 

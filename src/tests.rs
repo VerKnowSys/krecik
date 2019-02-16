@@ -223,7 +223,7 @@ mod tests {
     fn test_page_check_history_length() {
         let check = FileCheck::load("tests/test2").unwrap();
         let history = check.execute().unwrap();
-        assert!(history.length() == 2);
+        assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp > 1550287754);
@@ -235,7 +235,7 @@ mod tests {
     fn test_redirect_no_follow() {
         let check = FileCheck::load("tests/test3").unwrap();
         let history = check.execute().unwrap();
-        assert!(history.length() == 2);
+        assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp > 1550287754);
