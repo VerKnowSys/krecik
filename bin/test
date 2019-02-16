@@ -28,25 +28,25 @@ fi
 
 
 _tests_count=6
-_maybe_server_in_background="\
-    $(ps xd 2>/dev/null \
+_maybe_server_in_background="$(ps xd 2>/dev/null \
     | grep -Ev 'egrep|awk|grep|tail|cat|bat' 2>/dev/null \
     | grep -E "${_bin_name}" 2>/dev/null \
-    | cut -d' ' -f1 2>/dev/null)"
+    | awk '{print $1;}' 2>/dev/null \
+    | head -n1 2>/dev/null)"
 
-if [ -n "${_maybe_server_in_background}" ] \
-&& kill -0 "${_maybe_server_in_background}" 2>/dev/null; then
-
-    printf "\n\n%b-WebAPI service is available in background… Spawning additional tests…\n\n" "${_project_name}"
-    if [ ! -x "${_curl_software}/bin/curl" ]; then
-        failure "Curl software bundle is not installed yet. To install Curl_lib bundle do:  \`s i Curl_lib\` then retry this process."
+if [ -n "${_maybe_server_in_background}" ]; then
+    kill -0 "${_maybe_server_in_background}"
+    if [ "0" = "${?}" ]; then
+        printf "\n\n%b-WebAPI service is available in background… Spawning additional tests…\n\n" "${_project_name}"
+        if [ ! -x "${_curl_software}/bin/curl" ]; then
+            failure "Curl software bundle is not installed yet. To install Curl_lib bundle do:  \`s i Curl_lib\` then retry this process."
+        fi
+        for _tst in $(seq 1 ${_tests_count}); do
+            printf "Spawning test: #%b / %b\n" "${_tst}" "${_tests_count}"
+            "${_curl_software}/bin/curl" "http://${_travmole_webapi_endpoint}/check/execute/test${_tst}" 2>> "${_travmole_logfile}" | jq '.'
+            printf "Test #%b completed.\n\n" "${_tst}"
+        done
+    else
+        printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
     fi
-    for _tst in $(seq 1 ${_tests_count}); do
-        printf "Spawning test: #%b of: %b.\n" "${_tst}" "${_tests_count}"
-        eval "${_curl_software}/bin/curl http://${_travmole_webapi_endpoint}/check/execute/test${_tst} 2>> ${_travmole_logfile}" | jq '.'
-        printf "Done: test${_tst}\n\n"
-    done
-
-else
-    printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
 fi
