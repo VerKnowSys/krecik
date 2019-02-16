@@ -222,7 +222,7 @@ mod tests {
     #[test]
     fn test_page_check_history_length() {
         let check = FileCheck::load("tests/test2").unwrap();
-        let history = check.execute().unwrap();
+        let history = check.execute();
         println!("TEST2: {:#?}", history);
         assert!(history.length() == 1);
         let first = history.head();
@@ -235,7 +235,7 @@ mod tests {
     #[test]
     fn test_redirect_no_follow() {
         let check = FileCheck::load("tests/test3").unwrap();
-        let history = check.execute().unwrap();
+        let history = check.execute();
         println!("TEST3: {:#?}", history);
         assert!(history.length() == 1);
         let first = history.head();
@@ -247,7 +247,7 @@ mod tests {
     #[test]
     fn test_gibberish_url_check() {
         let check = FileCheck::load("tests/test4").unwrap();
-        let history = check.execute().unwrap();
+        let history = check.execute();
         println!("TEST4: {:#?}", history);
         assert!(history.length() == 1);
         let first = history.head();
@@ -259,7 +259,7 @@ mod tests {
     #[test]
     fn test_page_content_length_check() {
         let check = FileCheck::load("tests/test5").unwrap();
-        let history = check.execute().unwrap();
+        let history = check.execute();
         println!("TEST5: {:#?}", history);
         assert!(history.length() == 2);
         let first = history.head();

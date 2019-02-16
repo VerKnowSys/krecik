@@ -54,7 +54,7 @@ impl Checks<FileCheck> for FileCheck {
     }
 
 
-    fn execute(&self) -> Result<History, History> {
+    fn execute(&self) -> History {
         let mut history = History::empty();
 
         let page_check = FileCheck::check_pages(self.pages.clone())
@@ -70,8 +70,7 @@ impl Checks<FileCheck> for FileCheck {
                 History::empty()
             });
         history = history.merge(domain_check);
-
-        Ok(history)
+        history
     }
 
 

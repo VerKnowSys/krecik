@@ -24,9 +24,7 @@ pub fn handler_check_execute_all(state: State) -> (State, History) {
     info!("Loading check from path: {}", &check_path);
     let history = FileCheck::load(&check_path)
         .and_then(|check| {
-            Ok(check
-                .execute()
-                .unwrap())
+            Ok(check.execute())
         })
         .unwrap_or_else(|_| {
             error!("Failed to load check from file: '{}.json'", check_path);
