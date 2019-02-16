@@ -124,17 +124,45 @@ pub trait Checks<T> {
                 let handlers: Vec<_> = page_expectations
                     .iter()
                     .map(|page_expectation| {
+                        // Initialize Curl, set URL
                         let mut curl = Easy2::new(Collector(Vec::new()));
-                        // todo: use options field to set wanted options, leaving default for now:
                         curl.url(&page_url).unwrap();
-                        curl.get(true).unwrap();
-                        curl.follow_location(true).unwrap();
+
+                        // Load Curl request options from check:
+                        let curl_options = page_check.clone().options.unwrap_or_default();
+
+                        // Setup Curl configuration based on given options
+                        if curl_options.follow_redirects.unwrap_or_default() {
+                            curl.follow_location(true).unwrap();
+                        } else {
+                            curl.follow_location(false).unwrap();
+                        }
+
+                        // Setup Curl configuration based on given options
+                        let http_method = match curl_options.method {
+                            Some(Method::PUT) => curl.put(true).unwrap(),
+                            Some(Method::GET) => curl.get(true).unwrap(),
+                            Some(Method::POST) => curl.post(true).unwrap(),
+
+                            // fallbacks to GET
+                            Some(_) => curl.get(true).unwrap(),
+                            None => curl.get(true).unwrap(),
+                        };
+
+                        // Set connection and request timeout with default fallback to 30s for each
+                        curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| 30))).unwrap();
+                        curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| 30))).unwrap();
+
+                        // Verify SSL peer and host by default:
                         curl.ssl_verify_peer(true).unwrap();
                         curl.ssl_verify_host(true).unwrap();
-                        curl.connect_timeout(Duration::from_secs(30)).unwrap();
-                        curl.timeout(Duration::from_secs(30)).unwrap();
+
+                        // Max connections is 10 per check
                         curl.max_connects(10).unwrap();
+
+                        // Max reconnections is 10 per check
                         curl.max_redirections(10).unwrap();
+
                         multi.add2(curl)
                     })
                     .collect();
