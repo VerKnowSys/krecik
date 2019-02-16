@@ -225,7 +225,10 @@ pub trait Checks<T> {
                 }
                 Some(history)
             })
-            .unwrap()
+            .unwrap_or_else(|| {
+                debug!("Faillback to empty history");
+                History::empty()
+            })
     }
 
 
