@@ -1,0 +1,13 @@
+{
+    "name": "Testcheck5",
+    "pages": [
+        {
+            "url": "https://centra.com/",
+            "expects": [
+                {
+                    "ValidLength": 17674
+                }
+            ]
+        }
+    ]
+}

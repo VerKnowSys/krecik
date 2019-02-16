@@ -252,4 +252,15 @@ mod tests {
         assert!(first.timestamp > 1550287754);
     }
 
+
+    #[test]
+    fn test_page_content_length_check() {
+        let check = FileCheck::load("tests/test5").unwrap();
+        let history = check.execute().unwrap();
+        assert!(history.length() == 1);
+        let first = history.head();
+        assert!(first.count == 1);
+        assert!(first.timestamp > 1550287754);
+    }
+
 }
