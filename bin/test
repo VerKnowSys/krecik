@@ -34,17 +34,19 @@ _maybe_server_in_background="\
     | grep -E "${_bin_name}" 2>/dev/null \
     | cut -d' ' -f1 2>/dev/null)"
 
-if kill -0 "${_maybe_server_in_background}"; then
-    printf "${_project_name}-WebAPI services available in background… Spawning additional tests…"
+if [ -n "${_maybe_server_in_background}" ] \
+&& kill -0 "${_maybe_server_in_background}" 2>/dev/null; then
 
+    printf "\n\n%b-WebAPI service is available in background… Spawning additional tests…\n\n" "${_project_name}"
     if [ ! -x "${_curl_software}/bin/curl" ]; then
         failure "Curl software bundle is not installed yet. To install Curl_lib bundle do:  \`s i Curl_lib\` then retry this process."
     fi
-
     for _tst in $(seq 1 ${_tests_count}); do
-        printf "Running test: #%b of: %b.\n" "${_tst}" "${_tests_count}"
-        eval "${_curl_software}/bin/curl http://${_travmole_webapi_endpoint}/check/execute/test${_tst}"
-        printf "Finished task: test${_tst}\n\n"
+        printf "Spawning test: #%b of: %b.\n" "${_tst}" "${_tests_count}"
+        eval "${_curl_software}/bin/curl http://${_travmole_webapi_endpoint}/check/execute/test${_tst} 2>> ${_travmole_logfile}" | jq '.'
+        printf "Done: test${_tst}\n\n"
     done
 
+else
+    printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
 fi

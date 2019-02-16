@@ -65,7 +65,7 @@ pub trait Checks<T> {
                  }
              })
              .unwrap_or_else(|err| {
-                let error_msg = format!("Internal OpenSSL/ Protocol error for domain: {}! Error details: {:#?}", domain_name, err.0);
+                let error_msg = format!("Internal OpenSSL/ Protocol error for domain: {}! Error details: {:?}", domain_name, err.0);
                 error!("{}", error_msg);
                 Story::new_error(Some(Unexpected::FailedInternal(error_msg)))
              })
