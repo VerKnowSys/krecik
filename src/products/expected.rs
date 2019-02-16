@@ -15,13 +15,9 @@ pub enum PageExpectation {
     #[fail(display = "Passed ValidContent: '{}'", _0)]
     ValidContent (String),
 
-    /// Valid address regex match
-    #[fail(display = "Passed ValidAddress: '{}'", _0)]
-    ValidAddress (String),
-
     /// Valid content length
     #[fail(display = "Passed ValidLength: '{}'", _0)]
-    ValidLength (i64),
+    ValidLength (usize),
 
 }
 
