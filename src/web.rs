@@ -17,7 +17,7 @@ use crate::products::history::*;
 
 
 /// Execute all checks
-pub fn handler_check_execute_all(state: State) -> (State, History) {
+pub fn handler_check_execute_by_name(state: State) -> (State, History) {
     let uri = Uri::borrow_from(&state).to_string();
     let name = uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, "");
     let check_path = format!("tests/{}", &name);
@@ -46,7 +46,7 @@ pub fn router() -> Router {
                 &format!("{}:name", CHECK_API_EXECUTE_REQUEST_PATH), |handler| {
                     handler
                         .get()
-                        .to(handler_check_execute_all);
+                        .to(handler_check_execute_by_name);
                 }
             );
 
