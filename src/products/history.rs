@@ -12,16 +12,16 @@ use crate::products::unexpected::*;
 pub struct Story {
 
     /// Story - timestamp
-    timestamp: i64,
+    pub timestamp: i64,
 
     /// Story - failure count
-    count: u64,
+    pub count: u64,
 
     /// Story - message
-    message: Option<String>,
+    pub message: Option<String>,
 
     /// Story - keep history of unexpected results
-    error: Option<Unexpected>,
+    pub error: Option<Unexpected>,
 
 }
 
