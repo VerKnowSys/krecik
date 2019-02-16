@@ -54,7 +54,7 @@ impl Checks<FileCheck> for FileCheck {
     }
 
 
-    fn execute(&self) -> Result<(), History> {
+    fn execute(&self) -> Result<History, History> {
         FileCheck::check_pages(self.pages.clone())
             .and_then(|_| FileCheck::check_domains(self.domains.clone()))
     }

@@ -1,5 +1,3 @@
-use crate::checks::page::Pages;
-use crate::checks::domain::Domains;
 use curl::multi::{Easy2Handle, Multi};
 use ssl_expiration::SslExpiration;
 use curl::easy::{Easy2, Handler, WriteError};
@@ -30,15 +28,55 @@ impl Handler for Collector {
 /// Checks trait
 pub trait Checks<T> {
 
+
     /// Load check from any source
     fn load(name: &str) -> Result<T, Error>;
 
+
     /// Execute loaded checks
-    fn execute(&self) -> Result<(), History>;
+    fn execute(&self) -> Result<History, History>;
+
+
+    /// Check SSL certificate expiration using OpenSSL function
+    fn check_ssl_expire(domain_name: &str, domain_expectation: &DomainExpectation) -> Story {
+         SslExpiration::from_domain_name(&domain_name)
+             .and_then(|ssl_validator| {
+                 match domain_expectation {
+                     DomainExpectation::ValidExpiryPeriod(days) => {
+                         debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name);
+                         if &ssl_validator.days() < &days
+                         || ssl_validator.is_expired() {
+                             error!("Expired domain: {}.", domain_name);
+                             Err(format!("Expired domain: {}.", domain_name).into())
+                         } else {
+                             debug!("Requested domain: {} to be valid for: {} days. Domain will remain valid for {} days.",
+                                    domain_name, days, ssl_validator.days());
+                             Ok(Story::new(Some(format!("SSL for domain: {} is valid for {} days", domain_name, ssl_validator.days()))))
+                         }
+                     },
+
+                     _ => {
+                         debug!("Validating expectation: ValidResolvable for domain: {}", domain_name);
+                         if ssl_validator.is_expired() {
+                             error!("Expired domain: {}.", domain_name);
+                             Err(format!("Expired domain: {}.", domain_name).into())
+                         } else {
+                             Ok(Story::new(Some(format!("Domain: {} validation successful", domain_name))))
+                         }
+                     }
+                 }
+             })
+             .unwrap_or_else(|_| {
+                let error_msg = format!("Internal OpenSSL/ Protocol error for domain: {}!", domain_name);
+                error!("{}", error_msg);
+                Story::new_error(Some(Unexpected::FailedInternal(error_msg)))
+             })
+    }
 
 
     /// Check domains
-    fn check_domains(domains: Option<Domains>) -> Result<(), History> {
+    fn check_domains(domains: Option<Domains>) -> Result<History, History> {
+        let mut history = History::empty();
         match domains {
             Some(domains) => {
                 domains
@@ -52,48 +90,28 @@ pub trait Checks<T> {
                                 domain_expectations
                                     .iter()
                                     .for_each(|domain_expectation| {
-                                        SslExpiration::from_domain_name(&domain_name)
-                                            .and_then(|ssl_validator| {
-                                                match domain_expectation {
-                                                    DomainExpectation::ValidExpiryPeriod(days) => {
-                                                        debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name);
-                                                        if &ssl_validator.days() < days
-                                                        || ssl_validator.is_expired() {
-                                                            error!("Expired domain: {}.", domain_name);
-                                                        } else {
-                                                            debug!("Requested domain: {} to be valid for: {} days. Domain will remain valid for {} days.",
-                                                                   domain_name, days, ssl_validator.days());
-                                                        }
-                                                        Ok(())
-                                                    },
-
-                                                    _ => {
-                                                        debug!("Validating expectation: ValidResolvable for domain: {}", domain_name);
-                                                        if ssl_validator.is_expired() {
-                                                            error!("Expired domain: {}.", domain_name);
-                                                        }
-                                                        Ok(())
-                                                    }
-                                                }
-                                            })
-                                            .unwrap_or_else(|err| {
-                                                error!("Internal OpenSSL/ Protocol error for domain: {}! Details: {:?}", domain_name, err);
-                                            });
+                                        history = history.append(Self::check_ssl_expire(&domain_name, &domain_expectation));
                                     });
 
                                 Some(())
-                            })
-                            .unwrap_or_default();
+                            });
                         }
-                    )
+                    );
+
+                Ok(history)
             },
 
             None => {
                 debug!("Execute: No domains to check.");
+                Ok(
+                    history.append(
+                        Story::new(
+                            Some("No domains to check".to_string())
+                        )
+                    )
+                )
             }
         }
-
-        Ok(())
     }
 
 
