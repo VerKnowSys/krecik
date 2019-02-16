@@ -50,6 +50,9 @@ pub struct PageOptions {
     /// HTTP connection timeout in seconds
     pub connection_timeout: Option<u64>,
 
+    /// HTTP connection timeout in seconds
+    pub verbose: Option<bool>,
+
 }
 
 
@@ -64,6 +67,7 @@ impl Default for PageOptions {
             method: Some(Method::default()),
             timeout: Some(CHECK_TIMEOUT),
             connection_timeout: Some(CHECK_CONNECTION_TIMEOUT),
+            verbose: None,
         }
     }
 }

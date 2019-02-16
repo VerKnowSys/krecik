@@ -127,12 +127,18 @@ pub trait Checks<T> {
                         debug!("Curl options: {:#?}", curl_options);
 
                         // Setup Curl configuration based on given options
-                        if curl_options.follow_redirects.unwrap_or_default() {
+                        if curl_options.follow_redirects.unwrap_or_else(|| true) {
                             debug!("Following 30x");
                             curl.follow_location(true).unwrap();
                         } else {
                             debug!("NOT Following 30x");
                             curl.follow_location(false).unwrap();
+                        }
+
+                        if curl_options.verbose.unwrap_or_else(|| false) {
+                            debug!("Enabling Verbose and CertInfo mode.");
+                            curl.verbose(true).unwrap();
+                            curl.certinfo(true).unwrap();
                         }
 
                         // Setup Curl configuration based on given options
