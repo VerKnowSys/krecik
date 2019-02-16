@@ -53,7 +53,7 @@ mod tests {
         // easy.verbose(true).unwrap();
         easy.url("https://www.rust-lang.org/").unwrap();
         easy.perform().unwrap();
-        assert_eq!(easy.response_code().unwrap(), 200);
+        assert_eq!(easy.response_code().unwrap(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
@@ -121,11 +121,11 @@ mod tests {
         assert!(raw_page.len() == 0);
 
         let mut handler1after = multi.remove2(easy1handle).unwrap();
-        assert!(handler1after.response_code().unwrap() == 200);
+        assert!(handler1after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         assert!(handler1after.download_size().unwrap() > 0f64);
 
         let mut handler2after = multi.remove2(easy2handle).unwrap();
-        assert!(handler2after.response_code().unwrap() == 200);
+        assert!(handler2after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         assert!(handler2after.download_size().unwrap() > 0f64);
 
         let mut handler3after = multi.remove2(easy3handle).unwrap();
@@ -163,7 +163,7 @@ mod tests {
         println!("TIMINGS: Connect time: {:?}, Name lookup time: {:?}, Redirect time: {:?}, Total time: {:?}",
                  easy.connect_time().unwrap(), easy.namelookup_time().unwrap(), easy.redirect_time().unwrap(), easy.total_time().unwrap());
 
-        assert_eq!(easy.response_code().unwrap(), 200);
+        assert_eq!(easy.response_code().unwrap(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
@@ -186,7 +186,7 @@ mod tests {
             pages: Some(vec!(
                 Page {
                     url: "http://rust-lang.org/".to_string(),
-                    expects: Some(vec!(PageExpectation::ValidCode(200))),
+                    expects: Some(vec!(PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE))),
                     options: Some(PageOptions::default())
                 }
             )),
