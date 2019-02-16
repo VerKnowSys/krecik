@@ -128,8 +128,10 @@ pub trait Checks<T> {
 
                         // Setup Curl configuration based on given options
                         if curl_options.follow_redirects.unwrap_or_default() {
+                            debug!("Following 30x");
                             curl.follow_location(true).unwrap();
                         } else {
+                            debug!("NOT Following 30x");
                             curl.follow_location(false).unwrap();
                         }
 
