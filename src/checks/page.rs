@@ -10,9 +10,11 @@ pub struct Page {
     pub url: String,
 
     /// Page expectations
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expects: Option<PageExpectations>,
 
     /// Curl options
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<PageOptions>,
 
 }
@@ -27,36 +29,47 @@ pub type Pages = Vec<Page>;
 pub struct PageOptions {
 
     /// HTTP cookies
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cookies: Option<Vec<String>>,
 
     /// HTTP headers
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<Vec<String>>,
 
     /// HTTP data (body)
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<Vec<String>>,
 
     /// HTTP follow 301/302 redirects
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub follow_redirects: Option<bool>,
 
     /// HTTP method used
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<Method>,
 
     /// HTTP agent name
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub agent: Option<String>,
 
     /// HTTP check timeout in seconds
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout: Option<u64>,
 
     /// HTTP connection timeout in seconds
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub connection_timeout: Option<u64>,
 
     /// HTTP connection timeout in seconds
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub verbose: Option<bool>,
 
     /// TLS peer verification
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ssl_verify_peer: Option<bool>,
 
     /// TLS host verification
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ssl_verify_host: Option<bool>,
 
 }

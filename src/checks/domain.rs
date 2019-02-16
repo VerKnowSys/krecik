@@ -9,6 +9,7 @@ pub struct Domain {
     pub name: String,
 
     /// Domain expectations
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expects: Option<DomainExpectations>,
 
 }
