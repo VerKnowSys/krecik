@@ -25,3 +25,26 @@ cargo test -- --color always --nocapture
 if [ "0" != "${?}" ]; then
     failure "Test: Library: Failed!"
 fi
+
+
+_tests_count=6
+_maybe_server_in_background="\
+    $(ps xd 2>/dev/null \
+    | grep -Ev 'egrep|awk|grep|tail|cat|bat' 2>/dev/null \
+    | grep -E "${_bin_name}" 2>/dev/null \
+    | cut -d' ' -f1 2>/dev/null)"
+
+if kill -0 "${_maybe_server_in_background}"; then
+    printf "${_project_name}-WebAPI services available in background… Spawning additional tests…"
+
+    if [ ! -x "${_curl_software}/bin/curl" ]; then
+        failure "Curl software bundle is not installed yet. To install Curl_lib bundle do:  \`s i Curl_lib\` then retry this process."
+    fi
+
+    for _tst in $(seq 1 ${_tests_count}); do
+        printf "Running test: #%b of: %b.\n" "${_tst}" "${_tests_count}"
+        eval "${_curl_software}/bin/curl http://${_travmole_webapi_endpoint}/check/execute/test${_tst}"
+        printf "Finished task: test${_tst}\n\n"
+    done
+
+fi
