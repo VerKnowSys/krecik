@@ -16,7 +16,7 @@ _travmole_dest_bin="/usr/bin/${_bin_name}"
 _travmole_logfile="/var/log/travmole.log"
 _travmole_supervisor_pidfile="/var/run/travmole.pid"
 _bin_product_target="target/${_release_type}/${_bin_name}"
-_curl_software="/Software/Curl-lib"
+_curl_software="/Software/Curl_lib"
 
 _cargo_release_flag="--release"
 if [ "release" != "${_release_type}" ]; then
