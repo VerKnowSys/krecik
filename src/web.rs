@@ -19,7 +19,7 @@ use crate::products::history::*;
 /// Execute all checks
 pub fn handler_check_execute_all(state: State) -> (State, History) {
     let uri = Uri::borrow_from(&state).to_string();
-    let name = uri.replace("/json/execute/", "");
+    let name = uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, "");
     let check_path = format!("tests/{}", &name);
     info!("Loading check from path: {}", &check_path);
     let history = FileCheck::load(&check_path)
@@ -43,8 +43,10 @@ pub fn router() -> Router {
     build_simple_router(|route| {
         route
             .associate(
-                &"/json/execute/:name".to_string(), |handler| {
-                    handler.get().to(handler_check_execute_all);
+                &format!("{}:name", CHECK_API_EXECUTE_REQUEST_PATH), |handler| {
+                    handler
+                        .get()
+                        .to(handler_check_execute_all);
                 }
             );
 

@@ -35,3 +35,8 @@ pub const CHECK_SSL_DAYS_EXPIRATION: i32 = 14;
 
 /// Default successful HTTP code: 200
 pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;
+
+
+/// Web-API endpoint
+pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute/";
+
