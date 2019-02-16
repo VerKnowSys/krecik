@@ -139,7 +139,7 @@ pub trait Checks<T> {
                         }
 
                         // Setup Curl configuration based on given options
-                        let http_method = match curl_options.method {
+                        match curl_options.method {
                             Some(Method::PUT) => curl.put(true).unwrap(),
                             Some(Method::GET) => curl.get(true).unwrap(),
                             Some(Method::POST) => curl.post(true).unwrap(),
