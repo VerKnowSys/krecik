@@ -18,9 +18,11 @@ pub struct Story {
     pub count: u64,
 
     /// Story - message
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
 
     /// Story - keep history of unexpected results
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<Unexpected>,
 
 }
