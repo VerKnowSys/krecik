@@ -1,0 +1,10 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-11-22-0129-1542846591
+
+
+. bin/common "${*}"
+
+
+RUST_BACKTRACE=1 \
+    cargo clippy
