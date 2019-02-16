@@ -128,10 +128,10 @@ pub trait Checks<T> {
 
                         // Setup Curl configuration based on given options
                         if curl_options.follow_redirects.unwrap_or_else(|| true) {
-                            debug!("Following 30x");
+                            debug!("Enabled following redirects");
                             curl.follow_location(true).unwrap();
                         } else {
-                            debug!("NOT Following 30x");
+                            debug!("Disabled following redirects");
                             curl.follow_location(false).unwrap();
                         }
 
@@ -139,6 +139,10 @@ pub trait Checks<T> {
                             debug!("Enabling Verbose and CertInfo mode.");
                             curl.verbose(true).unwrap();
                             curl.certinfo(true).unwrap();
+                        } else {
+                            debug!("Disabling Verbose and CertInfo mode.");
+                            curl.verbose(false).unwrap();
+                            curl.certinfo(false).unwrap();
                         }
 
                         // Setup Curl configuration based on given options
