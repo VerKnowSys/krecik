@@ -26,6 +26,7 @@ fi
 # used Shared Libraries
 case "${_uname}" in
     Darwin|FreeBSD)
+        export LD_LIBRARY_PATH="${_curl_software}/lib"
         export OPENSSL_LIB_DIR="${_curl_software}/lib"
         export X86_64_APPLE_DARWIN_OPENSSL_LIB_DIR="${OPENSSL_LIB_DIR}"
         export OPENSSL_INCLUDE_DIR="${_curl_software}/include"
