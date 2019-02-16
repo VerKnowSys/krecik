@@ -265,7 +265,7 @@ pub trait Checks<T> {
                     .for_each(|defined_page| {
                         let page_check = defined_page.clone();
                         let page_url = page_check.url.clone();
-                        history = Self::check_page(&page_url, &page_check);
+                        history = history.merge(Self::check_page(&page_url, &page_check));
                     });
             },
 

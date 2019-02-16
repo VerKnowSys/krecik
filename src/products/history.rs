@@ -93,6 +93,20 @@ impl History {
         History([self.0.clone(), vec!(story)].concat())
     }
 
+
+    /// Merge History with another History
+    pub fn merge(&self, a_history: History) -> History {
+        let mut history = History(self.0.clone());
+        match a_history {
+            History(stories) => {
+                for story in stories {
+                    history = history.append(story);
+                }
+            }
+        }
+        history
+    }
+
 }
 
 
