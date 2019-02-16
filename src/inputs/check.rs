@@ -222,7 +222,7 @@ pub trait Checks<T> {
                         },
 
                         _ => {
-                            let other_msg = "Some other case".to_string();
+                            let other_msg = "Expected content length: Other case".to_string();
                             debug!("{}", other_msg);
                             history = history.append(Story::new(Some(other_msg)))
                         },
@@ -242,7 +242,7 @@ pub trait Checks<T> {
                                 info!("{}", info_msg);
                                 history = history.append(Story::new(Some(info_msg)));
                             } else {
-                                let err_msg = format!("Got Unexpected code: {} from URL: {}", code, page_url);
+                                let err_msg = format!("Got unexpected code: {} from URL: {}", code, page_url);
                                 error!("{}", err_msg);
                                 history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
                             }
@@ -258,7 +258,7 @@ pub trait Checks<T> {
                 Some(history)
             })
             .unwrap_or_else(|| {
-                debug!("Faillback to empty history");
+                debug!("History is empty.");
                 History::empty()
             })
     }
@@ -279,7 +279,7 @@ pub trait Checks<T> {
             },
 
             None => {
-                debug!("Execute: No domains to check.");
+                debug!("Execute: No pages to check.");
             }
         }
 

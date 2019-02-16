@@ -22,9 +22,6 @@
                 },
                 {
                     "ValidContent": "<title"
-                },
-                {
-                    "ValidAddress": "https://centra.com/"
                 }
             ],
             "options": {
@@ -49,9 +46,6 @@
                 },
                 {
                     "ValidContent": "<title"
-                },
-                {
-                    "ValidAddress": "https://google.com/"
                 }
             ]
         },

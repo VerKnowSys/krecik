@@ -1,5 +1,6 @@
 use failure::Error;
 
+use crate::configuration::*;
 use crate::products::unexpected::*;
 
 
