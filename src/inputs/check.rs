@@ -92,26 +92,23 @@ pub trait Checks<T> {
                                     .for_each(|domain_expectation| {
                                         history = history.append(Self::check_ssl_expire(&domain_name, &domain_expectation));
                                     });
-
                                 Some(())
                             });
                         }
                     );
-
-                Ok(history)
             },
 
             None => {
                 debug!("Execute: No domains to check.");
-                Ok(
-                    history.append(
-                        Story::new(
-                            Some("No domains to check".to_string())
-                        )
+                history = history.append(
+                    Story::new(
+                        Some("No domains to check".to_string())
                     )
-                )
+                );
             }
-        }
+        };
+
+        Ok(history)
     }
 
 
