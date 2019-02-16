@@ -136,7 +136,6 @@ pub trait Checks<T> {
                         // Setup Curl configuration based on given options
                         match curl_options.method {
                             Some(Method::PUT) => curl.put(true).unwrap(),
-                            Some(Method::GET) => curl.get(true).unwrap(),
                             Some(Method::POST) => curl.post(true).unwrap(),
 
                             // fallbacks to GET
