@@ -12,7 +12,7 @@ use crate::products::unexpected::*;
 pub struct Story {
 
     /// Story - timestamp
-    pub timestamp: i64,
+    pub timestamp: u64,
 
     /// Story - failure count
     pub count: u64,
@@ -31,9 +31,10 @@ impl Story {
 
     /// New story
     pub fn new(message: Option<String>) -> Story {
+        let local_now = Local::now();
         Story {
             count: 1,
-            timestamp: Local::now().timestamp(),
+            timestamp: local_now.timestamp() as u64 + local_now.timestamp_subsec_millis() as u64 + local_now.timestamp_subsec_micros() as u64,
             message,
             error: None,
         }
@@ -42,9 +43,10 @@ impl Story {
 
     /// New error story
     pub fn new_error(error: Option<Unexpected>) -> Story {
+        let local_now = Local::now();
         Story {
             count: 1,
-            timestamp: Local::now().timestamp(),
+            timestamp: local_now.timestamp() as u64 + local_now.timestamp_subsec_millis() as u64 + local_now.timestamp_subsec_micros() as u64,
             message: None,
             error,
         }
