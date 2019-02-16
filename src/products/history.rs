@@ -7,7 +7,7 @@ use crate::products::expected::*;
 use crate::products::unexpected::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Story holds errornous state
 pub struct Story {
 
@@ -56,7 +56,7 @@ impl Story {
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// History is list of Stories
 pub struct History(Vec<Story>);
 
