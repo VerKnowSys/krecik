@@ -53,6 +53,12 @@ pub struct PageOptions {
     /// HTTP connection timeout in seconds
     pub verbose: Option<bool>,
 
+    /// TLS peer verification
+    pub ssl_verify_peer: Option<bool>,
+
+    /// TLS host verification
+    pub ssl_verify_host: Option<bool>,
+
 }
 
 
@@ -63,6 +69,8 @@ impl Default for PageOptions {
             cookies: None,
             headers: None,
             data: None,
+            ssl_verify_peer: Some(true),
+            ssl_verify_host: Some(true),
             follow_redirects: Some(true),
             method: Some(Method::default()),
             timeout: Some(CHECK_TIMEOUT),

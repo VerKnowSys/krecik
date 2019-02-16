@@ -163,9 +163,23 @@ pub trait Checks<T> {
                         curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
                         curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT))).unwrap();
 
-                        // Verify SSL peer and host by default:
-                        curl.ssl_verify_peer(true).unwrap();
-                        curl.ssl_verify_host(true).unwrap();
+                        // Verify SSL PEER
+                        if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
+                            debug!("Enabled TLS-PEER verification.");
+                            curl.ssl_verify_peer(true).unwrap();
+                        } else {
+                            warn!("Disabled TLS-PEER verification!");
+                            curl.ssl_verify_peer(false).unwrap();
+                        }
+
+                        // Verify SSL HOST
+                        if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
+                            debug!("Enabled TLS-HOST verification.");
+                            curl.ssl_verify_host(true).unwrap();
+                        } else {
+                            warn!("Disabled TLS-HOST verification!");
+                            curl.ssl_verify_host(false).unwrap();
+                        }
 
                         // Max connections is 10 per check
                         curl.max_connects(CHECK_MAX_CONNECTIONS).unwrap();
