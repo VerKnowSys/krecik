@@ -74,6 +74,12 @@ impl History {
     }
 
 
+    /// Head of the History - first element added
+    pub fn head(&self) -> Story {
+        self.0[0].clone()
+    }
+
+
     /// History length
     pub fn length(&self) -> usize {
         self.0.len()
