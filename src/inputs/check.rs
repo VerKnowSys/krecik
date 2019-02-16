@@ -167,6 +167,7 @@ pub trait Checks<T> {
                     multi.wait(&mut [], Duration::from_secs(1)).unwrap();
                 }
 
+                // gather handlers after multicheck is finished, extract results
                 for handler in handlers {
                     let a_handler = handler.unwrap();
                     let handle = a_handler.get_ref();
@@ -175,6 +176,7 @@ pub trait Checks<T> {
                         .expects
                         .unwrap_or_default();
 
+                    // Error code expectation
                     let expected_code = expectations
                         .iter()
                         .find(|exp| {
@@ -186,6 +188,7 @@ pub trait Checks<T> {
                         })
                         .unwrap_or_else(|| &PageExpectation::ValidCode(0)); // code 0 means connection error - we may want to check if page just fails
 
+                    // Content expectation
                     let empty_content = PageExpectation::ValidContent("".to_string());
                     let expected_content = expectations
                         .iter()
