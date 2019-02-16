@@ -75,8 +75,8 @@ pub trait Checks<T> {
                                                     }
                                                 }
                                             })
-                                            .unwrap_or_else(|_| {
-                                                error!("Internal OpenSSL/ Protocol error for domain: {}!", domain_name);
+                                            .unwrap_or_else(|err| {
+                                                error!("Internal OpenSSL/ Protocol error for domain: {}! Details: {:?}", domain_name, err);
                                             });
                                     });
 
