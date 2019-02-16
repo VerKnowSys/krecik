@@ -36,16 +36,10 @@
             }
         },
         {
-            "url": "http://google.com/",
+            "url": "http://google.com/fdgrtjkgengjkdfnglksfdgsdfg",
             "expects": [
                 {
-                    "ValidCode": 200
-                },
-                {
-                    "ValidContent": "google"
-                },
-                {
-                    "ValidContent": "<title"
+                    "ValidCode": 404
                 }
             ]
         },
