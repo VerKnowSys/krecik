@@ -1,0 +1,26 @@
+{
+    "name": "Testcheck6",
+    "domains": [
+        {
+            "name": "rust-lang.org",
+            "expects": [
+                {
+                    "ValidExpiryPeriod": 14
+                }
+            ]
+        }
+    ],
+    "pages": [
+        {
+            "url": "https://rust-lang.org/",
+            "expects": [
+                {
+                    "ValidCode": 200
+                },
+                {
+                    "ValidContent": "rust-lang.org"
+                }
+            ]
+        }
+    ]
+}

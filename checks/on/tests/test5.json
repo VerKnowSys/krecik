@@ -2,10 +2,10 @@
     "name": "Testcheck5",
     "pages": [
         {
-            "url": "https://centra.com/",
+            "url": "https://rust-lang.org/",
             "expects": [
                 {
-                    "ValidLength": 17674
+                    "ValidLength": 16000
                 }
             ]
         }
