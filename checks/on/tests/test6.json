@@ -20,7 +20,11 @@
                 {
                     "ValidContent": "rust-lang.org"
                 }
-            ]
+            ],
+            "options": {
+                "ssl_verify_host": false,
+                "ssl_verify_peer": false
+            }
         }
     ]
 }
