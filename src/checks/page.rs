@@ -27,28 +27,28 @@ pub type Pages = Vec<Page>;
 pub struct PageOptions {
 
     /// HTTP cookies
-    cookies: Option<Vec<String>>,
+    pub cookies: Option<Vec<String>>,
 
     /// HTTP headers
-    headers: Option<Vec<String>>,
+    pub headers: Option<Vec<String>>,
 
     /// HTTP data (body)
-    data: Option<Vec<String>>,
+    pub data: Option<Vec<String>>,
 
     /// HTTP follow 301/302 redirects
-    follow_redirects: Option<bool>,
+    pub follow_redirects: Option<bool>,
 
     /// HTTP method used
-    method: Option<Method>,
+    pub method: Option<Method>,
 
     /// HTTP agent name
-    agent: Option<String>,
+    pub agent: Option<String>,
 
     /// HTTP check timeout in seconds
-    timeout: Option<u64>,
+    pub timeout: Option<u64>,
 
     /// HTTP connection timeout in seconds
-    connection_timeout: Option<u64>,
+    pub connection_timeout: Option<u64>,
 
 }
 
