@@ -242,4 +242,14 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_gibberish_url_check() {
+        let check = FileCheck::load("tests/test4").unwrap();
+        let history = check.execute().unwrap();
+        assert!(history.length() == 1);
+        let first = history.head();
+        assert!(first.count == 1);
+        assert!(first.timestamp > 1550287754);
+    }
+
 }

@@ -1,0 +1,13 @@
+{
+    "name": "Testcheck4",
+    "pages": [
+        {
+            "url": "http://erhbgiyhgbisdfgbdfhsgbdfskhjgbsdfhjkbg.com/",
+            "expects": [
+                {
+                    "ValidCode": 0
+                }
+            ]
+        }
+    ]
+}
