@@ -23,7 +23,8 @@
             ],
             "options": {
                 "ssl_verify_host": false,
-                "ssl_verify_peer": false
+                "ssl_verify_peer": false,
+                "verbose": true
             }
         }
     ]
