@@ -215,7 +215,7 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.clone().unwrap_or_default().contains("is valid for "));
+        assert!(first.message.clone().unwrap_or_default().contains("TLS certificate for domain"));
     }
 
 
