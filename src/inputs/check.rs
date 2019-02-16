@@ -136,13 +136,11 @@ pub trait Checks<T> {
                         }
 
                         if curl_options.verbose.unwrap_or_else(|| false) {
-                            debug!("Enabling Verbose and CertInfo mode.");
+                            debug!("Enabling Verbose mode");
                             curl.verbose(true).unwrap();
-                            curl.certinfo(true).unwrap();
                         } else {
-                            debug!("Disabling Verbose and CertInfo mode.");
+                            debug!("Disabling Verbose mode");
                             curl.verbose(false).unwrap();
-                            curl.certinfo(false).unwrap();
                         }
 
                         // Setup Curl configuration based on given options
