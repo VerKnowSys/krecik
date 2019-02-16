@@ -32,3 +32,6 @@ pub const CHECK_MAX_REDIRECTIONS: u32 = 10;
 
 /// Minimum SSL certificate validity in days
 pub const CHECK_SSL_DAYS_EXPIRATION: i32 = 14;
+
+/// Default successful HTTP code: 200
+pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;

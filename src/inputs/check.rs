@@ -191,11 +191,11 @@ pub trait Checks<T> {
                         .find(|exp| {
                             let the_code = match exp {
                                 PageExpectation::ValidCode(code) => code,
-                                _ => &0u32,
+                                _ => &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
                             };
-                            the_code != &0u32
+                            the_code != &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
                         })
-                        .unwrap_or_else(|| &PageExpectation::ValidCode(0)); // code 0 means connection error - we may want to check if page just fails
+                        .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE));
 
                     // Content expectation
                     let empty_content = PageExpectation::ValidContent("".to_string());
