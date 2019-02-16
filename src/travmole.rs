@@ -21,8 +21,6 @@ extern crate log;
 #[macro_use]
 extern crate serde_derive;
 
-// extern crate travmole;
-
 
 use fern::log_file;
 use colored::Colorize;
@@ -32,14 +30,9 @@ use fern::Dispatch;
 use chrono::Local;
 use std::fs::File;
 use fern::colors::{Color, ColoredLevelConfig};
-// use futures::future;
 use tokio::runtime::Runtime;
 
 use travmole::configuration::*;
-// use travmole::*;
-// use travmole::checks::*;
-// use travmole::inputs::*;
-// use travmole::products::*;
 use travmole::web::router;
 
 
