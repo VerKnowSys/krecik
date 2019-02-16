@@ -11,6 +11,7 @@ use crate::checks::page::*;
 use crate::checks::domain::*;
 use crate::products::expected::*;
 use crate::products::unexpected::*;
+use crate::products::history::*;
 
 
 /// NOTE: Pigeon (previous implementation) supported list of checks per file. TravMole will require each JSON to be separate file.
