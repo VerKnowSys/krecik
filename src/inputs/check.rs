@@ -227,6 +227,7 @@ pub trait Checks<T> {
                         },
                     }
 
+                    // Content length validation
                     let expected_content_length = expectations
                         .iter()
                         .find(|exp| {

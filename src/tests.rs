@@ -180,7 +180,7 @@ mod tests {
                Domain {
                    name: "rust-lang.org".to_string(),
                    expects: Some(vec!(DomainExpectation::ValidResolvable,
-                                      DomainExpectation::ValidExpiryPeriod(14))),
+                                      DomainExpectation::ValidExpiryPeriod(CHECK_SSL_DAYS_EXPIRATION))),
                }
             )),
             pages: Some(vec!(
@@ -215,7 +215,7 @@ mod tests {
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
-        assert!(first.timestamp > 1550287754);
+        assert!(first.timestamp.len() > 10);
         assert!(first.message.clone().unwrap_or_default().contains("is valid for "));
     }
 
@@ -228,7 +228,7 @@ mod tests {
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
-        assert!(first.timestamp > 1550287754);
+        assert!(first.timestamp.len() > 10);
         assert!(first.message.clone().unwrap_or_default().contains("Got expected"));
     }
 
@@ -241,7 +241,7 @@ mod tests {
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
-        assert!(first.timestamp > 1550287754);
+        assert!(first.timestamp.len() > 10);
     }
 
 
@@ -253,7 +253,7 @@ mod tests {
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
-        assert!(first.timestamp > 1550287754);
+        assert!(first.timestamp.len() > 10);
     }
 
 
@@ -265,7 +265,7 @@ mod tests {
         assert!(history.length() == 2);
         let first = history.head();
         assert!(first.count == 1);
-        assert!(first.timestamp > 1550287754);
+        assert!(first.timestamp.len() > 10);
     }
 
 }
