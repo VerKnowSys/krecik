@@ -154,7 +154,8 @@ mod tests {
 
         println!("URL: {}", &url);
         println!("Redirect count: {:?}", easy.redirect_count().unwrap());
-        println!("Final URL: {:?}", easy.redirect_url().unwrap());
+        // println!("Final URL: {:?}", easy.redirect_url().unwrap());
+        println!("Effective URL: {:?}", easy.effective_url().unwrap());
         println!("Local IPv4: {:?}", easy.local_ip().unwrap());
         println!("Remote IPv4: {:?}", easy.primary_ip().unwrap());
         println!("Content type: {:?}", easy.content_type().unwrap());
