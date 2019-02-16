@@ -158,10 +158,10 @@ pub trait Checks<T> {
                         curl.ssl_verify_host(true).unwrap();
 
                         // Max connections is 10 per check
-                        curl.max_connects(10).unwrap();
+                        curl.max_connects(CHECK_MAX_CONNECTIONS).unwrap();
 
                         // Max reconnections is 10 per check
-                        curl.max_redirections(10).unwrap();
+                        curl.max_redirections(CHECK_MAX_REDIRECTIONS).unwrap();
 
                         multi.add2(curl)
                     })

@@ -23,3 +23,10 @@ pub const CHECK_TIMEOUT: u64 = 15;
 
 /// Check connection timeout in seconds
 pub const CHECK_CONNECTION_TIMEOUT: u64 = 30;
+
+/// Check max connect attempts
+pub const CHECK_MAX_CONNECTIONS: u32 = 10;
+
+/// Check max redirections
+pub const CHECK_MAX_REDIRECTIONS: u32 = 10;
+
