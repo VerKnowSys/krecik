@@ -210,30 +210,24 @@ mod tests {
     fn test_domain_check_history_length() {
         let check = FileCheck::load("tests/test1").unwrap();
         let history = FileCheck::check_domains(check.domains).unwrap();
-        println!("DOMAIN-HISTORY(of length: {}): {:#?}", history.length(), history);
         assert!(history.length() > 0);
         assert!(history.length() == 1);
-
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp > 1550287754);
         assert!(first.message.clone().unwrap_or_default().contains("is valid for "));
-        println!("DOMAIN-HISTORY_FIRST: {:?}", first);
     }
 
 
     #[test]
     fn test_page_check_history_length() {
-        let check = FileCheck::load("tests/test1").unwrap();
-        let history = FileCheck::check_pages(Some(check.pages.unwrap_or_default())).unwrap();
-        println!("PAGE-HISTORY(of length: {}): {:#?}", history.length(), history);
-        assert!(history.length() > 3);
-
+        let check = FileCheck::load("tests/test2").unwrap();
+        let history = check.execute().unwrap();
+        assert!(history.length() == 2);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp > 1550287754);
         assert!(first.message.clone().unwrap_or_default().contains("Got expected "));
-        println!("PAGE-HISTORY_FIRST: {:?}", first);
     }
 
 }

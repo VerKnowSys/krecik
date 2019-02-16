@@ -1,0 +1,13 @@
+{
+    "name": "Testcheck2",
+    "pages": [
+        {
+            "url": "https://centra.com/",
+            "expects": [
+                {
+                    "ValidCode": 200
+                }
+            ]
+        }
+    ]
+}
