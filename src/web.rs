@@ -1,5 +1,11 @@
+use hyper::*;
+use mime::*;
+use futures::{future, Future, Stream};
+use gotham::helpers::http::response::create_response;
+use gotham::state::{FromState, State};
+use gotham::handler::{HandlerFuture, IntoHandlerError};
 use gotham::router::Router;
-use gotham::state::State;
+
 
 use crate::configuration::*;
 use crate::products::expected::*;
@@ -12,8 +18,20 @@ use crate::products::history::*;
 
 /// Execute all checks
 pub fn handler_check_execute_all(state: State) -> (State, History) {
-    let check = FileCheck::load("tests/test2").unwrap();
-    let history = check.execute().unwrap();
+    let uri = Uri::borrow_from(&state).to_string();
+    let name = uri.replace("/json/execute/", "");
+    let check_path = format!("tests/{}", &name);
+    info!("Loading check from path: {}", &check_path);
+    let history = FileCheck::load(&check_path)
+        .and_then(|check| {
+            Ok(check
+                .execute()
+                .unwrap())
+        })
+        .unwrap_or_else(|_| {
+            error!("Failed to load check from file: '{}.json'", check_path);
+            History::empty()
+        });
     (state, history)
 }
 
@@ -27,7 +45,7 @@ pub fn router() -> Router {
     build_simple_router(|route| {
         route
             .associate(
-                &"/json/execute/all".to_string(), |handler| {
+                &"/json/execute/:name".to_string(), |handler| {
                     handler.get().to(handler_check_execute_all);
                 }
             );
