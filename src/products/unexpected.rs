@@ -29,6 +29,10 @@ pub enum Unexpected {
     #[fail(display = "Remote access failure for: {}", _0)]
     FailedRemote (String),
 
+    /// Failed content check
+    #[fail(display = "Content validation failure for: {}", _0)]
+    FailedContent (String),
+
     /// Failed internal function
     #[fail(display = "Internal failure for: {}", _0)]
     FailedInternal (String),
