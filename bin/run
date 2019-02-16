@@ -21,6 +21,6 @@ else
     bin/build \
         && \
         RUST_BACKTRACE=1 \
-            target/debug/travmole
+            target/release/travmole
 
 fi
