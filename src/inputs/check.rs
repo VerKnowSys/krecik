@@ -43,9 +43,9 @@ pub trait Checks<T> {
              .and_then(|ssl_validator| {
                  match domain_expectation {
                     DomainExpectation::ValidExpiryPeriod(0) => {
-                        let err_msg = format!("Given ValidExpiryPeriod(0) for domain: {}. Validation skipped.", domain_name);
-                        warn!("{}", err_msg);
-                        Err(err_msg.into())
+                        let warn_msg = format!("Given ValidExpiryPeriod(0) for domain: {}. Validation skipped.", domain_name);
+                        warn!("{}", warn_msg);
+                        Err(warn_msg.into())
                     },
 
                     DomainExpectation::ValidExpiryPeriod(days) => {
@@ -204,21 +204,21 @@ pub trait Checks<T> {
                     match expected_content {
                         &PageExpectation::ValidContent(ref content) if content.len() > 0 => {
                             if raw_page_content.contains(content) {
-                                let ok_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
-                                info!("{}", ok_msg);
-                                history = history.append(Story::new(Some(ok_msg)))
+                                let info_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
+                                info!("{}", info_msg);
+                                history = history.append(Story::new(Some(info_msg)))
                             }
                         },
 
                         &PageExpectation::ValidContent(ref content) if content == "" => {
-                            let err_msg = format!("Validation of an empty content from URL: '{}'", page_url);
-                            warn!("{}", err_msg);
+                            let warn_msg = format!("Validation of an empty content from URL: '{}'", page_url);
+                            warn!("{}", warn_msg);
                         },
 
                         edge_case => {
-                            let other_msg = format!("Unimplemented Validator: {:?}", edge_case);
-                            warn!("{}", other_msg);
-                            history = history.append(Story::new(Some(other_msg)))
+                            let warn_msg = format!("Unimplemented Validator: {:?}", edge_case);
+                            warn!("{}", warn_msg);
+                            history = history.append(Story::new(Some(warn_msg)))
                         }
                     }
 
@@ -236,17 +236,16 @@ pub trait Checks<T> {
 
                     match expected_content_length {
                         &PageExpectation::ValidLength(0) => {
-                            let err_msg = format!("Got Unexpected zero-length content for URL: '{}'. ValidLength(0) will be ignored.", page_url);
-                            warn!("{}", err_msg);
-                            // history = history.append(Story::new_error(Some(Unexpected::FailedContent(err_msg))));
+                            let warn_msg = format!("Got Unexpected zero-length content for URL: '{}'. ValidLength(0) will be ignored.", page_url);
+                            warn!("{}", warn_msg);
                         },
 
                         &PageExpectation::ValidLength(ref requested_length) => {
                             if &raw_page_content.len() >= requested_length {
-                                let ok_msg = format!("Expected content length is at least: '{}' bytes long for URL: '{}'",
+                                let info_msg = format!("Expected content length is at least: '{}' bytes long for URL: '{}'",
                                                      requested_length, page_url);
-                                info!("{}", ok_msg);
-                                history = history.append(Story::new(Some(ok_msg)))
+                                info!("{}", info_msg);
+                                history = history.append(Story::new(Some(info_msg)))
                             } else {
                                 let err_msg = format!("Unexpected content length, requested to be at least: '{}' bytes long, yet got: '{}' bytes instead for URL: '{}'",
                                                       requested_length, raw_page_content.len(), page_url);
@@ -255,10 +254,10 @@ pub trait Checks<T> {
                             }
                         },
 
-                        _ => {
-                            let other_msg = "Expected content length: Other case".to_string();
-                            debug!("{}", other_msg);
-                            history = history.append(Story::new(Some(other_msg)))
+                        edge_case => {
+                            let warn_msg = format!("Unimplemented Validator: {:?}", edge_case);
+                            warn!("{}", warn_msg);
+                            history = history.append(Story::new(Some(warn_msg)))
                         },
                     }
 
