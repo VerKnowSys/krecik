@@ -25,7 +25,7 @@ pub enum PageExpectation {
 
 impl Default for PageExpectation {
     fn default() -> PageExpectation {
-        PageExpectation::ValidCode(200)
+        PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE)
     }
 }
 
