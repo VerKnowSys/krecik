@@ -124,3 +124,12 @@ impl IntoResponse for History {
         )
     }
 }
+
+
+/// Implement JSON serialization on .to_string():
+impl ToString for History {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self.0)
+            .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}"))
+    }
+}

@@ -194,7 +194,7 @@ mod tests {
             alert_channel: None,
         };
         let output = serde_json::to_string(&check).unwrap();
-        println!("Output: {}", output.to_string());
+        println!("Output: {}", output);
         assert!(output.len() > 100);
     }
 
@@ -210,7 +210,7 @@ mod tests {
     fn test_domain_check_history_length() {
         let check = FileCheck::load("tests/test1").unwrap();
         let history = FileCheck::check_domains(check.domains).unwrap();
-        println!("TEST1: {:#?}", history);
+        println!("TEST1: {}", history.to_string());
         assert!(history.length() > 0);
         assert!(history.length() == 1);
         let first = history.head();
@@ -224,7 +224,7 @@ mod tests {
     fn test_page_check_history_length() {
         let check = FileCheck::load("tests/test2").unwrap();
         let history = check.execute();
-        println!("TEST2: {:#?}", history);
+        println!("TEST2: {}", history.to_string());
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
@@ -237,7 +237,7 @@ mod tests {
     fn test_redirect_no_follow() {
         let check = FileCheck::load("tests/test3").unwrap();
         let history = check.execute();
-        println!("TEST3: {:#?}", history);
+        println!("TEST3: {}", history.to_string());
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
@@ -249,7 +249,7 @@ mod tests {
     fn test_gibberish_url_check() {
         let check = FileCheck::load("tests/test4").unwrap();
         let history = check.execute();
-        println!("TEST4: {:#?}", history);
+        println!("TEST4: {}", history.to_string());
         assert!(history.length() == 1);
         let first = history.head();
         assert!(first.count == 1);
@@ -261,7 +261,7 @@ mod tests {
     fn test_page_content_length_check() {
         let check = FileCheck::load("tests/test5").unwrap();
         let history = check.execute();
-        println!("TEST5: {:#?}", history);
+        println!("TEST5: {}", history.to_string());
         assert!(history.length() == 2);
         let first = history.head();
         assert!(first.count == 1);
