@@ -7,28 +7,14 @@ use crate::products::unexpected::*;
 use crate::utilities::*;
 use crate::inputs::check::*;
 use crate::inputs::file::*;
+use crate::products::history::*;
 
 
 /// Execute all checks
 pub fn handler_check_execute_all(state: State) -> (State, History) {
-    let story = Story::new(
-        3,
-        Unexpected::FailedDomain("domain.tld".to_string(), DomainExpectation::ValidResolvable)
-    );
-    let history = History::new(
-        Story::new(
-            1,
-            Unexpected::FailedDomain("domain.tld".to_string(), DomainExpectation::ValidResolvable)
-        )
-    );
-
-    FileCheck::load("tests/test1")
-        .and_then(|check| {
-            Ok(check.execute().unwrap())
-        })
-        .unwrap_or_default();
-
-    (state, history.append(story))
+    let check = FileCheck::load("tests/test1").unwrap();
+    let history = check.execute().unwrap();
+    (state, history)
 }
 
 
