@@ -38,7 +38,7 @@ pub trait Checks<T> {
 
 
     /// Check SSL certificate expiration using OpenSSL function
-    fn check_ssl_expire(domain_name: &str, domain_expectation: &DomainExpectation) -> Story {
+    fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
          SslExpiration::from_domain_name(&domain_name)
              .and_then(|ssl_validator| {
                  match domain_expectation {
@@ -50,7 +50,7 @@ pub trait Checks<T> {
 
                     DomainExpectation::ValidExpiryPeriod(days) => {
                          debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name);
-                         if &ssl_validator.days() < &days
+                         if ssl_validator.days() < days
                          || ssl_validator.is_expired() {
                             let err_msg = format!("Got expired domain: {}.", domain_name);
                             error!("{}", err_msg);
@@ -87,7 +87,7 @@ pub trait Checks<T> {
                                 domain_expectations
                                     .iter()
                                     .for_each(|domain_expectation| {
-                                        history = history.append(Self::check_ssl_expire(&domain_name, &domain_expectation));
+                                        history = history.append(Self::check_ssl_expire(&domain_name, *domain_expectation));
                                     });
                                 Some(())
                             });
@@ -122,7 +122,7 @@ pub trait Checks<T> {
 
                         // Load Curl request options from check:
                         let curl_options = page_check.clone().options.unwrap_or_default();
-                        debug!("Curl options: {:?}", curl_options);
+                        debug!("Curl options: {:#?}", curl_options);
 
                         // Setup Curl configuration based on given options
                         if curl_options.follow_redirects.unwrap_or_default() {
@@ -202,7 +202,7 @@ pub trait Checks<T> {
 
                     let raw_page_content = String::from_utf8_lossy(&handle.0);
                     match expected_content {
-                        &PageExpectation::ValidContent(ref content) if content.len() > 0 => {
+                        &PageExpectation::ValidContent(ref content) if !content.is_empty() => {
                             if raw_page_content.contains(content) {
                                 let info_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
                                 info!("{}", info_msg);
@@ -210,7 +210,7 @@ pub trait Checks<T> {
                             }
                         },
 
-                        &PageExpectation::ValidContent(ref content) if content == "" => {
+                        &PageExpectation::ValidContent(ref content) if content.is_empty() => {
                             let warn_msg = format!("Validation of an empty content from URL: '{}'", page_url);
                             warn!("{}", warn_msg);
                         },
@@ -241,7 +241,7 @@ pub trait Checks<T> {
                         },
 
                         &PageExpectation::ValidLength(ref requested_length) => {
-                            if &raw_page_content.len() >= requested_length {
+                            if raw_page_content.len() >= *requested_length {
                                 let info_msg = format!("Expected content length is at least: '{}' bytes long for URL: '{}'",
                                                      requested_length, page_url);
                                 info!("{}", info_msg);

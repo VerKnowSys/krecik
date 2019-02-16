@@ -20,16 +20,13 @@ pub fn produce_list(glob_pattern: &str) -> Vec<String> {
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
-                match path.file_name() {
-                    Some(element) => {
-                        element
-                            .to_str()
-                            .and_then(|elem| {
-                                list.push(elem.to_string());
-                                Some(elem.to_string())
-                            });
-                    },
-                    None => (),
+                if let Some(element) = path.file_name() {
+                    element
+                        .to_str()
+                        .and_then(|elem| {
+                            list.push(elem.to_string());
+                            Some(elem.to_string())
+                        });
                 }
             },
             Err(err) => {
