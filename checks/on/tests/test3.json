@@ -9,8 +9,7 @@
                 }
             ],
             "options": {
-                "follow_redirects": false,
-                "method": "GET"
+                "follow_redirects": false
             }
         }
     ]
