@@ -112,8 +112,126 @@ pub trait Checks<T> {
     }
 
 
+    /// Check page expectations
+    fn check_page(page_url: &str, page_check: &Page) -> History {
+        let mut history = History::empty();
+        page_check
+            .clone()
+            .expects
+            .and_then(|page_expectations| {
+                let mut multi = Multi::new();
+                multi.pipelining(true, true).unwrap();
+                let handlers: Vec<_> = page_expectations
+                    .iter()
+                    .map(|page_expectation| {
+                        let mut curl = Easy2::new(Collector(Vec::new()));
+                        // todo: use options field to set wanted options, leaving default for now:
+                        curl.url(&page_url).unwrap();
+                        curl.get(true).unwrap();
+                        curl.follow_location(true).unwrap();
+                        curl.ssl_verify_peer(true).unwrap();
+                        curl.ssl_verify_host(true).unwrap();
+                        curl.connect_timeout(Duration::from_secs(30)).unwrap();
+                        curl.timeout(Duration::from_secs(30)).unwrap();
+                        curl.max_connects(10).unwrap();
+                        curl.max_redirections(10).unwrap();
+                        multi.add2(curl)
+                    })
+                    .collect();
+
+                // perform async multicheck
+                while multi.perform().unwrap() > 0 {
+                    multi.wait(&mut [], Duration::from_secs(1)).unwrap();
+                }
+
+                for handler in handlers {
+                    let a_handler = handler.unwrap();
+                    let handle = a_handler.get_ref();
+                    let expectations = page_check
+                        .clone()
+                        .expects
+                        .unwrap_or_default();
+
+                    let expected_code = expectations
+                        .iter()
+                        .find(|exp| {
+                            let the_code = match exp {
+                                PageExpectation::ValidCode(code) => code,
+                                _ => &0u32,
+                            };
+                            the_code != &0u32
+                        })
+                        .unwrap_or_else(|| &PageExpectation::ValidCode(0)); // code 0 means connection error - we may want to check if page just fails
+
+                    let empty_content = PageExpectation::ValidContent("".to_string());
+                    let expected_content = expectations
+                        .iter()
+                        .find(|exp| {
+                            let the_content = match exp {
+                                PageExpectation::ValidContent(content) => content,
+                                _ => "",
+                            };
+                            the_content != ""
+                        })
+                        .unwrap_or_else(|| &empty_content);
+
+                    let raw_page_content = String::from_utf8_lossy(&handle.0);
+                    match expected_content {
+                        &PageExpectation::ValidContent(ref content) => {
+                            if raw_page_content.contains(content) {
+                                let ok_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
+                                info!("{}", ok_msg);
+                                history = history.append(Story::new(Some(ok_msg)))
+                            } else {
+                                let err_msg = format!("Failed to find content: '{}' from URL: '{}'", content, page_url);
+                                error!("{}", err_msg);
+                                history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                            }
+                        },
+
+                        _ => {
+                            let other_msg = "Some other case".to_string();
+                            debug!("{}", other_msg);
+                            history = history.append(Story::new(Some(other_msg)))
+                        },
+                    }
+
+                    let mut result_handler = multi.remove2(a_handler).unwrap();
+                    match result_handler.response_code() {
+                        Ok(0) => {
+                            let err_msg = format!("Error connecting to URL: {}", page_url);
+                            error!("{}", err_msg);
+                            history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                        },
+
+                        Ok(code) => {
+                            if &PageExpectation::ValidCode(code) == expected_code {
+                                let info_msg = format!("Got expected code: {} from URL: {}", code, page_url);
+                                info!("{}", info_msg);
+                                history = history.append(Story::new(Some(info_msg)));
+                            } else {
+                                let err_msg = format!("Got Unexpected code: {} from URL: {}", code, page_url);
+                                error!("{}", err_msg);
+                                history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                            }
+                        },
+
+                        Err(err) => {
+                            let err_msg = format!("Got unexpected error: {} from URL: {}", err, page_url);
+                            error!("{}", err_msg);
+                            history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                        }
+                    }
+                }
+                Some(history)
+            })
+            .unwrap()
+    }
+
+
     /// Check pages
-    fn check_pages(pages: Option<Pages>) -> Result<(), History> {
+    fn check_pages(pages: Option<Pages>) -> Result<History, History> {
+        let mut history = History::empty();
         match pages {
             Some(pages) => {
                 pages
@@ -121,106 +239,8 @@ pub trait Checks<T> {
                     .for_each(|defined_page| {
                         let page_check = defined_page.clone();
                         let page_url = page_check.url.clone();
-                        page_check
-                            .clone()
-                            .expects
-                            .and_then(|page_expectations| {
-                                let mut multi = Multi::new();
-                                multi.pipelining(true, true).unwrap();
-                                let handlers: Vec<_> = page_expectations
-                                    .iter()
-                                    .map(|page_expectation| {
-                                        let mut curl = Easy2::new(Collector(Vec::new()));
-                                        // todo: use options field to set wanted options, leaving default for now:
-                                        curl.url(&page_url).unwrap();
-                                        curl.get(true).unwrap();
-                                        curl.follow_location(true).unwrap();
-                                        curl.ssl_verify_peer(true).unwrap();
-                                        curl.ssl_verify_host(true).unwrap();
-                                        curl.connect_timeout(Duration::from_secs(30)).unwrap();
-                                        curl.timeout(Duration::from_secs(30)).unwrap();
-                                        curl.max_connects(10).unwrap();
-                                        curl.max_redirections(10).unwrap();
-                                        multi.add2(curl)
-                                    })
-                                    .collect();
-
-                                // perform async multicheck
-                                while multi.perform().unwrap() > 0 {
-                                    multi.wait(&mut [], Duration::from_secs(1)).unwrap();
-                                }
-
-                                for handler in handlers {
-                                    let a_handler = handler.unwrap();
-                                    let handle = a_handler.get_ref();
-                                    let expectations = page_check
-                                        .clone()
-                                        .expects
-                                        .unwrap_or_default();
-
-                                    let expected_code = expectations
-                                        .iter()
-                                        .find(|exp| {
-                                            let the_code = match exp {
-                                                PageExpectation::ValidCode(code) => code,
-                                                _ => &0u32,
-                                            };
-                                            the_code != &0u32
-                                        })
-                                        .unwrap_or_else(|| &PageExpectation::ValidCode(0)); // code 0 means connection error - we may want to check if page just fails
-
-                                    let empty_content = PageExpectation::ValidContent("".to_string());
-                                    let expected_content = expectations
-                                        .iter()
-                                        .find(|exp| {
-                                            let the_content = match exp {
-                                                PageExpectation::ValidContent(content) => content,
-                                                _ => "",
-                                            };
-                                            the_content != ""
-                                        })
-                                        .unwrap_or_else(|| &empty_content);
-
-                                    let raw_page_content = String::from_utf8_lossy(&handle.0);
-                                    match expected_content {
-                                        &PageExpectation::ValidContent(ref content) => {
-                                            if raw_page_content.contains(content) {
-                                                info!("Got expected content: '{}' from URL: '{}'", content, page_url);
-                                            } else {
-                                                error!("Failed to find content: '{}' from URL: '{}'", content, page_url);
-                                            }
-                                        },
-
-                                        _ => {
-                                            debug!("Some other case");
-                                        },
-                                    }
-
-                                    let mut result_handler = multi.remove2(a_handler).unwrap();
-                                    match result_handler.response_code() {
-                                        Ok(0) => {
-                                            error!("Error connecting to URL: {}", page_url);
-                                        },
-
-                                        Ok(code) => {
-                                            if &PageExpectation::ValidCode(code) == expected_code {
-                                                info!("Got expected code: {} from URL: {}", code, page_url);
-                                            } else {
-                                                error!("Got UNexpected code: {} from URL: {}", code, page_url);
-                                            }
-                                        },
-
-                                        Err(err) => {
-                                            error!("Got unexpected error: {}", err);
-                                        }
-                                    }
-                                }
-
-                                Some(())
-                            })
-                            .unwrap_or_default();
-                        }
-                    )
+                        history = Self::check_page(&page_url, &page_check);
+                    });
             },
 
             None => {
@@ -228,7 +248,7 @@ pub trait Checks<T> {
             }
         }
 
-        Ok(())
+        Ok(history)
     }
 
 
