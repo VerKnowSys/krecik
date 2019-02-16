@@ -66,7 +66,7 @@ jemallocator = "0.1.8"
 opt-level = 3
 debug = false
 rpath = true
-lto = true
+lto = 'thin'
 debug-assertions = false
 codegen-units = 1
 panic = 'abort'
@@ -79,7 +79,7 @@ overflow-checks = true
 opt-level = 3
 debug = false
 rpath = true
-lto = true
+lto = 'thin'
 debug-assertions = false
 codegen-units = 1
 incremental = false
@@ -88,13 +88,13 @@ overflow-checks = true
 
 # The testing profile, used for `cargo test`.
 [profile.test]
-opt-level = 1
+opt-level = 0
 debug = 2
 rpath = true
-lto = false
+lto = 'thin'
 debug-assertions = true
-codegen-units = 12
-incremental = true
+codegen-units = 4
+incremental = false
 overflow-checks = true
 
 
@@ -109,7 +109,7 @@ debug-assertions = true       # controls whether debug assertions are enabled
                               # (e.g. debug_assert!() and arithmetic overflow checks)
 rpath = true                  # controls whether compiler should set loader paths.
                               # If true, passes `-C rpath` flag to the compiler.
-lto = true                    # Link Time Optimization usually reduces size of binaries
+lto = 'thin'                  # Link Time Optimization usually reduces size of binaries
                               # and static libraries. Increases compilation time.
                               # If true, passes `-C lto` flag to the compiler, and if a
                               # string is specified like 'thin' then `-C lto=thin` will
