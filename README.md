@@ -8,7 +8,7 @@
 
 ## Requirements:
 
-    `Curl-lib` software bundle (`/Software/Curl-lib`), built with Sofin (with all useful features enabled by default which are NOT enabled in 99% of prebuilt Curl versions from ports, fink, brew, rpm or apt builds).
+    `Curl_lib` software bundle (`/Software/Curl_lib`), built with Sofin (with all useful features enabled by default which are NOT enabled in 99% of prebuilt Curl versions from ports, fink, brew, rpm or apt builds).
 
 
 ## Features:
