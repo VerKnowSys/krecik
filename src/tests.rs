@@ -204,4 +204,15 @@ mod tests {
         let check = FileCheck::load("tests/test1").unwrap();
         assert!(check.name.unwrap() == "Testcheck");
     }
+
+
+    #[test]
+    fn test_domain_check_history_length() {
+        let check = FileCheck::load("tests/test1").unwrap();
+        let history = FileCheck::check_domains(check.domains).unwrap();
+        println!("HISTORY: {:#?}", history);
+        assert!(history.length() > 0);
+        assert!(history.length() == 1);
+    }
+
 }
