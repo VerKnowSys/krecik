@@ -202,26 +202,24 @@ pub trait Checks<T> {
 
                     let raw_page_content = String::from_utf8_lossy(&handle.0);
                     match expected_content {
-                        &PageExpectation::ValidContent(ref content) => {
-                            if content.len() > 0 {
-                                if raw_page_content.contains(content) {
-                                    let ok_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
-                                    info!("{}", ok_msg);
-                                    history = history.append(Story::new(Some(ok_msg)))
-                                } else {
-                                    let err_msg = format!("Failed to find content: '{}' from URL: '{}'", content, page_url);
-                                    error!("{}", err_msg);
-                                    history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
-                                }
-                            } else {
-                                debug!("Skipping validation of match for empty content!");
+                        &PageExpectation::ValidContent(ref content) if content.len() > 0 => {
+                            if raw_page_content.contains(content) {
+                                let ok_msg = format!("Got expected content: '{}' from URL: '{}'", content, page_url);
+                                info!("{}", ok_msg);
+                                history = history.append(Story::new(Some(ok_msg)))
                             }
                         },
-                        _ => {
-                            let other_msg = "Expected content: Other case".to_string();
-                            debug!("{}", other_msg);
-                            history = history.append(Story::new(Some(other_msg)))
+
+                        &PageExpectation::ValidContent(ref content) if content == "" => {
+                            let err_msg = format!("Validation of an empty content from URL: '{}'", page_url);
+                            warn!("{}", err_msg);
                         },
+
+                        edge_case => {
+                            let other_msg = format!("Unimplemented Validator: {:?}", edge_case);
+                            warn!("{}", other_msg);
+                            history = history.append(Story::new(Some(other_msg)))
+                        }
                     }
 
                     // Content length validation
