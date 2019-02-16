@@ -42,26 +42,23 @@ pub trait Checks<T> {
          SslExpiration::from_domain_name(&domain_name)
              .and_then(|ssl_validator| {
                  match domain_expectation {
-                     DomainExpectation::ValidExpiryPeriod(days) => {
+                    DomainExpectation::ValidExpiryPeriod(0) => {
+                        let err_msg = format!("Given ValidExpiryPeriod(0) for domain: {}. Validation skipped.", domain_name);
+                        warn!("{}", err_msg);
+                        Err(err_msg.into())
+                    },
+
+                    DomainExpectation::ValidExpiryPeriod(days) => {
                          debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name);
                          if &ssl_validator.days() < &days
                          || ssl_validator.is_expired() {
-                             error!("Expired domain: {}.", domain_name);
-                             Err(format!("Expired domain: {}.", domain_name).into())
+                            let err_msg = format!("Got expired domain: {}.", domain_name);
+                            error!("{}", err_msg);
+                            Err(err_msg.into())
                          } else {
-                             debug!("Requested domain: {} to be valid for: {} days. Domain will remain valid for {} days.",
+                            debug!("Requested domain: {} to be valid for: {} days. Domain will remain valid for {} days.",
                                     domain_name, days, ssl_validator.days());
-                             Ok(Story::new(Some(format!("SSL for domain: {} is valid for {} days", domain_name, ssl_validator.days()))))
-                         }
-                     },
-
-                     _ => {
-                         debug!("Validating expectation: ValidResolvable for domain: {}", domain_name);
-                         if ssl_validator.is_expired() {
-                             error!("Expired domain: {}.", domain_name);
-                             Err(format!("Expired domain: {}.", domain_name).into())
-                         } else {
-                             Ok(Story::new(Some(format!("Domain: {} validation successful", domain_name))))
+                            Ok(Story::new(Some(format!("SSL for domain: {} is valid for {} days", domain_name, ssl_validator.days()))))
                          }
                      }
                  }

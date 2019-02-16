@@ -179,8 +179,7 @@ mod tests {
             domains: Some(vec!(
                Domain {
                    name: "rust-lang.org".to_string(),
-                   expects: Some(vec!(DomainExpectation::ValidResolvable,
-                                      DomainExpectation::ValidExpiryPeriod(CHECK_SSL_DAYS_EXPIRATION))),
+                   expects: Some(vec!(DomainExpectation::ValidExpiryPeriod(CHECK_SSL_DAYS_EXPIRATION))),
                }
             )),
             pages: Some(vec!(

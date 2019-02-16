@@ -38,10 +38,6 @@ pub type PageExpectations = Vec<PageExpectation>;
 /// Describes all supported domain expectations
 pub enum DomainExpectation {
 
-    /// Domain is resolvable
-    #[fail(display = "Passed ValidResolvable")]
-    ValidResolvable,
-
     /// Domain expiry minimum period in days
     #[fail(display = "Passed ValidExpiryPeriod: '{}'", _0)]
     ValidExpiryPeriod (i32),
