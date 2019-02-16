@@ -179,7 +179,7 @@ mod tests {
             name: Some("Testcheck".to_string()),
             domains: Some(vec!(
                Domain {
-                   name: "rust-lang.org".to_string(),
+                   name: "nask.pl".to_string(),
                    expects: Some(vec!(DomainExpectation::ValidExpiryPeriod(CHECK_SSL_DAYS_EXPIRATION))),
                }
             )),
