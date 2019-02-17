@@ -42,3 +42,29 @@ case "${_uname}" in
         ;;
 esac
 
+
+# Sanity checks…
+if [ ! -x "${_curl_software}/bin/curl-config" ] \
+|| [ ! -x "/usr/bin/curl-config" ]
+then
+    failure "Unavailable Curl >= 7.64.0"
+fi
+
+if [ ! -x "$(which rustc)" ] \
+|| [ ! -x "$(which cargo)" ]
+then
+    failure "Unavailable Rust >= 1.32.0"
+fi
+
+if [ ! -x "$(which jq)" ]
+then
+    failure "Unavailable utility: Jq >= 1.5"
+fi
+
+if [ ! -x "$(which grep)" ] \
+|| [ ! -x "$(which awk)" ] \
+|| [ ! -x "$(which head)" ] \
+|| [ ! -x "$(which seq)" ]
+then
+    failure "Unavailable base system utilities?!"
+fi
