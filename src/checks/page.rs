@@ -75,6 +75,15 @@ pub struct PageOptions {
 }
 
 
+/// Implement JSON serialization on .to_string():
+impl ToString for PageOptions {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self)
+            .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}"))
+    }
+}
+
+
 impl Default for PageOptions {
     fn default() -> PageOptions {
         PageOptions {
