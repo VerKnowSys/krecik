@@ -119,8 +119,8 @@ impl IntoResponse for History {
             state,
             StatusCode::OK,
             APPLICATION_JSON,
-            serde_json::to_string(&self.0)
-                .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}")),
+            self
+                .to_string()
         )
     }
 }
