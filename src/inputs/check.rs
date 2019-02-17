@@ -45,21 +45,21 @@ pub trait Checks<T> {
              .and_then(|ssl_validator| {
                  match domain_expectation {
                     DomainExpectation::ValidExpiryPeriod(0) => {
-                        let warn_msg = format!("Given ValidExpiryPeriod(0) for domain: {}. Validation skipped.", domain_name);
+                        let warn_msg = format!("Given ValidExpiryPeriod(0) for domain: {}. Validation skipped.", domain_name.cyan());
                         warn!("{}", warn_msg.yellow());
                         Err(warn_msg.into())
                     },
 
                     DomainExpectation::ValidExpiryPeriod(days) => {
-                         debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name);
+                         debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name.cyan());
                          if ssl_validator.days() < days
                          || ssl_validator.is_expired() {
-                            let err_msg = format!("Got expired domain: {}.", domain_name);
-                            error!("{}", err_msg);
+                            let err_msg = format!("Got expired domain: {}.", domain_name.cyan());
+                            error!("{}", err_msg.red());
                             Err(err_msg.into())
                          } else {
                             let info_msg = format!("TLS certificate for domain: {} will be valid for: {} days. Check requested minimum: {} days.",
-                                                    domain_name, ssl_validator.days(), days);
+                                                    domain_name.cyan(), ssl_validator.days(), days);
                             info!("{}", info_msg.green());
                             Ok(Story::new(Some(info_msg)))
                          }
@@ -67,8 +67,8 @@ pub trait Checks<T> {
                  }
              })
              .unwrap_or_else(|err| {
-                let error_msg = format!("Internal OpenSSL/ Protocol error for domain: {}! Error details: {:?}", domain_name, err.0);
-                error!("{}", error_msg);
+                let error_msg = format!("Internal OpenSSL/ Protocol error for domain: {}! Error details: {:?}", domain_name.cyan(), err.0);
+                error!("{}", error_msg.red());
                 Story::new_error(Some(Unexpected::FailedInternal(error_msg)))
              })
     }
@@ -291,7 +291,7 @@ pub trait Checks<T> {
 
                     match expected_content_length {
                         &PageExpectation::ValidLength(0) => {
-                            let dbg_msg = format!("Got Unexpected zero-length content for URL: {}. ValidLength(0) will be ignored.", page_url.cyan());
+                            let dbg_msg = format!("Got zero-length content for URL: {}. ValidLength(0) will be ignored.", page_url.cyan());
                             debug!("{}", dbg_msg);
                         },
 
@@ -304,7 +304,7 @@ pub trait Checks<T> {
                             } else {
                                 let err_msg = format!("Unexpected content length, requested to be at least: {} bytes long, yet got: {} bytes instead for URL: {}",
                                                       requested_length, raw_page_content.len(), page_url.cyan());
-                                error!("{}", err_msg);
+                                error!("{}", err_msg.red());
                                 history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
                             }
                         },
@@ -320,7 +320,7 @@ pub trait Checks<T> {
                     match result_handler.response_code() {
                         Ok(0) => {
                             let err_msg = format!("Error connecting to URL: {}", page_url.cyan());
-                            error!("{}", err_msg);
+                            error!("{}", err_msg.red());
                             history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
                         },
 
@@ -331,14 +331,14 @@ pub trait Checks<T> {
                                 history = history.append(Story::new(Some(info_msg)));
                             } else {
                                 let err_msg = format!("Got unexpected code: {} from URL: {}", code, page_url.cyan());
-                                error!("{}", err_msg);
+                                error!("{}", err_msg.red());
                                 history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
                             }
                         },
 
                         Err(err) => {
                             let err_msg = format!("Got unexpected error: {} from URL: {}", err, page_url.cyan());
-                            error!("{}", err_msg);
+                            error!("{}", err_msg.red());
                             history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
                         }
                     }
