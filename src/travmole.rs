@@ -74,7 +74,7 @@ pub fn main() {
                 .unwrap_or_else(|_|
                     File::open(DEFAULT_STDOUT_DEV)
                         .unwrap_or_else(|_|
-                            panic!("{}: STDOUT device '{}' is not available! Something is terribly wrong here!",
+                            panic!("{}: STDOUT device {} is not available! Something is terribly wrong here!",
                                      "FATAL ERROR".blue(), DEFAULT_STDOUT_DEV.cyan())
                         )
                 )

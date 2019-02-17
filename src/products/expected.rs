@@ -9,15 +9,15 @@ use crate::products::unexpected::*;
 pub enum PageExpectation {
 
     /// Valid error code
-    #[fail(display = "Passed ValidCode: '{}'", _0)]
+    #[fail(display = "Passed ValidCode: {}", _0)]
     ValidCode (u32),
 
     /// Valid content regex match
-    #[fail(display = "Passed ValidContent: '{}'", _0)]
+    #[fail(display = "Passed ValidContent: {}", _0)]
     ValidContent (String),
 
     /// Valid content length
-    #[fail(display = "Passed ValidLength: '{}'", _0)]
+    #[fail(display = "Passed ValidLength: {}", _0)]
     ValidLength (usize),
 
 }
@@ -39,7 +39,7 @@ pub type PageExpectations = Vec<PageExpectation>;
 pub enum DomainExpectation {
 
     /// Domain expiry minimum period in days
-    #[fail(display = "Passed ValidExpiryPeriod: '{}'", _0)]
+    #[fail(display = "Passed ValidExpiryPeriod: {}", _0)]
     ValidExpiryPeriod (i32),
 
 }
