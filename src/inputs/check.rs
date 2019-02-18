@@ -109,6 +109,49 @@ pub trait Checks<T> {
     /// Check page expectations
     fn check_page(page_check: &Page) -> History {
         let mut history = History::empty();
+        let page_expectations = page_check
+            .clone()
+            .expects
+            .unwrap_or_default();
+
+        // Error code expectation
+        let expected_code = page_expectations
+            .iter()
+            .find(|exp| {
+                let the_code = match exp {
+                    PageExpectation::ValidCode(code) => code,
+                    _ => &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
+                };
+                the_code != &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
+            })
+            .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE));
+
+        // Content expectation
+        let empty_content = PageExpectation::ValidContent("".to_string());
+        let expected_content = page_expectations
+            .iter()
+            .find(|exp| {
+                let the_content = match exp {
+                    PageExpectation::ValidContent(content) => content,
+                    _ => "",
+                };
+                the_content != ""
+            })
+            .unwrap_or_else(|| &empty_content);
+
+        // Content length validation
+        let expected_content_length = page_expectations
+            .iter()
+            .find(|exp| {
+                let the_content = match exp {
+                    PageExpectation::ValidLength(length) => length,
+                    _ => &0usize,
+                };
+                the_content != &0usize
+            })
+            .unwrap_or_else(|| &PageExpectation::ValidLength(0usize));
+
+        // Proceed with check
         page_check
             .clone()
             .expects
@@ -220,126 +263,101 @@ pub trait Checks<T> {
                     multi.wait(&mut [], Duration::from_secs(1)).unwrap();
                 }
 
-                // gather handlers after multicheck is finished, extract results
+                // gather handlers, perform validations, produce stories…
                 for handler in handlers {
                     let a_handler = handler.unwrap();
                     let handle = a_handler.get_ref();
-                    let expectations = page_check
-                        .clone()
-                        .expects
-                        .unwrap_or_default();
-
-                    // Error code expectation
-                    let expected_code = expectations
-                        .iter()
-                        .find(|exp| {
-                            let the_code = match exp {
-                                PageExpectation::ValidCode(code) => code,
-                                _ => &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
-                            };
-                            the_code != &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
-                        })
-                        .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE));
-
-                    // Content expectation
-                    let empty_content = PageExpectation::ValidContent("".to_string());
-                    let expected_content = expectations
-                        .iter()
-                        .find(|exp| {
-                            let the_content = match exp {
-                                PageExpectation::ValidContent(content) => content,
-                                _ => "",
-                            };
-                            the_content != ""
-                        })
-                        .unwrap_or_else(|| &empty_content);
-
                     let raw_page_content = String::from_utf8_lossy(&handle.0);
-                    match expected_content {
+
+                    let content_story = match expected_content {
                         &PageExpectation::ValidContent(ref content) if !content.is_empty() => {
                             if raw_page_content.contains(content) {
                                 let info_msg = Expected::ContentValid(page_check.url.to_string(), content.to_string());
                                 info!("{}", info_msg.to_string().green());
-                                history = history.append(Story::new(Some(info_msg)))
+                                Story::new(Some(info_msg))
+                            } else {
+                                let error_msg = Unexpected::InvalidContent(page_check.url.to_string(), content.to_string());
+                                info!("{}", error_msg.to_string().green());
+                                Story::new_error(Some(error_msg))
                             }
                         },
 
                         &PageExpectation::ValidContent(ref content) if content.is_empty() => {
-                            let dbg_msg = format!("Validation of an empty content from URL: {}", page_check.url.cyan());
-                            debug!("{}", dbg_msg);
+                            let err_msg = Unexpected::EmptyContent(page_check.url.clone());
+                            warn!("{}", err_msg.to_string().yellow());
+                            Story::new_error(Some(err_msg))
                         },
 
                         edge_case => {
                             let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
                             warn!("{}", warn_msg.to_string().yellow());
-                            history = history.append(Story::new_error(Some(warn_msg)))
+                            Story::new_error(Some(warn_msg))
                         }
-                    }
+                    };
 
-                    // Content length validation
-                    let expected_content_length = expectations
-                        .iter()
-                        .find(|exp| {
-                            let the_content = match exp {
-                                PageExpectation::ValidLength(length) => length,
-                                _ => &0usize,
-                            };
-                            the_content != &0usize
-                        })
-                        .unwrap_or_else(|| &PageExpectation::ValidLength(0usize));
-
-                    match expected_content_length {
+                    let content_length_story = match expected_content_length {
                         &PageExpectation::ValidLength(0) => {
-                            let dbg_msg = format!("Got zero-length content for URL: {}. ValidLength(0) will be ignored.", &page_check.url.cyan());
-                            debug!("{}", dbg_msg);
+                            let err_msg = Unexpected::ZeroLengthContent(page_check.url.clone());
+                            warn!("{}", err_msg.to_string().yellow());
+                            Story::new_error(Some(err_msg))
                         },
 
                         &PageExpectation::ValidLength(ref requested_length) => {
                             if raw_page_content.len() >= *requested_length {
                                 let info_msg = Expected::ContentLength(page_check.url.to_string(), *requested_length);
                                 info!("{}", info_msg.to_string().green());
-                                history = history.append(Story::new(Some(info_msg)))
+                                Story::new(Some(info_msg))
                             } else {
                                 let unexpected = Unexpected::MinimumContentLength(page_check.url.to_string(), *requested_length, raw_page_content.len());
                                 error!("{}", unexpected.to_string().red());
-                                history = history.append(Story::new_error(Some(unexpected)));
+                                Story::new_error(Some(unexpected))
                             }
                         },
 
                         edge_case => {
                             let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
                             warn!("{}", warn_msg.to_string().yellow());
-                            history = history.append(Story::new_error(Some(warn_msg)));
+                            Story::new_error(Some(warn_msg))
                         },
-                    }
+                    };
 
                     let mut result_handler = multi.remove2(a_handler).unwrap();
-                    match result_handler.response_code() {
+                    let result_handler_story = match result_handler.response_code() {
                         Ok(0) => {
                             let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), 0, 0);
                             error!("{}", unexpected.to_string().red());
-                            history = history.append(Story::new_error(Some(unexpected)));
+                            Story::new_error(Some(unexpected))
                         },
 
                         Ok(code) => {
                             if &PageExpectation::ValidCode(code) == expected_code {
                                 let info_msg = Expected::HttpCodeValid(page_check.url.to_string(), code);
                                 info!("{}", info_msg.to_string().green());
-                                history = history.append(Story::new(Some(info_msg)));
+                                Story::new(Some(info_msg))
 
                             } else if let PageExpectation::ValidCode(ref expectation_code) = expected_code {
                                 let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), code, *expectation_code);
                                 error!("{}", unexpected.to_string().red());
-                                history = history.append(Story::new_error(Some(unexpected)));
+                                Story::new_error(Some(unexpected))
+
+                            } else {
+                                let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), code, 0);
+                                error!("{}", unexpected.to_string().red());
+                                Story::new_error(Some(unexpected))
                             }
                         },
 
                         Err(err) => {
                             let unexpected = Unexpected::URLConnectionProblem(page_check.url.to_string(), err.to_string());
                             error!("{}", unexpected.to_string().red());
-                            history = history.append(Story::new_error(Some(unexpected)));
+                            Story::new_error(Some(unexpected))
                         }
-                    }
+                    };
+
+                    // Collect the history results
+                    history = history.append(content_story);
+                    history = history.append(content_length_story);
+                    history = history.append(result_handler_story);
                 }
                 Some(history)
             })
