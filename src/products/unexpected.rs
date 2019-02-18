@@ -13,28 +13,29 @@ use crate::products::expected::*;
 /// Unexpected check result
 pub enum Unexpected {
 
-    /// Failed to pass domain expectation
-    #[fail(display = "Domain expectation: {} has failed", _0)]
-    FailedDomain (String),
+    /// Failed to pass page expectation
+    #[fail(display = "Failed to connect to URL: {}. Details: {}.", _0, _1)]
+    URLConnectionProblem (String, String),
 
     /// Failed to pass page expectation
-    #[fail(display = "Page expectation has failed for page: {}", _0)]
-    FailedPage (String),
+    #[fail(display = "Expired TLS/SSL Certificate for domain: {}.", _0)]
+    TLSDomainExpired (String),
 
-    /// Failed to read/parse JSON
-    #[fail(display = "JSON parse failure for: {}", _0)]
-    FailedJson (String),
+    /// HttpErrorCode (url, got_code, expected_code)
+    #[fail(display = "URL: {} responded with unexpected error-code: {} but code: {} was expected.", _0, _1, _2)]
+    HttpErrorCode (String, u32, u32),
 
-    /// Failed to connect/read from remote
-    #[fail(display = "Remote access failure for: {}", _0)]
-    FailedRemote (String),
-
-    /// Failed content check
-    #[fail(display = "Content validation failure for: {}", _0)]
-    FailedContent (String),
+    /// Failed content length check
+    #[fail(display = "URL: {} is unable to pass minimum-content-length expectation! Actual content length: {}. Expected minimum-length: {}.", _0, _1, _2)]
+    MinimumContentLength (String, usize, usize),
 
     /// Failed internal function
-    #[fail(display = "Internal failure for: {}", _0)]
-    FailedInternal (String),
+    #[fail(display = "InternalProtocolProblemFailure on: {}. Details: {}.", _0, _1)]
+    InternalProtocolProblem (String, String),
+
+
+    /// Not Implemented functionality
+    #[fail(display = "Not Implemented yet: {}. Details: {}.", _0, _1)]
+    NotImplementedYet (String, String),
 
 }
