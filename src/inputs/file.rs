@@ -55,22 +55,14 @@ impl Checks<FileCheck> for FileCheck {
 
 
     fn execute(&self) -> History {
-        let mut history = History::empty();
-
-        let page_check = FileCheck::check_pages(self.pages.clone())
-            .unwrap_or_else(|_| {
-                warn!("No pages to check!");
-                History::empty()
-            });
-        history = history.merge(page_check);
-
-        let domain_check = FileCheck::check_domains(self.domains.clone())
-            .unwrap_or_else(|_| {
-                debug!("No domains to check!");
-                History::empty()
-            });
-        history = history.merge(domain_check);
-        history
+        let pages = FileCheck::check_pages(self.pages.clone()).unwrap();
+        let domains = FileCheck::check_domains(self.domains.clone()).unwrap();
+        History::new_from(
+            [
+                pages.stories(),
+                domains.stories(),
+            ].concat()
+        )
     }
 
 

@@ -72,9 +72,21 @@ impl History {
     }
 
 
-    /// New History
+    /// New History with first element
     pub fn new(first: Story) -> History {
         History(vec!(first))
+    }
+
+
+    /// New History with stories list
+    pub fn new_from(stories: Vec<Story>) -> History {
+        History(stories)
+    }
+
+
+    /// Stories extractor
+    pub fn stories(&self) -> Vec<Story> {
+        self.0.clone()
     }
 
 
@@ -104,6 +116,7 @@ impl History {
             }
         }
     }
+
 
 }
 
