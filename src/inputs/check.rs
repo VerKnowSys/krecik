@@ -74,34 +74,36 @@ pub trait Checks<T> {
 
     /// Check domains
     fn check_domains(domains: Option<Domains>) -> Result<History, History> {
-        let mut history = History::empty();
         match domains {
             Some(domains) => {
-                domains
-                    .iter()
-                    .for_each(|defined_check| {
-                        let domain_check = defined_check.clone();
-                        let domain_name = domain_check.name;
-                        domain_check
-                            .expects
-                            .and_then(|domain_expectations| {
-                                domain_expectations
-                                    .iter()
-                                    .for_each(|domain_expectation| {
-                                        history = history.append(Self::check_ssl_expire(&domain_name, *domain_expectation));
-                                    });
-                                Some(())
-                            });
-                        }
-                    );
+                Ok(History::new_from(
+                    domains
+                        .iter()
+                        .flat_map(|defined_check| {
+                            let domain_check = defined_check.clone();
+                            let domain_name = domain_check.name;
+                            let domain_expectations = domain_check
+                                .expects
+                                .unwrap_or_default();
+
+                            History::new_from(domain_expectations
+                                .iter()
+                                .map(|domain_expectation| {
+                                    Self::check_ssl_expire(&domain_name, *domain_expectation)
+                                })
+                                .collect()
+                            ).stories()
+                        })
+                        .collect()
+                    )
+                )
             },
 
             None => {
                 debug!("Execute: No domains to check.");
+                Ok(History::empty())
             }
-        };
-
-        Ok(history)
+        }
     }
 
 
