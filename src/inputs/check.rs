@@ -51,25 +51,23 @@ pub trait Checks<T> {
                     },
 
                     DomainExpectation::ValidExpiryPeriod(days) => {
-                         debug!("Validating expectation: ValidExpiryPeriod({} days) for domain: {}", days, domain_name.cyan());
                          if ssl_validator.days() < days
                          || ssl_validator.is_expired() {
-                            let err_msg = format!("Got expired domain: {}.", domain_name.cyan());
+                            let err_msg = Unexpected::TLSDomainExpired(domain_name.to_string()).to_string();
                             error!("{}", err_msg.red());
                             Err(err_msg.into())
                          } else {
-                            let info_msg = format!("TLS certificate for domain: {} will be valid for: {} days. Check requested minimum: {} days.",
-                                                    domain_name.cyan(), ssl_validator.days(), days);
-                            info!("{}", info_msg.green());
+                            let info_msg = Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), days);
+                            info!("{}", info_msg.to_string().green());
                             Ok(Story::new(Some(info_msg)))
                          }
                      }
                  }
              })
              .unwrap_or_else(|err| {
-                let error_msg = format!("Internal OpenSSL/ Protocol error for domain: {}! Error details: {:?}", domain_name.cyan(), err.0);
-                error!("{}", error_msg.red());
-                Story::new_error(Some(Unexpected::FailedInternal(error_msg)))
+                let unexpected = Unexpected::InternalProtocolProblem(domain_name.to_string(), err.0.to_string());
+                error!("{}", unexpected.to_string().red());
+                Story::new_error(Some(unexpected))
              })
     }
 
@@ -259,8 +257,8 @@ pub trait Checks<T> {
                     match expected_content {
                         &PageExpectation::ValidContent(ref content) if !content.is_empty() => {
                             if raw_page_content.contains(content) {
-                                let info_msg = format!("Got expected content: {} from URL: {}", content.cyan(), page_url.cyan());
-                                info!("{}", info_msg.green());
+                                let info_msg = Expected::ContentValid(page_url.to_string(), content.to_string());
+                                info!("{}", info_msg.to_string().green());
                                 history = history.append(Story::new(Some(info_msg)))
                             }
                         },
@@ -271,9 +269,9 @@ pub trait Checks<T> {
                         },
 
                         edge_case => {
-                            let warn_msg = format!("Unimplemented Validator: {:?}", edge_case);
-                            warn!("{}", warn_msg.yellow());
-                            history = history.append(Story::new(Some(warn_msg)))
+                            let warn_msg = Unexpected::NotImplementedYet(page_url.to_string(), edge_case.to_string());
+                            warn!("{}", warn_msg.to_string().yellow());
+                            history = history.append(Story::new_error(Some(warn_msg)))
                         }
                     }
 
@@ -297,49 +295,48 @@ pub trait Checks<T> {
 
                         &PageExpectation::ValidLength(ref requested_length) => {
                             if raw_page_content.len() >= *requested_length {
-                                let info_msg = format!("Expected content length is at least: {} bytes long for URL: {}",
-                                                     requested_length, page_url.cyan());
-                                info!("{}", info_msg.green());
+                                let info_msg = Expected::ContentLength(page_url.to_string(), *requested_length);
+                                info!("{}", info_msg.to_string().green());
                                 history = history.append(Story::new(Some(info_msg)))
                             } else {
-                                let err_msg = format!("Unexpected content length, requested to be at least: {} bytes long, yet got: {} bytes instead for URL: {}",
-                                                      requested_length, raw_page_content.len(), page_url.cyan());
-                                error!("{}", err_msg.red());
-                                history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                                let unexpected = Unexpected::MinimumContentLength(page_url.to_string(), *requested_length, raw_page_content.len());
+                                error!("{}", unexpected.to_string().red());
+                                history = history.append(Story::new_error(Some(unexpected)));
                             }
                         },
 
                         edge_case => {
-                            let warn_msg = format!("Unimplemented Validator: {:?}", edge_case);
-                            warn!("{}", warn_msg.yellow());
-                            history = history.append(Story::new(Some(warn_msg)))
+                            let warn_msg = Unexpected::NotImplementedYet(page_url.to_string(), edge_case.to_string());
+                            warn!("{}", warn_msg.to_string().yellow());
+                            history = history.append(Story::new_error(Some(warn_msg)));
                         },
                     }
 
                     let mut result_handler = multi.remove2(a_handler).unwrap();
                     match result_handler.response_code() {
                         Ok(0) => {
-                            let err_msg = format!("Error connecting to URL: {}", page_url.cyan());
-                            error!("{}", err_msg.red());
-                            history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                            let unexpected = Unexpected::HttpErrorCode(page_url.to_string(), 0, 0);
+                            error!("{}", unexpected.to_string().red());
+                            history = history.append(Story::new_error(Some(unexpected)));
                         },
 
                         Ok(code) => {
                             if &PageExpectation::ValidCode(code) == expected_code {
-                                let info_msg = format!("Got expected code: {} from URL: {}", code, page_url.cyan());
-                                info!("{}", info_msg.green());
+                                let info_msg = Expected::HttpCodeValid(page_url.to_string(), code);
+                                info!("{}", info_msg.to_string().green());
                                 history = history.append(Story::new(Some(info_msg)));
-                            } else {
-                                let err_msg = format!("Got unexpected code: {} from URL: {}", code, page_url.cyan());
-                                error!("{}", err_msg.red());
-                                history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+
+                            } else if let PageExpectation::ValidCode(ref expectation_code) = expected_code {
+                                let unexpected = Unexpected::HttpErrorCode(page_url.to_string(), code, *expectation_code);
+                                error!("{}", unexpected.to_string().red());
+                                history = history.append(Story::new_error(Some(unexpected)));
                             }
                         },
 
                         Err(err) => {
-                            let err_msg = format!("Got unexpected error: {} from URL: {}", err, page_url.cyan());
-                            error!("{}", err_msg.red());
-                            history = history.append(Story::new_error(Some(Unexpected::FailedPage(err_msg))));
+                            let unexpected = Unexpected::URLConnectionProblem(page_url.to_string(), err.to_string());
+                            error!("{}", unexpected.to_string().red());
+                            history = history.append(Story::new_error(Some(unexpected)));
                         }
                     }
                 }
