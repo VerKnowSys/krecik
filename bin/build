@@ -6,16 +6,6 @@
 . bin/common "${*}"
 
 
-echo
-echo
-echo "Project directory: ${_cargo_project_dir}"
-echo "Project product: ${_bin_name}"
-echo "Project release type: ${_release_type}"
-echo "System type: ${_uname}"
-echo
-echo
-
-
 printf "\n\nBuilding: Library: %b\n" "${_project_name}"
 cargo build \
     --verbose \

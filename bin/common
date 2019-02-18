@@ -78,3 +78,10 @@ if [ ! -x "$(${_command} -v grep)" ] \
 then
     failure "Unavailable base system utilities?!"
 fi
+
+
+echo "Project directory: ${_cargo_project_dir}"
+echo "Project product: ${_bin_name}"
+echo "Project release type: ${_release_type}"
+echo "System type: ${_uname}"
+echo
