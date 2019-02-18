@@ -29,8 +29,14 @@ if [ -n "${_maybe_server_in_background}" ]; then
         fi
         for _tst in $(seq 1 ${_tests_count}); do
             printf "Spawning test: #%b / %b\n" "${_tst}" "${_tests_count}"
-            "${_curl_software}/bin/curl" "http://${_travmole_webapi_endpoint}/check/execute/test${_tst}" 2>> "${_travmole_logfile}" | jq '.'
-            printf "Test #%b completed.\n\n" "${_tst}"
+            _request="$(${_curl_software}/bin/curl "http://${_travmole_webapi_endpoint}/check/execute/test${_tst}" 2>> "${_travmole_logfile}")"
+            if [ "0" != "${?}" ]; then
+                failure "Test: HTTP test #${_tst} has failed: http://${_travmole_webapi_endpoint}/check/execute/test${_tst}"
+            fi
+            printf "%b\n" "${_request}" \
+                | jq '.' 2>> "${_travmole_logfile}"
+
+            printf "Test successful: #%b.\n\n" "${_tst}"
         done
     else
         printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
