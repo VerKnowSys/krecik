@@ -33,6 +33,17 @@ pub enum Unexpected {
     #[fail(display = "InternalProtocolProblemFailure on: {}. Details: {}.", _0, _1)]
     InternalProtocolProblem (String, String),
 
+    /// EmptyContent
+    #[fail(display = "URL: {} responded with empty content.", _0)]
+    EmptyContent (String),
+
+    /// ZeroLengthContent
+    #[fail(display = "URL: {} responded with 0 content-length.", _0)]
+    ZeroLengthContent (String),
+
+    /// InvalidContent - expected content not found where expected
+    #[fail(display = "URL: {} responded with invalid content: {}", _0, _1)]
+    InvalidContent (String, String),
 
     /// Not Implemented functionality
     #[fail(display = "Not Implemented yet: {}. Details: {}.", _0, _1)]

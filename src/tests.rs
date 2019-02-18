@@ -210,7 +210,7 @@ mod tests {
     fn test_domain_check_history_length() {
         let check = FileCheck::load("tests/test1").unwrap();
         let history = FileCheck::check_domains(check.domains);
-        println!("TEST1: {}", history.to_string());
+        println!("TEST1({}): {}", history.length(), history.to_string());
         assert!(history.length() > 0);
         assert!(history.length() == 1);
         let first = history.head();
@@ -224,12 +224,12 @@ mod tests {
     fn test_page_check_history_length() {
         let check = FileCheck::load("tests/test2").unwrap();
         let history = check.execute();
-        println!("TEST2: {}", history.to_string());
-        assert!(history.length() == 1);
+        println!("TEST2({}): {}", history.length(), history.to_string());
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
+        assert!(first.message.is_none());
     }
 
 
@@ -237,12 +237,13 @@ mod tests {
     fn test_redirect_no_follow() {
         let check = FileCheck::load("tests/test3").unwrap();
         let history = check.execute();
-        println!("TEST3: {}", history.to_string());
-        assert!(history.length() == 1);
+        println!("TEST3({}): {}", history.length(), history.to_string());
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
+        assert!(first.message.is_none());
+        assert!(first.error.is_some());
     }
 
 
@@ -250,8 +251,8 @@ mod tests {
     fn test_gibberish_url_check() {
         let check = FileCheck::load("tests/test4").unwrap();
         let history = check.execute();
-        println!("TEST4: {}", history.to_string());
-        assert!(history.length() == 1);
+        println!("TEST4({}): {}", history.length(), history.to_string());
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
@@ -264,12 +265,13 @@ mod tests {
     fn test_page_content_length_check() {
         let check = FileCheck::load("tests/test5").unwrap();
         let history = check.execute();
-        println!("TEST5: {}", history.to_string());
-        assert!(history.length() == 2);
+        println!("TEST5({}): {}", history.length(), history.to_string());
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
+        assert!(first.message.is_none());
+        assert!(first.error.is_some());
     }
 
 
