@@ -334,25 +334,13 @@ pub trait Checks<T> {
 
                     let mut result_handler = multi.remove2(a_handler).unwrap();
                     let result_handler_story = match result_handler.response_code() {
-                        Ok(0) => {
-                            let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), 0, 0);
-                            error!("{}", unexpected.to_string().red());
-                            Story::new_error(Some(unexpected))
-                        },
-
                         Ok(code) => {
                             if &PageExpectation::ValidCode(code) == expected_code {
                                 let info_msg = Expected::HttpCodeValid(page_check.url.to_string(), code);
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
-
-                            } else if let PageExpectation::ValidCode(ref expectation_code) = expected_code {
-                                let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), code, *expectation_code);
-                                error!("{}", unexpected.to_string().red());
-                                Story::new_error(Some(unexpected))
-
                             } else {
-                                let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), code, 0);
+                                let unexpected = Unexpected::HttpCodeValid(page_check.url.to_string(), code);
                                 error!("{}", unexpected.to_string().red());
                                 Story::new_error(Some(unexpected))
                             }
