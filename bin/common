@@ -52,9 +52,11 @@ esac
 
 
 # Sanity checks…
-if [ ! -x "${_curl_software}/bin/curl-config" ] \
-|| [ ! -x "/usr/bin/curl-config" ]
+if [ -x "${_curl_software}/bin/curl-config" ] \
+|| [ -x "/usr/bin/curl-config" ]
 then
+    printf "Curl: OK\n"
+else
     failure "Unavailable Curl >= 7.64.0"
 fi
 
