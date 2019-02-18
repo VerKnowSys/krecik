@@ -216,7 +216,7 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.clone().unwrap_or_default().contains("TLS certificate for domain"));
+        assert!(first.message.is_some());
     }
 
 
@@ -229,7 +229,7 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.clone().unwrap_or_default().contains("Got expected"));
+        assert!(first.message.is_some());
     }
 
 
@@ -242,6 +242,7 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
+        assert!(first.message.is_some());
     }
 
 
@@ -254,6 +255,8 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
+        assert!(first.message.is_none());
+        assert!(first.error.is_some());
     }
 
 
@@ -266,6 +269,10 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
+        assert!(first.message.is_some());
     }
+
+
+    // test POST
 
 }
