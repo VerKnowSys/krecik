@@ -107,7 +107,7 @@ pub trait Checks<T> {
 
 
     /// Check page expectations
-    fn check_page(page_url: &str, page_check: &Page) -> History {
+    fn check_page(page_check: &Page) -> History {
         let mut history = History::empty();
         page_check
             .clone()
@@ -117,11 +117,11 @@ pub trait Checks<T> {
                 multi.pipelining(true, true).unwrap();
                 let handlers: Vec<_> = page_expectations
                     .iter()
-                    .map(|page_expectation| {
+                    .map(|_| {
                         // Initialize Curl, set URL
                         let mut curl = Easy2::new(Collector(Vec::new()));
-                        curl.url(&page_url).unwrap();
-                        debug!("Curl URL: {}", page_url.cyan());
+                        curl.url(&page_check.url).unwrap();
+                        debug!("Curl URL: {}", &page_check.url.cyan());
 
                         // Load Curl request options from check:
                         let curl_options = page_check.clone().options.unwrap_or_default();
@@ -258,19 +258,19 @@ pub trait Checks<T> {
                     match expected_content {
                         &PageExpectation::ValidContent(ref content) if !content.is_empty() => {
                             if raw_page_content.contains(content) {
-                                let info_msg = Expected::ContentValid(page_url.to_string(), content.to_string());
+                                let info_msg = Expected::ContentValid(page_check.url.to_string(), content.to_string());
                                 info!("{}", info_msg.to_string().green());
                                 history = history.append(Story::new(Some(info_msg)))
                             }
                         },
 
                         &PageExpectation::ValidContent(ref content) if content.is_empty() => {
-                            let dbg_msg = format!("Validation of an empty content from URL: {}", page_url.cyan());
+                            let dbg_msg = format!("Validation of an empty content from URL: {}", page_check.url.cyan());
                             debug!("{}", dbg_msg);
                         },
 
                         edge_case => {
-                            let warn_msg = Unexpected::NotImplementedYet(page_url.to_string(), edge_case.to_string());
+                            let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
                             warn!("{}", warn_msg.to_string().yellow());
                             history = history.append(Story::new_error(Some(warn_msg)))
                         }
@@ -290,24 +290,24 @@ pub trait Checks<T> {
 
                     match expected_content_length {
                         &PageExpectation::ValidLength(0) => {
-                            let dbg_msg = format!("Got zero-length content for URL: {}. ValidLength(0) will be ignored.", page_url.cyan());
+                            let dbg_msg = format!("Got zero-length content for URL: {}. ValidLength(0) will be ignored.", &page_check.url.cyan());
                             debug!("{}", dbg_msg);
                         },
 
                         &PageExpectation::ValidLength(ref requested_length) => {
                             if raw_page_content.len() >= *requested_length {
-                                let info_msg = Expected::ContentLength(page_url.to_string(), *requested_length);
+                                let info_msg = Expected::ContentLength(page_check.url.to_string(), *requested_length);
                                 info!("{}", info_msg.to_string().green());
                                 history = history.append(Story::new(Some(info_msg)))
                             } else {
-                                let unexpected = Unexpected::MinimumContentLength(page_url.to_string(), *requested_length, raw_page_content.len());
+                                let unexpected = Unexpected::MinimumContentLength(page_check.url.to_string(), *requested_length, raw_page_content.len());
                                 error!("{}", unexpected.to_string().red());
                                 history = history.append(Story::new_error(Some(unexpected)));
                             }
                         },
 
                         edge_case => {
-                            let warn_msg = Unexpected::NotImplementedYet(page_url.to_string(), edge_case.to_string());
+                            let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
                             warn!("{}", warn_msg.to_string().yellow());
                             history = history.append(Story::new_error(Some(warn_msg)));
                         },
@@ -316,26 +316,26 @@ pub trait Checks<T> {
                     let mut result_handler = multi.remove2(a_handler).unwrap();
                     match result_handler.response_code() {
                         Ok(0) => {
-                            let unexpected = Unexpected::HttpErrorCode(page_url.to_string(), 0, 0);
+                            let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), 0, 0);
                             error!("{}", unexpected.to_string().red());
                             history = history.append(Story::new_error(Some(unexpected)));
                         },
 
                         Ok(code) => {
                             if &PageExpectation::ValidCode(code) == expected_code {
-                                let info_msg = Expected::HttpCodeValid(page_url.to_string(), code);
+                                let info_msg = Expected::HttpCodeValid(page_check.url.to_string(), code);
                                 info!("{}", info_msg.to_string().green());
                                 history = history.append(Story::new(Some(info_msg)));
 
                             } else if let PageExpectation::ValidCode(ref expectation_code) = expected_code {
-                                let unexpected = Unexpected::HttpErrorCode(page_url.to_string(), code, *expectation_code);
+                                let unexpected = Unexpected::HttpErrorCode(page_check.url.to_string(), code, *expectation_code);
                                 error!("{}", unexpected.to_string().red());
                                 history = history.append(Story::new_error(Some(unexpected)));
                             }
                         },
 
                         Err(err) => {
-                            let unexpected = Unexpected::URLConnectionProblem(page_url.to_string(), err.to_string());
+                            let unexpected = Unexpected::URLConnectionProblem(page_check.url.to_string(), err.to_string());
                             error!("{}", unexpected.to_string().red());
                             history = history.append(Story::new_error(Some(unexpected)));
                         }
@@ -357,10 +357,8 @@ pub trait Checks<T> {
                 History::new_from(
                     pages
                         .iter()
-                        .flat_map(|page| {
-                            let check = page.clone();
-                            let url = check.url.clone();
-                            Self::check_page(&url, &check).stories()
+                        .flat_map(|check| {
+                            Self::check_page(&check).stories()
                         })
                         .collect()
                     )
