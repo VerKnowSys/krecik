@@ -21,9 +21,9 @@ pub enum Unexpected {
     #[fail(display = "Expired TLS/SSL Certificate for domain: {}.", _0)]
     TLSDomainExpired (String),
 
-    /// HttpErrorCode (url, got_code, expected_code)
-    #[fail(display = "URL: {} responded with unexpected error-code: {} but code: {} was expected.", _0, _1, _2)]
-    HttpErrorCode (String, u32, u32),
+    /// HttpCodeValid (url, code)
+    #[fail(display = "URL: {} responded with unexpected error-code: {}.", _0, _1)]
+    HttpCodeValid (String, u32),
 
     /// Failed content length check
     #[fail(display = "URL: {} is unable to pass minimum-content-length expectation! Actual content length: {}. Expected minimum-length: {}.", _0, _1, _2)]
