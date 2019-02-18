@@ -221,6 +221,33 @@ pub trait Checks<T> {
                     .http_headers(list)
                     .unwrap();
 
+                // Pass cookies
+                match curl_options.cookies {
+                    Some(cookies) => {
+                        let value: &str = &String::from_utf8_lossy(&cookies);
+                        debug!("{}", format!("Setting cookies: {}", &value.cyan()).black());
+                        curl
+                            .cookie(value)
+                            .unwrap()
+                    },
+                    None => {
+                        debug!("{}", "Empty cookies".black());
+                    }
+                }
+
+                // Set agent
+                match curl_options.agent {
+                    Some(new_agent) => {
+                        debug!("{}", format!("Setting useragent: {}", &new_agent.cyan()).black());
+                        curl
+                            .useragent(&new_agent)
+                            .unwrap()
+                    },
+                    None => {
+                        debug!("{}", "Empty useragent".black());
+                    }
+                }
+
                 // Set connection and request timeout with default fallback to 30s for each
                 curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
                 curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT))).unwrap();

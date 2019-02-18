@@ -28,10 +28,6 @@ pub type Pages = Vec<Page>;
 /// Page options - passed to Curl
 pub struct PageOptions {
 
-    // /// HTTP cookies
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub cookies: Option<Vec<String>>,
-
     /// HTTP headers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<Vec<String>>,
@@ -39,6 +35,10 @@ pub struct PageOptions {
     /// HTTP POST data (body)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_data: Option<Vec<u8>>,
+
+    /// HTTP cookies
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cookies: Option<Vec<u8>>,
 
     /// HTTP follow 301/302 redirects
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,9 +48,9 @@ pub struct PageOptions {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<Method>,
 
-    // /// HTTP agent name
-    // #[serde(skip_serializing_if = "Option::is_none")]
-    // pub agent: Option<String>,
+    /// HTTP agent name
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub agent: Option<String>,
 
     /// HTTP check timeout in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,8 +87,8 @@ impl ToString for PageOptions {
 impl Default for PageOptions {
     fn default() -> PageOptions {
         PageOptions {
-            // agent: None,
-            // cookies: None,
+            agent: None,
+            cookies: None,
             headers: None,
             post_data: None,
             ssl_verify_peer: Some(true),
