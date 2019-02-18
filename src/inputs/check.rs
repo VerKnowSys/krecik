@@ -270,7 +270,7 @@ pub trait Checks<T> {
                     let raw_page_content = String::from_utf8_lossy(&handle.0);
 
                     let content_story = match expected_content {
-                        &PageExpectation::ValidContent(ref content) if !content.is_empty() => {
+                        &PageExpectation::ValidContent(ref content) => {
                             if raw_page_content.contains(content) {
                                 let info_msg = Expected::ContentValid(page_check.url.to_string(), content.to_string());
                                 info!("{}", info_msg.to_string().green());
@@ -282,12 +282,6 @@ pub trait Checks<T> {
                             }
                         },
 
-                        &PageExpectation::ValidContent(ref content) if content.is_empty() => {
-                            let err_msg = Unexpected::EmptyContent(page_check.url.clone());
-                            warn!("{}", err_msg.to_string().yellow());
-                            Story::new_error(Some(err_msg))
-                        },
-
                         edge_case => {
                             let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
                             warn!("{}", warn_msg.to_string().yellow());
@@ -296,12 +290,6 @@ pub trait Checks<T> {
                     };
 
                     let content_length_story = match expected_content_length {
-                        &PageExpectation::ValidLength(0) => {
-                            let err_msg = Unexpected::ZeroLengthContent(page_check.url.clone());
-                            warn!("{}", err_msg.to_string().yellow());
-                            Story::new_error(Some(err_msg))
-                        },
-
                         &PageExpectation::ValidLength(ref requested_length) => {
                             if raw_page_content.len() >= *requested_length {
                                 let info_msg = Expected::ContentLength(page_check.url.to_string(), *requested_length);
