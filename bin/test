@@ -6,15 +6,6 @@
 . bin/common "${*}"
 
 
-echo
-echo
-echo "Project directory: ${_cargo_project_dir}"
-echo "Project product: ${_bin_name}"
-echo "System type: ${_uname}"
-echo
-echo
-
-
 export RUST_BACKTRACE=1
 cargo test -- --color always --nocapture
 if [ "0" != "${?}" ]; then
