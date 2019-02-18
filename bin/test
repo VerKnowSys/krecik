@@ -15,11 +15,6 @@ echo
 echo
 
 
-failure () {
-    printf "FAILURE: %b\n" "${@}"
-    exit 1
-}
-
 export RUST_BACKTRACE=1
 cargo test -- --color always --nocapture
 if [ "0" != "${?}" ]; then

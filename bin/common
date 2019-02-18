@@ -25,6 +25,13 @@ if [ "release" != "${_release_type}" ]; then
     unset _cargo_release_flag
 fi
 
+
+failure () {
+    printf "FAILURE: %b\n" "${@}"
+    exit 1
+}
+
+
 # used Shared Libraries
 case "${_uname}" in
     Darwin|FreeBSD)
