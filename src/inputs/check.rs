@@ -99,7 +99,7 @@ pub trait Checks<T> {
             },
 
             None => {
-                debug!("Execute: No domains to check.");
+                debug!("{}", "Execute: No domains to check.".black());
                 History::empty()
             }
         }
@@ -159,33 +159,33 @@ pub trait Checks<T> {
                 // Initialize Curl, set URL
                 let mut curl = Easy2::new(Collector(Vec::new()));
                 curl.url(&page_check.url).unwrap();
-                debug!("Curl URL: {}", &page_check.url.cyan());
+                debug!("{}", format!("Curl URL: {}", &page_check.url.cyan()).black());
 
                 // Load Curl request options from check:
                 let curl_options = page_check.clone().options.unwrap_or_default();
-                debug!("Curl options: {}", curl_options.to_string().cyan());
+                debug!("{}", format!("Curl options: {}", curl_options.to_string().cyan()).black());
 
                 // Setup Curl configuration based on given options
                 if curl_options.follow_redirects.unwrap_or_else(|| true) {
-                    debug!("Enabled following redirects");
+                    debug!("{}", "Enabled following redirects".black());
                     curl.follow_location(true).unwrap();
                 } else {
-                    debug!("Disabled following redirects");
+                    debug!("{}", "Disabled following redirects".black());
                     curl.follow_location(false).unwrap();
                 }
 
                 if curl_options.verbose.unwrap_or_else(|| false) {
-                    debug!("Enabling Verbose mode");
+                    debug!("{}", "Enabling Verbose mode".black());
                     curl.verbose(true).unwrap();
                 } else {
-                    debug!("Disabling Verbose mode");
+                    debug!("{}", "Disabling Verbose mode".black());
                     curl.verbose(false).unwrap();
                 }
 
                 // Setup Curl configuration based on given options
                 match curl_options.method {
                     Some(Method::PUT) | Some(Method::POST) => {
-                        debug!("Curl method: PUT / POST");
+                        debug!("{}", "Curl method: PUT / POST".black());
                         let post_data = curl_options
                                             .post_data
                                             .unwrap_or_default();
@@ -199,14 +199,12 @@ pub trait Checks<T> {
 
                     // fallbacks to GET
                     Some(_) | None => {
-                        debug!("Curl method: GET");
+                        debug!("{}", "Curl method: GET".black());
                         curl.get(true).unwrap();
                     },
                 };
 
-                //
                 // Build List of HTTP headers
-                //
                 // ex. header:
                 //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
                 let mut list = List::new();
@@ -254,7 +252,7 @@ pub trait Checks<T> {
 
                 // Verify SSL PEER
                 if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
-                    debug!("Enabled TLS-PEER verification.");
+                    debug!("{}", "Enabled TLS-PEER verification.".black());
                     curl.ssl_verify_peer(true).unwrap();
                 } else {
                     warn!("Disabled TLS-PEER verification!");
@@ -263,7 +261,7 @@ pub trait Checks<T> {
 
                 // Verify SSL HOST
                 if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
-                    debug!("Enabled TLS-HOST verification.");
+                    debug!("{}", "Enabled TLS-HOST verification.".black());
                     curl.ssl_verify_host(true).unwrap();
                 } else {
                     warn!("Disabled TLS-HOST verification!");
@@ -396,7 +394,7 @@ pub trait Checks<T> {
             },
 
             None => {
-                debug!("Execute: No pages to check.");
+                debug!("{}", "Execute: No pages to check.".black());
                 History::empty()
             }
         }
