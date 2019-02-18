@@ -55,12 +55,10 @@ impl Checks<FileCheck> for FileCheck {
 
 
     fn execute(&self) -> History {
-        let pages = FileCheck::check_pages(self.pages.clone()).unwrap();
-        let domains = FileCheck::check_domains(self.domains.clone()).unwrap();
         History::new_from(
             [
-                pages.stories(),
-                domains.stories(),
+                FileCheck::check_pages(self.pages.clone()).stories(),
+                FileCheck::check_domains(self.domains.clone()).stories(),
             ].concat()
         )
     }

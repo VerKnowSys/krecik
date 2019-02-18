@@ -73,10 +73,10 @@ pub trait Checks<T> {
 
 
     /// Check domains
-    fn check_domains(domains: Option<Domains>) -> Result<History, History> {
+    fn check_domains(domains: Option<Domains>) -> History {
         match domains {
             Some(domains) => {
-                Ok(History::new_from(
+                History::new_from(
                     domains
                         .iter()
                         .flat_map(|defined_check| {
@@ -96,12 +96,11 @@ pub trait Checks<T> {
                         })
                         .collect()
                     )
-                )
             },
 
             None => {
                 debug!("Execute: No domains to check.");
-                Ok(History::empty())
+                History::empty()
             }
         }
     }
@@ -352,10 +351,10 @@ pub trait Checks<T> {
 
 
     /// Check pages
-    fn check_pages(pages: Option<Pages>) -> Result<History, History> {
+    fn check_pages(pages: Option<Pages>) -> History {
         match pages {
             Some(pages) => {
-                Ok(History::new_from(
+                History::new_from(
                     pages
                         .iter()
                         .flat_map(|page| {
@@ -365,12 +364,11 @@ pub trait Checks<T> {
                         })
                         .collect()
                     )
-                )
             },
 
             None => {
                 debug!("Execute: No pages to check.");
-                Ok(History::empty())
+                History::empty()
             }
         }
     }
