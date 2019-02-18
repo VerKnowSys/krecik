@@ -351,24 +351,26 @@ pub trait Checks<T> {
 
     /// Check pages
     fn check_pages(pages: Option<Pages>) -> Result<History, History> {
-        let mut history = History::empty();
         match pages {
             Some(pages) => {
-                pages
-                    .iter()
-                    .for_each(|defined_page| {
-                        let page_check = defined_page.clone();
-                        let page_url = page_check.url.clone();
-                        history = history.merge(Self::check_page(&page_url, &page_check));
-                    });
+                Ok(History::new_from(
+                    pages
+                        .iter()
+                        .flat_map(|page| {
+                            let check = page.clone();
+                            let url = check.url.clone();
+                            Self::check_page(&url, &check).stories()
+                        })
+                        .collect()
+                    )
+                )
             },
 
             None => {
                 debug!("Execute: No pages to check.");
+                Ok(History::empty())
             }
         }
-
-        Ok(history)
     }
 
 
