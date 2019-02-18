@@ -19,7 +19,7 @@ pub struct Story {
 
     /// Story - message
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<String>,
+    pub message: Option<Expected>,
 
     /// Story - keep history of unexpected results
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,7 +32,7 @@ impl Story {
 
 
     /// New story
-    pub fn new(message: Option<String>) -> Story {
+    pub fn new(message: Option<Expected>) -> Story {
         let local_now = Local::now();
         Story {
             count: 1,
