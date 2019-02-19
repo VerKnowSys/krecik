@@ -36,6 +36,8 @@ pub const CHECK_SSL_DAYS_EXPIRATION: i32 = 14;
 /// Default successful HTTP code: 200
 pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;
 
+/// Default minimum length of HTTP content
+pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 16;
 
 /// Web-API endpoint
 pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute/";

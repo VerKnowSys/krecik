@@ -144,11 +144,11 @@ pub trait Checks<T> {
             .find(|exp| {
                 let the_content = match exp {
                     PageExpectation::ValidLength(length) => length,
-                    _ => &0usize,
+                    _ => &CHECK_HTTP_MINIMUM_LENGHT,
                 };
-                the_content != &0usize
+                the_content != &CHECK_HTTP_MINIMUM_LENGHT
             })
-            .unwrap_or_else(|| &PageExpectation::ValidLength(0usize));
+            .unwrap_or_else(|| &PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT));
 
         // Final address validation
         let empty_address = PageExpectation::ValidAddress("".to_string());
