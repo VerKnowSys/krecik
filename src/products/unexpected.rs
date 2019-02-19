@@ -21,13 +21,13 @@ pub enum Unexpected {
     #[fail(display = "Expired TLS/SSL Certificate for domain: {}.", _0)]
     TLSDomainExpired (String),
 
-    /// HttpCodeValid (url, code)
+    /// HttpCode (url, code)
     #[fail(display = "URL: {} responded with unexpected error-code: {}.", _0, _1)]
-    HttpCodeValid (String, u32),
+    HttpCode (String, u32),
 
     /// Failed content length check
     #[fail(display = "URL: {} is unable to pass minimum-content-length expectation! Actual content length: {}. Expected minimum-length: {}.", _0, _1, _2)]
-    MinimumContentLength (String, usize, usize),
+    ContentLength (String, usize, usize),
 
     /// Failed internal function
     #[fail(display = "InternalProtocolProblemFailure on: {}. Details: {}.", _0, _1)]
@@ -41,9 +41,9 @@ pub enum Unexpected {
     #[fail(display = "URL: {} responded with 0 content-length.", _0)]
     ZeroLengthContent (String),
 
-    /// InvalidContent - expected content not found where expected
+    /// Content - expected content not found where expected
     #[fail(display = "URL: {} responded with invalid content: {}", _0, _1)]
-    InvalidContent (String, String),
+    Content (String, String),
 
     /// Not Implemented functionality
     #[fail(display = "Not Implemented yet: {}. Details: {}.", _0, _1)]

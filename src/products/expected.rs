@@ -64,12 +64,12 @@ pub enum Expected {
 
     /// Check returned expected HTTP error code
     #[fail(display = "URL: {} returned expected error-code: {}.", _0, _1)]
-    HttpCodeValid (String, u32),
+    HttpCode (String, u32),
 
 
     /// Check returned expected page contents
     #[fail(display = "URL: {} contains expected value: {}.", _0, _1)]
-    ContentValid (String, String),
+    Content (String, String),
 
 
     /// Check returned expected page content length

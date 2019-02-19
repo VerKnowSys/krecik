@@ -292,11 +292,11 @@ pub trait Checks<T> {
                     let content_story = match expected_content {
                         &PageExpectation::ValidContent(ref content) => {
                             if raw_page_content.contains(content) {
-                                let info_msg = Expected::ContentValid(page_check.url.to_string(), content.to_string());
+                                let info_msg = Expected::Content(page_check.url.to_string(), content.to_string());
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
                             } else {
-                                let error_msg = Unexpected::InvalidContent(page_check.url.to_string(), content.to_string());
+                                let error_msg = Unexpected::Content(page_check.url.to_string(), content.to_string());
                                 info!("{}", error_msg.to_string().green());
                                 Story::new_error(Some(error_msg))
                             }
@@ -316,7 +316,7 @@ pub trait Checks<T> {
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
                             } else {
-                                let unexpected = Unexpected::MinimumContentLength(page_check.url.to_string(), *requested_length, raw_page_content.len());
+                                let unexpected = Unexpected::ContentLength(page_check.url.to_string(), *requested_length, raw_page_content.len());
                                 error!("{}", unexpected.to_string().red());
                                 Story::new_error(Some(unexpected))
                             }
@@ -333,11 +333,11 @@ pub trait Checks<T> {
                     let result_handler_story = match result_handler.response_code() {
                         Ok(code) => {
                             if &PageExpectation::ValidCode(code) == expected_code {
-                                let info_msg = Expected::HttpCodeValid(page_check.url.to_string(), code);
+                                let info_msg = Expected::HttpCode(page_check.url.to_string(), code);
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
                             } else {
-                                let unexpected = Unexpected::HttpCodeValid(page_check.url.to_string(), code);
+                                let unexpected = Unexpected::HttpCode(page_check.url.to_string(), code);
                                 error!("{}", unexpected.to_string().red());
                                 Story::new_error(Some(unexpected))
                             }
