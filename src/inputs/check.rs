@@ -308,7 +308,11 @@ pub trait Checks<T> {
 
                     let content_story = match expected_content {
                         &PageExpectation::ValidContent(ref content) => {
-                            if !content.is_empty() && raw_page_content.contains(content) {
+                            if content.is_empty() {
+                                let info_msg = Expected::EmptyContent(page_check.url.to_string());
+                                info!("{}", info_msg.to_string().green());
+                                Story::new(Some(info_msg))
+                            } else if raw_page_content.contains(content) {
                                 let info_msg = Expected::Content(page_check.url.to_string(), content.to_string());
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
