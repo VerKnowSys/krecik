@@ -348,10 +348,10 @@ pub trait Checks<T> {
 
                     let mut result_handler = multi.remove2(a_handler).unwrap();
 
-                    let result_final_address = result_handler.effective_url().unwrap();
+                    let result_final_address = result_handler.effective_url().unwrap_or_default();
                     let result_final_address_story = match expected_final_address {
                         &PageExpectation::ValidAddress(ref address) => {
-                            if address == result_final_address.unwrap_or_default() {
+                            if result_final_address.unwrap_or_default().contains(address) {
                                 let info_msg = Expected::Address(page_check.url.to_string(), address.to_string());
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
