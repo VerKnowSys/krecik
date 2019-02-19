@@ -275,9 +275,13 @@ pub trait Checks<T> {
             })
             .collect();
 
-        // perform async multicheck
-        while multi.perform().unwrap() > 0 {
-            multi.wait(&mut [], Duration::from_secs(1)).unwrap();
+        // perform async checks
+        while multi
+                .perform()
+                .unwrap() > 0 {
+            multi
+                .wait(&mut [], Duration::from_secs(1))
+                .unwrap();
         }
 
         // gather handlers, perform validations, produce stories…
