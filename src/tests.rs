@@ -229,7 +229,6 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
     }
 
 
@@ -242,8 +241,6 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
-        assert!(first.error.is_none());
     }
 
 
@@ -277,8 +274,6 @@ mod tests {
         assert!(cookies.unwrap_or_default().len() == 3);
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
-        assert!(first.error.is_none());
     }
 
 
