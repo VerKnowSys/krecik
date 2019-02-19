@@ -22,7 +22,7 @@ pub enum Unexpected {
     TLSDomainExpired (String),
 
     /// Failed to get expected Address
-    #[fail(display = "URL: {} has unexpected final address: {}.", _0, _1)]
+    #[fail(display = "URL: {} has unexpected final address: \"{}\".", _0, _1)]
     Address (String, String),
 
     /// HttpCode (url, code)
