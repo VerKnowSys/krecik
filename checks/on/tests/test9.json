@@ -1,0 +1,29 @@
+{
+    "name": "Testcheck9",
+    "domains": [
+        {
+            "name": "fdgdhfjgsdfkgjsdfgdf.com",
+            "expects": [
+                {
+                    "ValidExpiryPeriod": 14
+                }
+            ]
+        }
+    ],
+    "pages": [
+        {
+            "url": "http://gist.github.com",
+            "expects": [
+                {
+                    "ValidCode": 404
+                },
+                {
+                    "ValidAddress": "https://gdksjnfshdfgdsggist.github.com/"
+                }
+            ],
+            "options": {
+                "agent": "Testcheck9"
+            }
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "name": "Testcheck7",
+    "pages": [
+        {
+            "url": "https://rust-lang.org/",
+            "expects": [
+                {
+                    "ValidCode": 0
+                },
+                {
+                    "ValidContent": "lang"
+                }
+            ],
+            "options": {
+                "ssl_verify_host": false,
+                "ssl_verify_peer": false
+            }
+        }
+    ]
+}

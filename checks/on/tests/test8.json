@@ -1,0 +1,29 @@
+{
+    "name": "Testcheck8",
+    "domains": [
+        {
+            "name": "gist.github.com",
+            "expects": [
+                {
+                    "ValidExpiryPeriod": 14
+                }
+            ]
+        }
+    ],
+    "pages": [
+        {
+            "url": "http://gist.github.com",
+            "expects": [
+                {
+                    "ValidCode": 200
+                },
+                {
+                    "ValidAddress": "https://gist.github.com/"
+                }
+            ],
+            "options": {
+                "agent": "Testcheck8"
+            }
+        }
+    ]
+}
