@@ -264,10 +264,17 @@ mod tests {
     #[test]
     fn test_page_content_length_check() {
         let check = FileCheck::load("tests/test5").unwrap();
+        let page: &Page = &check.clone().pages.unwrap()[0];
+        let options = page.options.clone().unwrap();
+        let cookies = options.cookies;
+        let headers = options.headers;
         let history = check.execute();
         println!("TEST5({}): {}", history.length(), history.to_string());
         assert!(history.length() == 3);
         let first = history.head();
+        assert!(headers.is_some());
+        assert!(cookies.is_some());
+        assert!(cookies.unwrap_or_default().len() == 3);
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
         assert!(first.message.is_some());
