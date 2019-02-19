@@ -66,17 +66,17 @@ pub type DomainExpectations = Vec<DomainExpectation>;
 pub enum Expected {
 
     /// Check returned expected Address
-    #[fail(display = "URL: {} returned expected final address: {}.", _0, _1)]
+    #[fail(display = "URL: {} returns expected final-address: \"{}\".", _0, _1)]
     Address (String, String),
 
 
     /// Check returned expected HTTP error code
-    #[fail(display = "URL: {} returned expected error-code: {}.", _0, _1)]
+    #[fail(display = "URL: {} returns expected error-code: {}.", _0, _1)]
     HttpCode (String, u32),
 
 
     /// Check returned expected page contents
-    #[fail(display = "URL: {} contains expected value: \"{}\".", _0, _1)]
+    #[fail(display = "URL: {} contains expected literal: \"{}\".", _0, _1)]
     Content (String, String),
 
 
@@ -91,7 +91,7 @@ pub enum Expected {
 
 
     /// Check returned expected page content length
-    #[fail(display = "URL: {} returned expected content-length at least: {} bytes long.", _0, _1)]
+    #[fail(display = "URL: {} has minimum content-length at least: {} bytes long.", _0, _1)]
     ContentLength (String, usize),
 
 
