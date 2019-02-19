@@ -211,6 +211,7 @@ pub trait Checks<T> {
                 for header in curl_options
                                 .headers
                                 .unwrap_or_default() {
+                    debug!("{}", format!("Setting header: {}", header.cyan()).black());
                     list
                         .append(&header.to_owned())
                         .unwrap();
