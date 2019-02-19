@@ -350,8 +350,15 @@ pub trait Checks<T> {
 
                     let result_final_address = result_handler.effective_url().unwrap_or_default();
                     let result_final_address_story = match expected_final_address {
-                        &PageExpectation::ValidAddress(ref address) => {
-                            if result_final_address.unwrap_or_default().contains(address) {
+                        &PageExpectation::ValidAddress(ref an_address) => {
+                            // skip validation if no address is given. validation passes
+                            let final_address = result_final_address.unwrap_or_default();
+                            let address = if an_address.is_empty() {
+                                final_address
+                            } else {
+                                an_address
+                            };
+                            if final_address.contains(address) {
                                 let info_msg = Expected::Address(page_check.url.to_string(), address.to_string());
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
