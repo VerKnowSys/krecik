@@ -306,103 +306,14 @@ pub trait Checks<T> {
                     let handle = a_handler.get_ref();
                     let raw_page_content = String::from_utf8_lossy(&handle.0);
 
-                    let content_story = match expected_content {
-                        &PageExpectation::ValidContent(ref content) => {
-                            if content.is_empty() {
-                                let info_msg = Expected::EmptyContent(page_check.url.to_string());
-                                info!("{}", info_msg.to_string().green());
-                                Story::new(Some(info_msg))
-                            } else if raw_page_content.contains(content) {
-                                let info_msg = Expected::Content(page_check.url.to_string(), content.to_string());
-                                info!("{}", info_msg.to_string().green());
-                                Story::new(Some(info_msg))
-                            } else {
-                                let error_msg = Unexpected::Content(page_check.url.to_string(), content.to_string());
-                                error!("{}", error_msg.to_string().red());
-                                Story::new_error(Some(error_msg))
-                            }
-                        },
-
-                        edge_case => {
-                            let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
-                            warn!("{}", warn_msg.to_string().yellow());
-                            Story::new_error(Some(warn_msg))
-                        }
-                    };
-
-                    let content_length_story = match expected_content_length {
-                        &PageExpectation::ValidLength(ref requested_length) => {
-                            if *requested_length == 0 {
-                                let info_msg = Expected::NoContentLength(page_check.url.to_string());
-                                info!("{}", info_msg.to_string().green());
-                                Story::new(Some(info_msg))
-                            } else if raw_page_content.len() >= *requested_length {
-                                let info_msg = Expected::ContentLength(page_check.url.to_string(), *requested_length);
-                                info!("{}", info_msg.to_string().green());
-                                Story::new(Some(info_msg))
-                            } else {
-                                let unexpected = Unexpected::ContentLength(page_check.url.to_string(), *requested_length, raw_page_content.len());
-                                error!("{}", unexpected.to_string().red());
-                                Story::new_error(Some(unexpected))
-                            }
-                        },
-
-                        edge_case => {
-                            let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
-                            warn!("{}", warn_msg.to_string().yellow());
-                            Story::new_error(Some(warn_msg))
-                        },
-                    };
+                    // Gather Story from expectations
+                    let content_story = Self::handle_page_content_expectation(&page_check.url, &raw_page_content, expected_content);
+                    let content_length_story = Self::handle_page_length_expectation(&page_check.url, &raw_page_content, expected_content_length);
 
                     let mut result_handler = multi.remove2(a_handler).unwrap();
-
                     let result_final_address = result_handler.effective_url().unwrap_or_default();
-                    let result_final_address_story = match expected_final_address {
-                        &PageExpectation::ValidAddress(ref an_address) => {
-                            // skip validation if no address is given. validation passes
-                            let final_address = result_final_address.unwrap_or_default();
-                            let address = if an_address.is_empty() {
-                                final_address
-                            } else {
-                                an_address
-                            };
-                            if final_address.contains(address) {
-                                let info_msg = Expected::Address(page_check.url.to_string(), address.to_string());
-                                info!("{}", info_msg.to_string().green());
-                                Story::new(Some(info_msg))
-                            } else {
-                                let error_msg = Unexpected::Address(page_check.url.to_string(), address.to_string());
-                                error!("{}", error_msg.to_string().red());
-                                Story::new_error(Some(error_msg))
-                            }
-                        },
-
-                        edge_case => {
-                            let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
-                            warn!("{}", warn_msg.to_string().yellow());
-                            Story::new_error(Some(warn_msg))
-                        }
-                    };
-
-                    let result_handler_story = match result_handler.response_code() {
-                        Ok(code) => {
-                            if &PageExpectation::ValidCode(code) == expected_code {
-                                let info_msg = Expected::HttpCode(page_check.url.to_string(), code);
-                                info!("{}", info_msg.to_string().green());
-                                Story::new(Some(info_msg))
-                            } else {
-                                let unexpected = Unexpected::HttpCode(page_check.url.to_string(), code);
-                                error!("{}", unexpected.to_string().red());
-                                Story::new_error(Some(unexpected))
-                            }
-                        },
-
-                        Err(err) => {
-                            let unexpected = Unexpected::URLConnectionProblem(page_check.url.to_string(), err.to_string());
-                            error!("{}", unexpected.to_string().red());
-                            Story::new_error(Some(unexpected))
-                        }
-                    };
+                    let result_final_address_story = Self::handle_page_address_expectation(&page_check.url, &result_final_address.unwrap_or_default(), expected_final_address);
+                    let result_handler_story = Self::handle_page_httpcode_expectation(&page_check.url, result_handler.response_code().map_err(|err| Error::new(ErrorKind::Other, err.to_string())), expected_code);
 
                     // Collect the history results
                     History::new_from(
@@ -416,6 +327,116 @@ pub trait Checks<T> {
                 })
                 .collect()
         )
+    }
+
+
+    /// Build a Story from a Length PageExpectation
+    fn handle_page_content_expectation(url: &str, raw_page_content: &str, expected_content: &PageExpectation) -> Story {
+        match expected_content {
+            &PageExpectation::ValidContent(ref content) => {
+                if content.is_empty() {
+                    let info_msg = Expected::EmptyContent(url.to_string());
+                    info!("{}", info_msg.to_string().green());
+                    Story::new(Some(info_msg))
+                } else if raw_page_content.contains(content) {
+                    let info_msg = Expected::Content(url.to_string(), content.to_string());
+                    info!("{}", info_msg.to_string().green());
+                    Story::new(Some(info_msg))
+                } else {
+                    let error_msg = Unexpected::Content(url.to_string(), content.to_string());
+                    error!("{}", error_msg.to_string().red());
+                    Story::new_error(Some(error_msg))
+                }
+            },
+
+            edge_case => {
+                let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                warn!("{}", warn_msg.to_string().yellow());
+                Story::new_error(Some(warn_msg))
+            }
+        }
+    }
+
+
+    /// Build a Story from a Length PageExpectation
+    fn handle_page_length_expectation(url: &str, raw_page_content: &str, expected_content_length: &PageExpectation) -> Story {
+        match expected_content_length {
+            &PageExpectation::ValidLength(ref requested_length) => {
+                if *requested_length == 0 {
+                    let info_msg = Expected::NoContentLength(url.to_string());
+                    info!("{}", info_msg.to_string().green());
+                    Story::new(Some(info_msg))
+                } else if raw_page_content.len() >= *requested_length {
+                    let info_msg = Expected::ContentLength(url.to_string(), *requested_length);
+                    info!("{}", info_msg.to_string().green());
+                    Story::new(Some(info_msg))
+                } else {
+                    let unexpected = Unexpected::ContentLength(url.to_string(), *requested_length, raw_page_content.len());
+                    error!("{}", unexpected.to_string().red());
+                    Story::new_error(Some(unexpected))
+                }
+            },
+
+            edge_case => {
+                let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                warn!("{}", warn_msg.to_string().yellow());
+                Story::new_error(Some(warn_msg))
+            },
+        }
+    }
+
+
+    /// Build a Story from a Address PageExpectation
+    fn handle_page_address_expectation(url: &str, result_final_address: &str, expected_address: &PageExpectation) -> Story {
+        match expected_address {
+            &PageExpectation::ValidAddress(ref an_address) => {
+                // skip validation if no address is given. validation passes
+                let address = if an_address.is_empty() {
+                    result_final_address
+                } else {
+                    an_address
+                };
+                if result_final_address.contains(address) {
+                    let info_msg = Expected::Address(url.to_string(), address.to_string());
+                    info!("{}", info_msg.to_string().green());
+                    Story::new(Some(info_msg))
+                } else {
+                    let error_msg = Unexpected::Address(url.to_string(), address.to_string());
+                    error!("{}", error_msg.to_string().red());
+                    Story::new_error(Some(error_msg))
+                }
+            },
+
+            edge_case => {
+                let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                warn!("{}", warn_msg.to_string().yellow());
+                Story::new_error(Some(warn_msg))
+            }
+        }
+    }
+
+
+    /// Build a Story from a HttpCode PageExpectation
+    fn handle_page_httpcode_expectation(url: &str, response_code: Result<u32, Error>, expected_code: &PageExpectation) -> Story {
+        match response_code {
+           Ok(code) => {
+               if &PageExpectation::ValidCode(code) == expected_code {
+                   let info_msg = Expected::HttpCode(url.to_string(), code);
+                   info!("{}", info_msg.to_string().green());
+                   Story::new(Some(info_msg))
+               } else {
+                   let unexpected = Unexpected::HttpCode(url.to_string(), code);
+                   error!("{}", unexpected.to_string().red());
+                   Story::new_error(Some(unexpected))
+               }
+           },
+
+           Err(err) => {
+               let unexpected = Unexpected::URLConnectionProblem(url.to_string(), err.to_string());
+               error!("{}", unexpected.to_string().red());
+               Story::new_error(Some(unexpected))
+           }
+       }
     }
 
 
