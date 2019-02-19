@@ -314,7 +314,7 @@ pub trait Checks<T> {
                                 Story::new(Some(info_msg))
                             } else {
                                 let error_msg = Unexpected::Content(page_check.url.to_string(), content.to_string());
-                                info!("{}", error_msg.to_string().green());
+                                error!("{}", error_msg.to_string().red());
                                 Story::new_error(Some(error_msg))
                             }
                         },
