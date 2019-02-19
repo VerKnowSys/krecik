@@ -328,7 +328,7 @@ pub trait Checks<T> {
 
                     let content_length_story = match expected_content_length {
                         &PageExpectation::ValidLength(ref requested_length) => {
-                            if raw_page_content.len() >= *requested_length {
+                            if *requested_length > 0 && raw_page_content.len() >= *requested_length {
                                 let info_msg = Expected::ContentLength(page_check.url.to_string(), *requested_length);
                                 info!("{}", info_msg.to_string().green());
                                 Story::new(Some(info_msg))
