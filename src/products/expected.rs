@@ -76,7 +76,7 @@ pub enum Expected {
 
 
     /// Check returned expected page contents
-    #[fail(display = "URL: {} contains expected value: {}.", _0, _1)]
+    #[fail(display = "URL: {} contains expected value: \"{}\".", _0, _1)]
     Content (String, String),
 
 
