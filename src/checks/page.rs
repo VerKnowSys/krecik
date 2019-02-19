@@ -34,11 +34,11 @@ pub struct PageOptions {
 
     /// HTTP POST data (body)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub post_data: Option<Vec<u8>>,
+    pub post_data: Option<Vec<String>>,
 
     /// HTTP cookies
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub cookies: Option<Vec<u8>>,
+    pub cookies: Option<Vec<String>>,
 
     /// HTTP follow 301/302 redirects
     #[serde(skip_serializing_if = "Option::is_none")]

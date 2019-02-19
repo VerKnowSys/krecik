@@ -220,17 +220,13 @@ pub trait Checks<T> {
                     .unwrap();
 
                 // Pass cookies
-                match curl_options.cookies {
-                    Some(cookies) => {
-                        let value: &str = &String::from_utf8_lossy(&cookies);
-                        debug!("{}", format!("Setting cookies: {}", &value.cyan()).black());
-                        curl
-                            .cookie(value)
-                            .unwrap()
-                    },
-                    None => {
-                        debug!("{}", "Empty cookies".black());
-                    }
+                for cookie in curl_options
+                                .cookies
+                                .unwrap_or_default() {
+                    debug!("{}", format!("Setting cookie: {}", cookie.cyan()).black());
+                    curl
+                        .cookie(&cookie)
+                        .unwrap();
                 }
 
                 // Set agent

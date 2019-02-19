@@ -7,7 +7,20 @@
                 {
                     "ValidLength": 16000
                 }
-            ]
+            ],
+            "options": {
+                "headers": [
+                    "zala: takiheder",
+                    "atala: header123",
+                    "oitrala: 1"
+                ],
+                "cookies": [
+                    "ala: 123",
+                    "tala: aye sensei",
+                    "trala: 6"
+                ],
+                "agent": "Krtecek-Underground-Agent"
+            }
         }
     ]
 }
