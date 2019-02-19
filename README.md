@@ -5,13 +5,13 @@
 
 ### Author:
 
-Daniel (@dmilith) Dettlaff
+> Daniel (@dmilith) Dettlaff
 
 
 ### Requirements:
 
-HardenedBSD | Darwin => `Curl_lib` software bundle (`/Software/Curl_lib`), built with all required features enabled by default.
-Linux                => `curl-dev`, `openssl-dev`, 'nghttp2-dev'
+- HardenedBSD | Darwin => `Curl_lib` software bundle (`/Software/Curl_lib`), built with all required features enabled by default.
+- Linux                => `curl-dev`, `openssl-dev`, 'nghttp2-dev'
 
 
 ### Few words about design solutions…
@@ -37,13 +37,13 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into travmole binary.
 
 ### Features:
 
-Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP)
+- Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP)
 
-HTTP2 used as default protocol, with fallback to HTTP1.1.
+- HTTP2 used as default protocol, with fallback to HTTP1.1.
 
-TLS1.3, TLS1.2, TLS1.1 as default TLS/SSL protocol versions.
+- TLS1.3, TLS1.2, TLS1.1 as default TLS/SSL protocol versions.
 
-OpenSSL 1.1.1a+ as base for TLS/SSL and domain expiry checks.
+- OpenSSL 1.1.1a+ as base for TLS/SSL and domain expiry checks.
 
 
 
@@ -69,11 +69,10 @@ OpenSSL 1.1.1a+ as base for TLS/SSL and domain expiry checks.
 
 ### Run tests:
 
-
-NOTE: If one of servers mentioned above… is started,
-      the script mentioned below will do additional
-      round of built in tests over HTTP2-Check-API
-      implemented by server.
+> NOTE: If one of servers mentioned above… is started,
+>       the script mentioned below will do additional
+>       round of built in tests over HTTP2-Check-API
+>       implemented by server.
 
 `bin/test`
 
