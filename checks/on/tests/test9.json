@@ -19,6 +19,12 @@
                 },
                 {
                     "ValidAddress": "https://gdksjnfshdfgdsggist.github.com/"
+                },
+                {
+                    "ValidLength": 1000000000000000
+                },
+                {
+                    "ValidContent": "Zdeněk Miler"
                 }
             ],
             "options": {
