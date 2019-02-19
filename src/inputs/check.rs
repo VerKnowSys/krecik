@@ -150,6 +150,19 @@ pub trait Checks<T> {
             })
             .unwrap_or_else(|| &PageExpectation::ValidLength(0usize));
 
+        // Final address validation
+        let empty_address = PageExpectation::ValidAddress("".to_string());
+        let expected_final_address = page_expectations
+            .iter()
+            .find(|exp| {
+                let the_content = match exp {
+                    PageExpectation::ValidAddress(ref address) => address,
+                    _ => "",
+                };
+                !the_content.is_empty()
+            })
+            .unwrap_or_else(|| &empty_address);
+
         // Proceed with check
         let mut multi = Multi::new();
         multi.pipelining(true, true).unwrap();
@@ -334,6 +347,28 @@ pub trait Checks<T> {
                     };
 
                     let mut result_handler = multi.remove2(a_handler).unwrap();
+
+                    let result_final_address = result_handler.effective_url().unwrap();
+                    let result_final_address_story = match expected_final_address {
+                        &PageExpectation::ValidAddress(ref address) => {
+                            if address == result_final_address.unwrap_or_default() {
+                                let info_msg = Expected::Address(page_check.url.to_string(), address.to_string());
+                                info!("{}", info_msg.to_string().green());
+                                Story::new(Some(info_msg))
+                            } else {
+                                let error_msg = Unexpected::Address(page_check.url.to_string(), address.to_string());
+                                info!("{}", error_msg.to_string().green());
+                                Story::new_error(Some(error_msg))
+                            }
+                        },
+
+                        edge_case => {
+                            let warn_msg = Unexpected::NotImplementedYet(page_check.url.to_string(), edge_case.to_string());
+                            warn!("{}", warn_msg.to_string().yellow());
+                            Story::new_error(Some(warn_msg))
+                        }
+                    };
+
                     let result_handler_story = match result_handler.response_code() {
                         Ok(code) => {
                             if &PageExpectation::ValidCode(code) == expected_code {
@@ -360,6 +395,7 @@ pub trait Checks<T> {
                             History::new(content_story).stories(),
                             History::new(content_length_story).stories(),
                             History::new(result_handler_story).stories(),
+                            History::new(result_final_address_story).stories(),
                         ].concat()
                     ).stories()
                 })

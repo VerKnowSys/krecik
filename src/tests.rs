@@ -225,7 +225,7 @@ mod tests {
         let check = FileCheck::load("tests/test2").unwrap();
         let history = check.execute();
         println!("TEST2({}): {}", history.length(), history.to_string());
-        assert!(history.length() == 3);
+        assert!(history.length() > 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
@@ -238,7 +238,7 @@ mod tests {
         let check = FileCheck::load("tests/test3").unwrap();
         let history = check.execute();
         println!("TEST3({}): {}", history.length(), history.to_string());
-        assert!(history.length() == 3);
+        assert!(history.length() > 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
@@ -252,7 +252,7 @@ mod tests {
         let check = FileCheck::load("tests/test4").unwrap();
         let history = check.execute();
         println!("TEST4({}): {}", history.length(), history.to_string());
-        assert!(history.length() == 3);
+        assert!(history.length() > 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
@@ -270,7 +270,7 @@ mod tests {
         let headers = options.headers;
         let history = check.execute();
         println!("TEST5({}): {}", history.length(), history.to_string());
-        assert!(history.length() == 3);
+        assert!(history.length() > 3);
         let first = history.head();
         assert!(headers.is_some());
         assert!(cookies.is_some());

@@ -21,6 +21,10 @@ pub enum Unexpected {
     #[fail(display = "Expired TLS/SSL Certificate for domain: {}.", _0)]
     TLSDomainExpired (String),
 
+    /// Failed to get expected Address
+    #[fail(display = "URL: {} has unexpected final address: {}.", _0, _1)]
+    Address (String, String),
+
     /// HttpCode (url, code)
     #[fail(display = "URL: {} responded with unexpected error-code: {}.", _0, _1)]
     HttpCode (String, u32),

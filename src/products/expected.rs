@@ -20,6 +20,10 @@ pub enum PageExpectation {
     #[fail(display = "ValidLength: {} bytes.", _0)]
     ValidLength (usize),
 
+    /// Valid final address (after all redirections)
+    #[fail(display = "ValidAddress: {}", _0)]
+    ValidAddress (String),
+
 }
 
 
@@ -60,6 +64,10 @@ pub type DomainExpectations = Vec<DomainExpectation>;
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq)]
 /// All response types for all supported expectations
 pub enum Expected {
+
+    /// Check returned expected Address
+    #[fail(display = "URL: {} returned expected final address: {}.", _0, _1)]
+    Address (String, String),
 
 
     /// Check returned expected HTTP error code
