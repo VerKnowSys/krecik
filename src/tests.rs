@@ -282,6 +282,17 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_agent_check() {
+        let check = FileCheck::load("tests/test5").unwrap();
+        let page: &Page = &check.clone().pages.unwrap()[0];
+        let options = page.options.clone().unwrap();
+        let agent = options.agent;
+        assert!(agent.is_some());
+        assert!(agent.unwrap() == "Krtecek-Underground-Agent");
+    }
+
+
     // test POST
 
 }
