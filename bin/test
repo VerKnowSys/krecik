@@ -12,8 +12,9 @@ if [ "0" != "${?}" ]; then
     failure "Test: Library: Failed!"
 fi
 
+_tests_count=$(find checks/on/tests/ -type f -name '*.json' 2>/dev/null | wc -l 2>/dev/null | awk '{print $1;}' 2>/dev/null)
+echo "Tests count: ${_tests_count}"
 
-_tests_count=6
 _maybe_server_in_background="$(ps xd 2>/dev/null \
     | grep -Ev 'egrep|awk|grep|tail|cat|bat' 2>/dev/null \
     | grep -E "${_bin_name}" 2>/dev/null \
