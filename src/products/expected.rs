@@ -80,6 +80,16 @@ pub enum Expected {
     Content (String, String),
 
 
+    /// NoContentLength
+    #[fail(display = "URL: {} no content-length validation.", _0)]
+    NoContentLength (String),
+
+
+    /// EmptyContent
+    #[fail(display = "URL: {} no content validation.", _0)]
+    EmptyContent (String),
+
+
     /// Check returned expected page content length
     #[fail(display = "URL: {} returned expected content-length at least: {} bytes long.", _0, _1)]
     ContentLength (String, usize),
