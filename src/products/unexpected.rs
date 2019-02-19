@@ -46,7 +46,7 @@ pub enum Unexpected {
     ZeroLengthContent (String),
 
     /// Content - expected content not found where expected
-    #[fail(display = "URL: {} responded with invalid content: {}", _0, _1)]
+    #[fail(display = "URL: {} responded with invalid content: \"{}\"", _0, _1)]
     Content (String, String),
 
     /// Not Implemented functionality
