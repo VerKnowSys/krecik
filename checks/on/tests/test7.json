@@ -5,14 +5,14 @@
             "url": "https://rust-lang.org/",
             "expects": [
                 {
-                    "ValidCode": 0
+                    "ValidCode": 200
                 },
                 {
-                    "ValidContent": "lang"
+                    "ValidContent": "reliable"
                 }
             ],
             "options": {
-                "ssl_verify_host": false,
+                "ssl_verify_host": true,
                 "ssl_verify_peer": false
             }
         }

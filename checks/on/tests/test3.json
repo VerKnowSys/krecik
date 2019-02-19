@@ -6,6 +6,9 @@
             "expects": [
                 {
                     "ValidCode": 301
+                },
+                {
+                    "ValidLength": 0
                 }
             ],
             "options": {

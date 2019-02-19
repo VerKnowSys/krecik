@@ -6,6 +6,9 @@
             "expects": [
                 {
                     "ValidCode": 0
+                },
+                {
+                    "ValidLength": 0
                 }
             ]
         }
