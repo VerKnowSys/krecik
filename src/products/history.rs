@@ -17,11 +17,11 @@ pub struct Story {
     /// Story - failure count
     pub count: u64,
 
-    /// Story - message
+    /// Story - success
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub message: Option<Expected>,
+    pub success: Option<Expected>,
 
-    /// Story - keep history of unexpected results
+    /// Story - keep history of unexpected results (failures)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<Unexpected>,
 
@@ -32,12 +32,12 @@ impl Story {
 
 
     /// New story
-    pub fn new(message: Option<Expected>) -> Story {
+    pub fn new(success: Option<Expected>) -> Story {
         let local_now = Local::now();
         Story {
             count: 1,
             timestamp: local_now.to_rfc3339(),
-            message,
+            success,
             error: None,
         }
     }
@@ -49,7 +49,7 @@ impl Story {
         Story {
             count: 1,
             timestamp: local_now.to_rfc3339(),
-            message: None,
+            success: None,
             error,
         }
     }

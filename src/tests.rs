@@ -216,7 +216,7 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
+        assert!(first.success.is_some());
     }
 
 
@@ -253,7 +253,7 @@ mod tests {
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
-        assert!(first.message.is_some());
+        assert!(first.success.is_some());
         assert!(first.error.is_none());
     }
 
