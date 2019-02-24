@@ -238,9 +238,13 @@ mod tests {
         let history = check.execute();
         println!("TEST3({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
-        let first = history.head();
-        assert!(first.count == 1);
-        assert!(first.timestamp.len() > 10);
+        history
+            .stories()
+            .iter()
+            .for_each(|story| {
+                assert!(story.success.is_some());
+                assert!(story.error.is_none());
+            });
     }
 
 
@@ -289,6 +293,20 @@ mod tests {
 
 
     #[test]
+    fn test_when_everything_is_a_failure_test9() {
+        FileCheck::load("tests/test9")
+            .unwrap_or_default()
+            .execute()
+            .stories()
+            .iter()
+            .for_each(|story| {
+                assert!(story.success.is_none());
+                assert!(story.error.is_some());
+            });
+    }
+
+
+    #[test]
     fn test_parsing_bogus_validators() {
         FileCheck::load("tests/test10")
             .and_then(|check| {
@@ -311,6 +329,27 @@ mod tests {
             });
     }
 
+
+    #[test]
+    fn test_empty_check() {
+        FileCheck::load("tests/test12")
+            .and_then(|check| {
+                assert!(check.pages.is_some());
+                assert!(check.domains.is_none());
+                check
+                    .execute()
+                    .stories()
+                    .iter()
+                    .for_each(|story| {
+                        assert!(story.success.is_some());
+                        assert!(story.error.is_none());
+                    });
+                Ok(())
+            })
+            .unwrap_or_else(|err| {
+                assert!(false)
+            });
+    }
 
     // test POST
 
