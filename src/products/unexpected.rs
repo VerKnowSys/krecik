@@ -26,11 +26,11 @@ pub enum Unexpected {
     AddressInvalid (String, String),
 
     /// HttpCode (url, code)
-    #[fail(display = "URL: {} responded with unexpected error-code: {}.", _0, _1)]
-    HttpCodeInvalid (String, u32),
+    #[fail(display = "URL: {} responded with unexpected error-code: {}. Expected code: {}", _0, _1, _2)]
+    HttpCodeInvalid (String, u32, u32),
 
     /// Content - expected content not found where expected
-    #[fail(display = "URL: {} responded with invalid content: \"{}\"", _0, _1)]
+    #[fail(display = "URL: {} response lacks expected content: \"{}\"", _0, _1)]
     ContentInvalid (String, String),
 
     /// Failed content length check
