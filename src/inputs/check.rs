@@ -105,11 +105,10 @@ pub trait Checks<T> {
         page_expectations
             .iter()
             .find(|exp| {
-                let the_code = match exp {
-                    PageExpectation::ValidCode(code) => code,
-                    _ => &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
-                };
-                the_code != &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
+                match exp {
+                    PageExpectation::ValidCode(_) => true,
+                    _ => false
+                }
             })
             .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE))
     }
@@ -120,11 +119,10 @@ pub trait Checks<T> {
         page_expectations
             .iter()
             .find(|exp| {
-                let the_content = match exp {
-                    PageExpectation::ValidContent(content) => content,
-                    _ => "",
-                };
-                the_content != ""
+                match exp {
+                    PageExpectation::ValidContent(_) => true,
+                    _ => false,
+                }
             })
             .unwrap_or_else(|| &PageExpectation::ValidNoContent)
     }
@@ -135,11 +133,10 @@ pub trait Checks<T> {
         page_expectations
             .iter()
             .find(|exp| {
-                let the_content = match exp {
-                    PageExpectation::ValidLength(length) => length,
-                    _ => &CHECK_HTTP_MINIMUM_LENGHT,
-                };
-                the_content != &CHECK_HTTP_MINIMUM_LENGHT
+                match exp {
+                    PageExpectation::ValidLength(_) => true,
+                    _ => false,
+                }
             })
             .unwrap_or_else(|| &PageExpectation::ValidNoLength)
     }
@@ -150,11 +147,10 @@ pub trait Checks<T> {
         page_expectations
             .iter()
             .find(|exp| {
-                let the_content = match exp {
-                    PageExpectation::ValidAddress(ref address) => address,
-                    _ => "",
-                };
-                !the_content.is_empty()
+                match exp {
+                    PageExpectation::ValidAddress(_) => true,
+                    _ => false,
+                }
             })
             .unwrap_or_else(|| &PageExpectation::ValidNoAddress)
     }
