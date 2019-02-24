@@ -176,7 +176,6 @@ mod tests {
     #[test]
     fn test_filecheck_to_json_serialization() {
         let check = FileCheck {
-            name: Some("Testcheck".to_string()),
             domains: Some(vec!(
                Domain {
                    name: "nask.pl".to_string(),
@@ -201,14 +200,15 @@ mod tests {
 
     #[test]
     fn test_check_json_to_filecheck_deserialization() {
-        let check = FileCheck::load("tests/test1").unwrap();
-        assert!(check.name.unwrap() == "Testcheck");
+        let check = FileCheck::load("tests/test1").unwrap_or_default();
+        assert!(check.pages.is_some());
+        assert!(check.domains.is_some());
     }
 
 
     #[test]
     fn test_domain_check_history_length() {
-        let check = FileCheck::load("tests/test1").unwrap();
+        let check = FileCheck::load("tests/test1").unwrap_or_default();
         let history = FileCheck::check_domains(check.domains);
         println!("TEST1({}): {}", history.length(), history.to_string());
         assert!(history.length() > 0);
@@ -222,7 +222,7 @@ mod tests {
 
     #[test]
     fn test_page_check_history_length() {
-        let check = FileCheck::load("tests/test2").unwrap();
+        let check = FileCheck::load("tests/test2").unwrap_or_default();
         let history = check.execute();
         println!("TEST2({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
@@ -234,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_redirect_no_follow() {
-        let check = FileCheck::load("tests/test3").unwrap();
+        let check = FileCheck::load("tests/test3").unwrap_or_default();
         let history = check.execute();
         println!("TEST3({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
@@ -246,7 +246,7 @@ mod tests {
 
     #[test]
     fn test_gibberish_url_check() {
-        let check = FileCheck::load("tests/test4").unwrap();
+        let check = FileCheck::load("tests/test4").unwrap_or_default();
         let history = check.execute();
         println!("TEST4({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
@@ -260,7 +260,7 @@ mod tests {
 
     #[test]
     fn test_page_content_length_check() {
-        let check = FileCheck::load("tests/test5").unwrap();
+        let check = FileCheck::load("tests/test5").unwrap_or_default();
         let page: &Page = &check.clone().pages.unwrap()[0];
         let options = page.options.clone().unwrap();
         let cookies = options.cookies;
@@ -279,7 +279,7 @@ mod tests {
 
     #[test]
     fn test_agent_check() {
-        let check = FileCheck::load("tests/test5").unwrap();
+        let check = FileCheck::load("tests/test5").unwrap_or_default();
         let page: &Page = &check.clone().pages.unwrap()[0];
         let options = page.options.clone().unwrap();
         let agent = options.agent;

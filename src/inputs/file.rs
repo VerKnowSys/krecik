@@ -23,9 +23,6 @@ use crate::products::history::*;
 /// FileCheck structure
 pub struct FileCheck {
 
-    /// Unique check name
-    pub name: Option<String>,
-
     /// Domains to check
     pub domains: Option<Domains>,
 
