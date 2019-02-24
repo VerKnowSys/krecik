@@ -360,7 +360,7 @@ pub trait Checks<T> {
             },
 
             edge_case => {
-                let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
                 warn!("{}", warn_msg.to_string().yellow());
                 Story::new_error(Some(warn_msg))
             }
@@ -390,7 +390,7 @@ pub trait Checks<T> {
             },
 
             edge_case => {
-                let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
                 warn!("{}", warn_msg.to_string().yellow());
                 Story::new_error(Some(warn_msg))
             },
@@ -420,7 +420,7 @@ pub trait Checks<T> {
             },
 
             edge_case => {
-                let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
                 warn!("{}", warn_msg.to_string().yellow());
                 Story::new_error(Some(warn_msg))
             }
@@ -446,7 +446,7 @@ pub trait Checks<T> {
                     },
 
                     edge_case => {
-                        let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                        let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
                         warn!("{}", warn_msg.to_string().yellow());
                         Story::new_error(Some(warn_msg))
                     }

@@ -42,7 +42,7 @@ pub enum Unexpected {
     InternalProtocolProblem (String, String),
 
     /// Not Implemented functionality
-    #[fail(display = "Not Implemented yet: {}. Details: {}.", _0, _1)]
-    NotImplementedYet (String, String),
+    #[fail(display = "Unmatched validation case for: \"{}\". Details: {}.", _0, _1)]
+    UnmatchedValidationCase (String, String),
 
 }
