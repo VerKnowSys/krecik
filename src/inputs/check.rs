@@ -407,7 +407,7 @@ pub trait Checks<T> {
                     info!("{}", info_msg.to_string().green());
                     Story::new(Some(info_msg))
                 } else {
-                    let error_msg = Unexpected::AddressInvalid(url.to_string(), address.to_string());
+                    let error_msg = Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string());
                     error!("{}", error_msg.to_string().red());
                     Story::new_error(Some(error_msg))
                 }
