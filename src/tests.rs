@@ -288,6 +288,18 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_parsing_bogus_validators() {
+        FileCheck::load("tests/test10")
+            .and_then(|check| {
+                Ok(assert!(false))
+            })
+            .unwrap_or_else(|err| {
+                assert!(err.to_string().contains("unknown variant `ValidMoonFlower`"));
+            });
+    }
+
+
     // test POST
 
 }

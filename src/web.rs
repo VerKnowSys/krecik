@@ -29,9 +29,9 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
         .and_then(|check| {
             Ok(check.execute())
         })
-        .unwrap_or_else(|_| {
-            error!("Failed to load check from file: {}.json", &check_path.cyan());
-            History::empty()
+        .unwrap_or_else(|err| {
+            error!("Failed to load check from file: {}.json. Error details: {}", &check_path.cyan(), err.to_string().red());
+            History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
         });
     (state, history)
 }

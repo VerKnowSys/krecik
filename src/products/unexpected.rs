@@ -41,6 +41,10 @@ pub enum Unexpected {
     #[fail(display = "InternalProtocolProblemFailure on: {}. Details: {}.", _0, _1)]
     InternalProtocolProblem (String, String),
 
+    /// Check file parse error
+    #[fail(display = "Failed to parse check input data! Error details: \"{}\".", _0)]
+    CheckParseProblem (String),
+
     /// Not Implemented functionality
     #[fail(display = "Unmatched validation case for: \"{}\". Details: {}.", _0, _1)]
     UnmatchedValidationCase (String, String),
