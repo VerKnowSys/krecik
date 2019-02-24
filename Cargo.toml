@@ -44,14 +44,15 @@ ns-std-threaded = "0.3"
 
 lazy_static = "1.1"
 
-uuid = { version = "0.6", features = ["v4"] }
-rand = "0.4"
 regex = "0.2"
 chrono = "0.4"
 glob = "0.2"
-hostname = "0.1"
-atomicwrites = "0.2"
-libc = "0.2"
+
+# uuid = { version = "0.7", features = ["v4"] }
+# rand = "0.4"
+# hostname = "0.1"
+# atomicwrites = "0.2"
+# libc = "0.2"
 
 bencher = "0.1"
 jemallocator = "0.1.8"
