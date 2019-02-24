@@ -24,6 +24,10 @@ pub enum PageExpectation {
     #[fail(display = "ValidLength: {} bytes.", _0)]
     ValidLength (usize),
 
+    /// Valid no-content-length check
+    #[fail(display = "ValidNoLength.")]
+    ValidNoLength,
+
     /// Valid final address (after all redirections)
     #[fail(display = "ValidAddress: {}", _0)]
     ValidAddress (String),

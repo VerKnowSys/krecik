@@ -141,9 +141,8 @@ pub trait Checks<T> {
                 };
                 the_content != &CHECK_HTTP_MINIMUM_LENGHT
             })
-            .unwrap_or_else(|| &PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT))
+            .unwrap_or_else(|| &PageExpectation::ValidNoLength)
     }
-
 
 
     /// Find and extract address validation from validations
@@ -373,19 +372,21 @@ pub trait Checks<T> {
     fn handle_page_length_expectation(url: &str, raw_page_content: &str, expected_content_length: &PageExpectation) -> Story {
         match expected_content_length {
             &PageExpectation::ValidLength(ref requested_length) => {
-                if *requested_length == 0 {
-                    let info_msg = Expected::NoContentLength(url.to_string());
-                    info!("{}", info_msg.to_string().green());
-                    Story::new(Some(info_msg))
-                } else if raw_page_content.len() >= *requested_length {
+                if raw_page_content.len() >= *requested_length {
                     let info_msg = Expected::ContentLength(url.to_string(), *requested_length);
                     info!("{}", info_msg.to_string().green());
                     Story::new(Some(info_msg))
                 } else {
-                    let unexpected = Unexpected::ContentLengthInvalid(url.to_string(), *requested_length, raw_page_content.len());
+                    let unexpected = Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length);
                     error!("{}", unexpected.to_string().red());
                     Story::new_error(Some(unexpected))
                 }
+            },
+
+            &PageExpectation::ValidNoLength => {
+                let info_msg = Expected::NoContentLength(url.to_string());
+                info!("{}", info_msg.to_string().green());
+                Story::new(Some(info_msg))
             },
 
             edge_case => {
