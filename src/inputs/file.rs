@@ -64,3 +64,15 @@ impl Checks<FileCheck> for FileCheck {
 
 
 }
+
+
+impl Default for FileCheck {
+    fn default() -> FileCheck {
+        FileCheck {
+            pages: None,
+            domains: None,
+            alert_channel: None,
+            alert_webhook: None,
+        }
+    }
+}
