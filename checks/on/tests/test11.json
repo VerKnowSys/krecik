@@ -1,0 +1,13 @@
+{
+    "name": "Test11",
+    "pages": [
+        {
+            "url": "http://gist.github.com",
+            "expects": [
+                {
+                    "ValidLength": "ala nie ma kota"
+                }
+            ]
+        }
+    ]
+}

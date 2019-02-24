@@ -300,6 +300,18 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_parsing_invalid_validator_value_type() {
+        FileCheck::load("tests/test11")
+            .and_then(|check| {
+                Ok(assert!(false))
+            })
+            .unwrap_or_else(|err| {
+                assert!(err.to_string().contains("invalid type: string"));
+            });
+    }
+
+
     // test POST
 
 }

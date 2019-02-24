@@ -1,0 +1,16 @@
+{
+    "name": "Test10",
+    "pages": [
+        {
+            "url": "http://gist.github.com",
+            "expects": [
+                {
+                    "ValidLength": 0
+                },
+                {
+                    "ValidMoonFlower": "flower"
+                }
+            ]
+        }
+    ]
+}
