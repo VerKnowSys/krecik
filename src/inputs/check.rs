@@ -431,23 +431,33 @@ pub trait Checks<T> {
     /// Build a Story from a HttpCode PageExpectation
     fn handle_page_httpcode_expectation(url: &str, response_code: Result<u32, Error>, expected_code: &PageExpectation) -> Story {
         match response_code {
-           Ok(code) => {
-               if &PageExpectation::ValidCode(code) == expected_code {
-                   let info_msg = Expected::HttpCode(url.to_string(), code);
-                   info!("{}", info_msg.to_string().green());
-                   Story::new(Some(info_msg))
-               } else {
-                   let unexpected = Unexpected::HttpCodeInvalid(url.to_string(), code);
-                   error!("{}", unexpected.to_string().red());
-                   Story::new_error(Some(unexpected))
-               }
-           },
+            Ok(responded_code) => {
+                match expected_code {
+                    &PageExpectation::ValidCode(the_code) if responded_code == the_code => {
+                       let info_msg = Expected::HttpCode(url.to_string(), the_code);
+                       info!("{}", info_msg.to_string().green());
+                       Story::new(Some(info_msg))
+                    },
 
-           Err(err) => {
-               let unexpected = Unexpected::URLConnectionProblem(url.to_string(), err.to_string());
-               error!("{}", unexpected.to_string().red());
-               Story::new_error(Some(unexpected))
-           }
+                    &PageExpectation::ValidCode(the_code) => {
+                        let unexpected = Unexpected::HttpCodeInvalid(url.to_string(), responded_code, the_code);
+                        error!("{}", unexpected.to_string().red());
+                        Story::new_error(Some(unexpected))
+                    },
+
+                    edge_case => {
+                        let warn_msg = Unexpected::NotImplementedYet(url.to_string(), edge_case.to_string());
+                        warn!("{}", warn_msg.to_string().yellow());
+                        Story::new_error(Some(warn_msg))
+                    }
+                }
+            },
+
+            Err(err) => {
+                let unexpected = Unexpected::URLConnectionProblem(url.to_string(), err.to_string());
+                error!("{}", unexpected.to_string().red());
+                Story::new_error(Some(unexpected))
+            }
        }
     }
 
