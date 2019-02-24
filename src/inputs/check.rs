@@ -44,12 +44,6 @@ pub trait Checks<T> {
          SslExpiration::from_domain_name(&domain_name)
              .and_then(|ssl_validator| {
                  match domain_expectation {
-                    DomainExpectation::ValidExpiryPeriod(0) => {
-                        let warn_msg = format!("Given ValidExpiryPeriod(0) for domain: {}. Validation skipped.", domain_name.cyan());
-                        warn!("{}", warn_msg.yellow());
-                        Err(warn_msg.into())
-                    },
-
                     DomainExpectation::ValidExpiryPeriod(days) => {
                          if ssl_validator.days() < days
                          || ssl_validator.is_expired() {
@@ -106,15 +100,9 @@ pub trait Checks<T> {
     }
 
 
-    /// Check page expectations
-    fn check_page(page_check: &Page) -> History {
-        let page_expectations = page_check
-            .clone()
-            .expects
-            .unwrap_or_default();
-
-        // Error code expectation
-        let expected_code = page_expectations
+    /// Find and extract code validation from validations
+    fn find_code_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
+        page_expectations
             .iter()
             .find(|exp| {
                 let the_code = match exp {
@@ -123,11 +111,13 @@ pub trait Checks<T> {
                 };
                 the_code != &CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
             })
-            .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE));
+            .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE))
+    }
 
-        // Content expectation
-        let empty_content = PageExpectation::ValidContent("".to_string());
-        let expected_content = page_expectations
+
+    /// Find and extract content validation from validations
+    fn find_content_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
+        page_expectations
             .iter()
             .find(|exp| {
                 let the_content = match exp {
@@ -136,10 +126,13 @@ pub trait Checks<T> {
                 };
                 the_content != ""
             })
-            .unwrap_or_else(|| &empty_content);
+            .unwrap_or_else(|| &PageExpectation::ValidNoContent)
+    }
 
-        // Content length validation
-        let expected_content_length = page_expectations
+
+    /// Find and extract content length validation from validations
+    fn find_content_length_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
+        page_expectations
             .iter()
             .find(|exp| {
                 let the_content = match exp {
@@ -148,11 +141,14 @@ pub trait Checks<T> {
                 };
                 the_content != &CHECK_HTTP_MINIMUM_LENGHT
             })
-            .unwrap_or_else(|| &PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT));
+            .unwrap_or_else(|| &PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT))
+    }
 
-        // Final address validation
-        let empty_address = PageExpectation::ValidAddress("".to_string());
-        let expected_final_address = page_expectations
+
+
+    /// Find and extract address validation from validations
+    fn find_address_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
+        page_expectations
             .iter()
             .find(|exp| {
                 let the_content = match exp {
@@ -161,7 +157,20 @@ pub trait Checks<T> {
                 };
                 !the_content.is_empty()
             })
-            .unwrap_or_else(|| &empty_address);
+            .unwrap_or_else(|| &PageExpectation::ValidNoAddress)
+    }
+
+
+    /// Check page expectations
+    fn check_page(page_check: &Page) -> History {
+        let page_expectations = page_check
+            .clone()
+            .expects
+            .unwrap_or_default();
+        let expected_code = Self::find_code_validation(&page_expectations);
+        let expected_content = Self::find_content_validation(&page_expectations);
+        let expected_content_length = Self::find_content_length_validation(&page_expectations);
+        let expected_final_address = Self::find_address_validation(&page_expectations);
 
         // Proceed with check
         let mut multi = Multi::new();
@@ -334,19 +343,21 @@ pub trait Checks<T> {
     fn handle_page_content_expectation(url: &str, raw_page_content: &str, expected_content: &PageExpectation) -> Story {
         match expected_content {
             &PageExpectation::ValidContent(ref content) => {
-                if content.is_empty() {
-                    let info_msg = Expected::EmptyContent(url.to_string());
-                    info!("{}", info_msg.to_string().green());
-                    Story::new(Some(info_msg))
-                } else if raw_page_content.contains(content) {
+                if raw_page_content.contains(content) {
                     let info_msg = Expected::Content(url.to_string(), content.to_string());
                     info!("{}", info_msg.to_string().green());
                     Story::new(Some(info_msg))
                 } else {
-                    let error_msg = Unexpected::Content(url.to_string(), content.to_string());
+                    let error_msg = Unexpected::ContentInvalid(url.to_string(), content.to_string());
                     error!("{}", error_msg.to_string().red());
                     Story::new_error(Some(error_msg))
                 }
+            },
+
+            &PageExpectation::ValidNoContent => {
+                let info_msg = Expected::EmptyContent(url.to_string());
+                info!("{}", info_msg.to_string().green());
+                Story::new(Some(info_msg))
             },
 
             edge_case => {
@@ -371,7 +382,7 @@ pub trait Checks<T> {
                     info!("{}", info_msg.to_string().green());
                     Story::new(Some(info_msg))
                 } else {
-                    let unexpected = Unexpected::ContentLength(url.to_string(), *requested_length, raw_page_content.len());
+                    let unexpected = Unexpected::ContentLengthInvalid(url.to_string(), *requested_length, raw_page_content.len());
                     error!("{}", unexpected.to_string().red());
                     Story::new_error(Some(unexpected))
                 }
@@ -387,24 +398,24 @@ pub trait Checks<T> {
 
 
     /// Build a Story from a Address PageExpectation
-    fn handle_page_address_expectation(url: &str, result_final_address: &str, expected_address: &PageExpectation) -> Story {
+    fn handle_page_address_expectation(url: &str, address: &str, expected_address: &PageExpectation) -> Story {
         match expected_address {
             &PageExpectation::ValidAddress(ref an_address) => {
-                // skip validation if no address is given. validation passes
-                let address = if an_address.is_empty() {
-                    result_final_address
-                } else {
-                    an_address
-                };
-                if result_final_address.contains(address) {
+                if address.contains(an_address) {
                     let info_msg = Expected::Address(url.to_string(), address.to_string());
                     info!("{}", info_msg.to_string().green());
                     Story::new(Some(info_msg))
                 } else {
-                    let error_msg = Unexpected::Address(url.to_string(), address.to_string());
+                    let error_msg = Unexpected::AddressInvalid(url.to_string(), address.to_string());
                     error!("{}", error_msg.to_string().red());
                     Story::new_error(Some(error_msg))
                 }
+            },
+
+            &PageExpectation::ValidNoAddress => {
+                let info_msg = Expected::Address(url.to_string(), url.to_string());
+                info!("{}", info_msg.to_string().green());
+                Story::new(Some(info_msg))
             },
 
             edge_case => {
@@ -425,7 +436,7 @@ pub trait Checks<T> {
                    info!("{}", info_msg.to_string().green());
                    Story::new(Some(info_msg))
                } else {
-                   let unexpected = Unexpected::HttpCode(url.to_string(), code);
+                   let unexpected = Unexpected::HttpCodeInvalid(url.to_string(), code);
                    error!("{}", unexpected.to_string().red());
                    Story::new_error(Some(unexpected))
                }
