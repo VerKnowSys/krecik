@@ -12,6 +12,10 @@ pub enum PageExpectation {
     #[fail(display = "ValidCode: {}.", _0)]
     ValidCode (u32),
 
+    /// Valid no-content check
+    #[fail(display = "ValidNoContent.")]
+    ValidNoContent,
+
     /// Valid content regex match
     #[fail(display = "ValidContent: {}.", _0)]
     ValidContent (String),
@@ -23,6 +27,10 @@ pub enum PageExpectation {
     /// Valid final address (after all redirections)
     #[fail(display = "ValidAddress: {}", _0)]
     ValidAddress (String),
+
+    /// Valid no-address check
+    #[fail(display = "ValidNoAddress.")]
+    ValidNoAddress,
 
 }
 
