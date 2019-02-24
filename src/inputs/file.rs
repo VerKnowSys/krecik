@@ -24,15 +24,19 @@ use crate::products::history::*;
 pub struct FileCheck {
 
     /// Domains to check
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub domains: Option<Domains>,
 
     /// Pages to check
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub pages: Option<Pages>,
 
     /// Slack Webhook
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_webhook: Option<String>,
 
     /// Slack alert channel
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_channel: Option<String>,
 
 }
