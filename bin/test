@@ -12,9 +12,6 @@ if [ "0" != "${?}" ]; then
     failure "Test: Library: Failed!"
 fi
 
-_tests_count=$(find checks/tests/ -type f -name '*.json' 2>/dev/null | wc -l 2>/dev/null | awk '{print $1;}' 2>/dev/null)
-echo "Tests count: ${_tests_count}"
-
 _maybe_server_in_background="$(ps xd 2>/dev/null \
     | grep -Ev 'egrep|awk|grep|tail|cat|bat' 2>/dev/null \
     | grep -E "${_bin_name}" 2>/dev/null \
@@ -28,17 +25,15 @@ if [ -n "${_maybe_server_in_background}" ]; then
         if [ ! -x "${_curl_software}/bin/curl" ]; then
             failure "Curl software bundle is not installed yet. To install Curl_lib bundle do:  \`s i Curl_lib\` then retry this process."
         fi
-        for _tst in $(seq 1 ${_tests_count}); do
-            printf "Spawning test: #%b / %b\n" "${_tst}" "${_tests_count}"
-            _request="$(${_curl_software}/bin/curl "http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests/test${_tst}" 2>> "${_travmole_logfile}")"
-            if [ "0" != "${?}" ]; then
-                failure "Test: HTTP test #${_tst} has failed: http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests/test${_tst}"
-            fi
-            printf "%b\n" "${_request}" \
-                | jq '.' 2>> "${_travmole_logfile}"
+        printf "Spawning all tests at once…\n"
+        _request="$(${_curl_software}/bin/curl "http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests" 2>> "${_travmole_logfile}")"
+        if [ "0" != "${?}" ]; then
+            failure "Test: HTTP test #${_tst} has failed: http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests"
+        fi
+        printf "%b\n" "${_request}" \
+            | jq '.' 2>> "${_travmole_logfile}"
 
-            printf "Test successful: #%b.\n\n" "${_tst}"
-        done
+        printf "Test successful: #%b.\n\n" "${_tst}"
     else
         printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
     fi
