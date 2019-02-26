@@ -27,11 +27,14 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
     (state,
         FileCheck::load(&check_path)
             .and_then(|check| {
+                let debug = format!("Executing check: {:#?}", check);
+                debug!("{}", debug.magenta());
                 Ok(check.execute())
             })
             .unwrap_or_else(|err| {
-                error!("Failed to load check from file: {}.json. Error details: {}", &check_path.cyan(), err.to_string().red());
-                History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
+                let error = format!("Failed to load check from file: {}. Error details: {}", &check_path, err);
+                error!("{}", error.red());
+                History::new(Story::new_error(Some(Unexpected::CheckParseProblem(error))))
             })
     )
 }
@@ -46,15 +49,17 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
         list_check_files_from(&check_path)
             .into_iter()
             .flat_map(|check_file| {
-                let check_file_abs = format!("{}/{}", check_path, check_file);
-                debug!("check_file_abs: {}", &check_file_abs);
-                FileCheck::load(&check_file_abs)
+                let check = format!("{}/{}", check_path, check_file);
+                FileCheck::load(&check)
                     .and_then(|check| {
+                        let debug = format!("Executing check: {:#?}", check);
+                        debug!("{}", debug.magenta());
                         Ok(check.execute())
                     })
                     .unwrap_or_else(|err| {
-                        error!("Failed to load check from file: {}.json. Error details: {}", &check_file_abs.cyan(), err.to_string().red());
-                        History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
+                        let error = format!("Failed to load check from file: {}. Error details: {}", &check, err);
+                        error!("{}", error.red());
+                        History::new(Story::new_error(Some(Unexpected::CheckParseProblem(error))))
                     })
                     .stories()
             })
