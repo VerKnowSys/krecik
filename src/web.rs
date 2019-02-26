@@ -37,6 +37,37 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
 }
 
 
+/// Execute all file checks from path
+pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
+    let uri = Uri::borrow_from(&state).to_string();
+    let check_path = format!("{}{}", CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, ""));
+    info!("Loading all checks from path: {}", &check_path.cyan());
+    (state, History::new_from(
+        list_check_files_from(&check_path)
+            .into_iter()
+            .flat_map(|check_file| {
+                let check_file_abs = format!("{}/{}", check_path, check_file);
+                debug!("check_file_abs: {}", &check_file_abs);
+                History::new_from(
+                    FileCheck::load(&check_file_abs)
+                        .and_then(|check| {
+                            Ok(check
+                                    .execute()
+                                    .stories()
+                            )
+                        })
+                        .unwrap_or_else(|err| {
+                            error!("Failed to load check from file: {}.json. Error details: {}", &check_file_abs.cyan(), err.to_string().red());
+                            History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
+                                .stories()
+                        })
+                ).stories()
+            })
+            .collect()
+    ))
+}
+
+
 /// Web router:
 pub fn router() -> Router {
     // use gotham::handler::assets::*;
@@ -44,6 +75,15 @@ pub fn router() -> Router {
 
 
     build_simple_router(|route| {
+        route
+            .associate(
+                &format!("{}/:path", CHECK_API_EXECUTE_REQUEST_PATH), |handler| {
+                    handler
+                        .get()
+                        .to(handler_check_execute_all_from_path);
+                }
+            );
+
         route
             .associate(
                 &format!("{}/:path/:name", CHECK_API_EXECUTE_REQUEST_PATH), |handler| {
