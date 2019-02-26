@@ -19,21 +19,21 @@ use crate::inputs::file::*;
 use crate::products::history::*;
 
 
-/// Execute all checks
+/// Execute single check by path/name
 pub fn handler_check_execute_by_name(state: State) -> (State, History) {
     let uri = Uri::borrow_from(&state).to_string();
-    let name = uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, "");
-    let check_path = format!("tests/{}", &name);
-    info!("Loading check from path: {}", &check_path.cyan());
-    let history = FileCheck::load(&check_path)
-        .and_then(|check| {
-            Ok(check.execute())
-        })
-        .unwrap_or_else(|err| {
-            error!("Failed to load check from file: {}.json. Error details: {}", &check_path.cyan(), err.to_string().red());
-            History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
-        });
-    (state, history)
+    let check_path = uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, "");
+    info!("Loading check from path: {}{}", &CHECKS_DIR.cyan(), &check_path.cyan());
+    (state,
+        FileCheck::load(&check_path)
+            .and_then(|check| {
+                Ok(check.execute())
+            })
+            .unwrap_or_else(|err| {
+                error!("Failed to load check from file: {}.json. Error details: {}", &check_path.cyan(), err.to_string().red());
+                History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
+            })
+    )
 }
 
 
@@ -46,7 +46,7 @@ pub fn router() -> Router {
     build_simple_router(|route| {
         route
             .associate(
-                &format!("{}:name", CHECK_API_EXECUTE_REQUEST_PATH), |handler| {
+                &format!("{}/:path/:name", CHECK_API_EXECUTE_REQUEST_PATH), |handler| {
                     handler
                         .get()
                         .to(handler_check_execute_by_name);

@@ -12,7 +12,7 @@ if [ "0" != "${?}" ]; then
     failure "Test: Library: Failed!"
 fi
 
-_tests_count=$(find checks/on/tests/ -type f -name '*.json' 2>/dev/null | wc -l 2>/dev/null | awk '{print $1;}' 2>/dev/null)
+_tests_count=$(find checks/tests/ -type f -name '*.json' 2>/dev/null | wc -l 2>/dev/null | awk '{print $1;}' 2>/dev/null)
 echo "Tests count: ${_tests_count}"
 
 _maybe_server_in_background="$(ps xd 2>/dev/null \
@@ -30,9 +30,9 @@ if [ -n "${_maybe_server_in_background}" ]; then
         fi
         for _tst in $(seq 1 ${_tests_count}); do
             printf "Spawning test: #%b / %b\n" "${_tst}" "${_tests_count}"
-            _request="$(${_curl_software}/bin/curl "http://${_travmole_webapi_endpoint}/check/execute/test${_tst}" 2>> "${_travmole_logfile}")"
+            _request="$(${_curl_software}/bin/curl "http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests/test${_tst}" 2>> "${_travmole_logfile}")"
             if [ "0" != "${?}" ]; then
-                failure "Test: HTTP test #${_tst} has failed: http://${_travmole_webapi_endpoint}/check/execute/test${_tst}"
+                failure "Test: HTTP test #${_tst} has failed: http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests/test${_tst}"
             fi
             printf "%b\n" "${_request}" \
                 | jq '.' 2>> "${_travmole_logfile}"

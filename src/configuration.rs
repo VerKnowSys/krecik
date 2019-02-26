@@ -6,9 +6,6 @@
 /// Default project directory:
 pub const PROJECT_DIRECTORY: &str = "/Projects/travmole";
 
-/// Checks directory:
-pub const CHECKS_DIR: &str = "checks/on";
-
 /// Default log file:
 pub const DEFAULT_LOG_FILE: &str = "logs/travmole.log";
 
@@ -39,6 +36,9 @@ pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;
 /// Default minimum length of HTTP content
 pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 16;
 
+/// Checks directory:
+pub const CHECKS_DIR: &str = "checks";
+
 /// Web-API endpoint
-pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute/";
+pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute";
 

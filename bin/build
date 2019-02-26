@@ -6,7 +6,7 @@
 . bin/common "${*}"
 
 
-printf "\n\nBuilding: Library: %b\n" "${_project_name}"
+printf "Building: Library: %b\n" "${_project_name}"
 cargo build \
     --verbose \
     --lib ${_cargo_release_flag}
