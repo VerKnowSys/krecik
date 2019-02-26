@@ -48,20 +48,15 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
             .flat_map(|check_file| {
                 let check_file_abs = format!("{}/{}", check_path, check_file);
                 debug!("check_file_abs: {}", &check_file_abs);
-                History::new_from(
-                    FileCheck::load(&check_file_abs)
-                        .and_then(|check| {
-                            Ok(check
-                                    .execute()
-                                    .stories()
-                            )
-                        })
-                        .unwrap_or_else(|err| {
-                            error!("Failed to load check from file: {}.json. Error details: {}", &check_file_abs.cyan(), err.to_string().red());
-                            History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
-                                .stories()
-                        })
-                ).stories()
+                FileCheck::load(&check_file_abs)
+                    .and_then(|check| {
+                        Ok(check.execute())
+                    })
+                    .unwrap_or_else(|err| {
+                        error!("Failed to load check from file: {}.json. Error details: {}", &check_file_abs.cyan(), err.to_string().red());
+                        History::new(Story::new_error(Some(Unexpected::CheckParseProblem(err.to_string()))))
+                    })
+                    .stories()
             })
             .collect()
     ))
