@@ -45,26 +45,28 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
     let uri = Uri::borrow_from(&state).to_string();
     let check_path = format!("{}{}", CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, ""));
     info!("Loading all checks from path: {}", &check_path.cyan());
-    (state, History::new_from(
-        list_check_files_from(&check_path)
-            .into_iter()
-            .flat_map(|check_file| {
-                let check = format!("{}/{}", check_path, check_file);
-                FileCheck::load(&check)
-                    .and_then(|check| {
-                        let debug = format!("Executing check: {:#?}", check);
-                        debug!("{}", debug.magenta());
-                        Ok(check.execute())
-                    })
-                    .unwrap_or_else(|err| {
-                        let error = format!("Failed to load check from file: {}. Error details: {}", &check, err);
-                        error!("{}", error.red());
-                        History::new(Story::new_error(Some(Unexpected::CheckParseProblem(error))))
-                    })
-                    .stories()
-            })
-            .collect()
-    ))
+    (state,
+        History::new_from(
+            list_check_files_from(&check_path)
+                .into_iter()
+                .flat_map(|check_file| {
+                    let check = format!("{}/{}", check_path, check_file);
+                    FileCheck::load(&check)
+                        .and_then(|check| {
+                            let debug = format!("Executing check: {:#?}", check);
+                            debug!("{}", debug.magenta());
+                            Ok(check.execute())
+                        })
+                        .unwrap_or_else(|err| {
+                            let error = format!("Failed to load check from file: {}. Error details: {}", &check, err);
+                            error!("{}", error.red());
+                            History::new(Story::new_error(Some(Unexpected::CheckParseProblem(error))))
+                        })
+                        .stories()
+                })
+                .collect()
+        )
+    )
 }
 
 
