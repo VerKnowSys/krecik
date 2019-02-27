@@ -26,6 +26,9 @@ impl Handler for Collector {
     }
 }
 
+/// Type alias for long type name:
+pub type CurlHandler = Result<Easy2Handle<Collector>, MultiError>;
+
 
 /// Checks trait
 pub trait Checks<T> {
