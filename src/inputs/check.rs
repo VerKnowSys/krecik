@@ -1,3 +1,4 @@
+use curl::MultiError;
 use curl::multi::{Easy2Handle, Multi};
 use ssl_expiration::SslExpiration;
 use curl::easy::{Easy2, List, Handler, WriteError};
@@ -196,15 +197,8 @@ pub trait Checks<T> {
     }
 
 
-    /// Check page expectations
-    fn check_page(page_check: &Page, multi: &Multi) -> History {
-        let page_expectations = page_check
-            .clone()
-            .expects
-            .unwrap_or_else(Self::default_page_expectations);
-        let debugmsg = format!("check_page::page_expectations -> {:#?}", page_expectations);
-        debug!("{}", debugmsg.magenta());
-
+    /// Load page check handler
+    fn load_handler_for(page_check: &Page, multi: &Multi) -> CurlHandler {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
         curl.url(&page_check.url).unwrap();
@@ -308,16 +302,19 @@ pub trait Checks<T> {
         // Max reconnections is 10 per check
         curl.max_redirections(CHECK_MAX_REDIRECTIONS).unwrap();
 
-        let handler = multi.add2(curl);
+        // let handler: CurlHandler = multi.add2(curl);
+        multi.add2(curl)
+    }
 
-        // perform async checks
-        while multi
-                .perform()
-                .unwrap() > 0 {
-            multi
-                .wait(&mut [], Duration::from_secs(1))
-                .unwrap();
-        }
+
+    /// Process Curl page requests using given handler
+    fn process_page_handler(page_check: &Page, handler: CurlHandler, multi: &Multi) -> History {
+        let page_expectations = page_check
+            .clone()
+            .expects
+            .unwrap_or_else(Self::default_page_expectations);
+        let debugmsg = format!("process_page_handler::page_expectations -> {:#?}", page_expectations);
+        debug!("{}", debugmsg.magenta());
 
         // gather handlers, perform validations, produce stories…
         let a_handler = handler.unwrap();
@@ -481,14 +478,33 @@ pub trait Checks<T> {
 
         match pages {
             Some(pages) => {
-                History::new_from(
+                // collect tuple of checks and handlers:
+                let process_handlers: Vec<(Page, CurlHandler)> =
                     pages
                         .iter()
-                        .flat_map(|check| {
-                            Self::check_page(&check, &multi).stories()
+                        .map(|check| {
+                            (check.clone(), Self::load_handler_for(&check, &multi))
+                        })
+                        .collect();
+
+                // perform all async checks
+                while multi
+                        .perform()
+                        .unwrap() > 0 {
+                    multi
+                        .wait(&mut [], Duration::from_secs(1))
+                        .unwrap();
+                }
+
+                // Collect results
+                History::new_from(
+                    process_handlers
+                        .into_iter()
+                        .flat_map(|(check, handler)| {
+                            Self::process_page_handler(&check, handler, &multi).stories()
                         })
                         .collect()
-                    )
+                )
             },
 
             None => {
