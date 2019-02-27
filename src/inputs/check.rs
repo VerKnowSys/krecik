@@ -78,12 +78,7 @@ pub trait Checks<T> {
                             let domain_name = domain_check.name;
                             let domain_expectations = domain_check
                                 .expects
-                                .unwrap_or_else(|| {
-                                    // provide own default domain expectations if nothing defined in check input:
-                                    vec![
-                                        DomainExpectation::ValidExpiryPeriod(14)
-                                    ]
-                                });
+                                .unwrap_or_else(Self::default_domain_expectations);
 
                             History::new_from(domain_expectations
                                 .iter()
@@ -177,19 +172,30 @@ pub trait Checks<T> {
     }
 
 
+    /// Provide own default page expectations if nothing defined in check input:
+    fn default_page_expectations() -> PageExpectations {
+        vec![
+            PageExpectation::ValidCode(200),
+            PageExpectation::ValidLength(100),
+            PageExpectation::ValidContent("<body".to_string()),
+        ]
+    }
+
+
+    /// Provide own default domain expectations if nothing defined in check input:
+    fn default_domain_expectations() -> DomainExpectations {
+        vec![
+            DomainExpectation::ValidExpiryPeriod(14)
+        ]
+    }
+
+
     /// Check page expectations
     fn check_page(page_check: &Page, multi: &Multi) -> History {
         let page_expectations = page_check
             .clone()
             .expects
-            .unwrap_or_else(||
-                // provide own default page expectations if nothing defined in check input:
-                vec![
-                    PageExpectation::ValidCode(200),
-                    PageExpectation::ValidLength(100),
-                    PageExpectation::ValidContent("<body".to_string()),
-                ]
-            );
+            .unwrap_or_else(Self::default_page_expectations);
         let debugmsg = format!("check_page::page_expectations -> {:#?}", page_expectations);
         debug!("{}", debugmsg.magenta());
 
