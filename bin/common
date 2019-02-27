@@ -46,6 +46,7 @@ case "${_uname}" in
         ;;
 
     *)
+        printf "NOTE: On Linux hosts, you may need to install additional packages: libcurl*-openssl-dev, openssl*-dev and libnghttp2*-dev to build %b\n" "${_project_name}"
         _curl_software="/usr/lib"
         ;;
 esac
