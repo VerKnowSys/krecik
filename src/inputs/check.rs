@@ -16,7 +16,8 @@ use crate::products::history::*;
 
 
 /// Collects async content from Curl:
-struct Collector(Vec<u8>);
+#[derive(Debug)]
+pub struct Collector(Vec<u8>);
 
 
 impl Handler for Collector {
