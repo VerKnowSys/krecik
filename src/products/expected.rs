@@ -4,7 +4,7 @@ use crate::configuration::*;
 use crate::products::unexpected::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// Describes all supported page expectations
 pub enum PageExpectation {
 
