@@ -161,6 +161,22 @@ pub trait Checks<T> {
     }
 
 
+    /// Build headers List for Curl
+    fn list_of_headers(headers: Option<Vec<String>>) -> List {
+        // Build List of HTTP headers
+        // ex. header:
+        //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
+        let mut list = List::new();
+        for header in headers.unwrap_or_default() {
+            debug!("{}", format!("Setting header: {}", header.cyan()).black());
+            list
+                .append(&header.to_owned())
+                .unwrap();
+        };
+        list
+    }
+
+
     /// Check page expectations
     fn check_page(page_check: &Page, multi: &Multi) -> History {
         let page_expectations = page_check
@@ -229,20 +245,8 @@ pub trait Checks<T> {
             },
         };
 
-        // Build List of HTTP headers
-        // ex. header:
-        //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
-        let mut list = List::new();
-        for header in curl_options
-                        .headers
-                        .unwrap_or_default() {
-            debug!("{}", format!("Setting header: {}", header.cyan()).black());
-            list
-                .append(&header.to_owned())
-                .unwrap();
-        }
         curl
-            .http_headers(list)
+            .http_headers(Self::list_of_headers(curl_options.headers))
             .unwrap();
 
         // Pass cookies
