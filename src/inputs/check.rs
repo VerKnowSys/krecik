@@ -78,7 +78,12 @@ pub trait Checks<T> {
                             let domain_name = domain_check.name;
                             let domain_expectations = domain_check
                                 .expects
-                                .unwrap_or_default();
+                                .unwrap_or_else(|| {
+                                    // provide own default domain expectations if nothing defined in check input:
+                                    vec![
+                                        DomainExpectation::ValidExpiryPeriod(14)
+                                    ]
+                                });
 
                             History::new_from(domain_expectations
                                 .iter()
