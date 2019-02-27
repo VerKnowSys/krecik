@@ -7,7 +7,6 @@ clear
 
 _params="${*}"
 
-_command="/usr/bin/command"
 _uname="$(uname 2>/dev/null)"
 _cargo_project_dir="$(pwd 2>/dev/null)"
 _release_type="${1:-release}"
@@ -61,21 +60,21 @@ else
     failure "Unavailable Curl >= 7.64.0"
 fi
 
-if [ ! -x "$(${_command} -v rustc)" ] \
-|| [ ! -x "$(${_command} -v cargo)" ]
+if [ ! -x "$(which rustc)" ] \
+|| [ ! -x "$(which cargo)" ]
 then
     failure "Unavailable Rust >= 1.32.0"
 fi
 
-if [ ! -x "$(${_command} -v jq)" ]
+if [ ! -x "$(which jq)" ]
 then
     failure "Unavailable utility: Jq >= 1.5"
 fi
 
-if [ ! -x "$(${_command} -v grep)" ] \
-|| [ ! -x "$(${_command} -v awk)" ] \
-|| [ ! -x "$(${_command} -v head)" ] \
-|| [ ! -x "$(${_command} -v seq)" ]
+if [ ! -x "$(which grep)" ] \
+|| [ ! -x "$(which awk)" ] \
+|| [ ! -x "$(which head)" ] \
+|| [ ! -x "$(which seq)" ]
 then
     failure "Unavailable base system utilities?!"
 fi
