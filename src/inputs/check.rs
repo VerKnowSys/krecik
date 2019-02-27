@@ -321,16 +321,14 @@ pub trait Checks<T> {
         let result_final_address_story = Self::handle_page_address_expectation(&page_check.url, &result_final_address.unwrap_or_default(), expected_final_address);
         let result_handler_story = Self::handle_page_httpcode_expectation(&page_check.url, result_handler.response_code().map_err(|err| Error::new(ErrorKind::Other, err.to_string())), expected_code);
 
+        // Collect the history results
         History::new_from(
-            // Collect the history results
-            History::new_from(
-                [
-                    History::new(content_story).stories(),
-                    History::new(content_length_story).stories(),
-                    History::new(result_handler_story).stories(),
-                    History::new(result_final_address_story).stories(),
-                ].concat()
-            ).stories()
+            [
+                History::new(content_story).stories(),
+                History::new(content_length_story).stories(),
+                History::new(result_handler_story).stories(),
+                History::new(result_final_address_story).stories(),
+            ].concat()
         )
     }
 
