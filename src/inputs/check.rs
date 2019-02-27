@@ -312,6 +312,11 @@ pub trait Checks<T> {
         let handle = a_handler.get_ref();
         let raw_page_content = String::from_utf8_lossy(&handle.0);
 
+        let expected_code = Self::find_code_validation(&page_expectations);
+        let expected_content = Self::find_content_validation(&page_expectations);
+        let expected_content_length = Self::find_content_length_validation(&page_expectations);
+        let expected_final_address = Self::find_address_validation(&page_expectations);
+
         // Gather Story from expectations
         let content_story = Self::handle_page_content_expectation(&page_check.url, &raw_page_content, expected_content);
         let content_length_story = Self::handle_page_length_expectation(&page_check.url, &raw_page_content, expected_content_length);
