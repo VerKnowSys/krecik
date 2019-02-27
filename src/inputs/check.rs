@@ -161,7 +161,16 @@ pub trait Checks<T> {
         let page_expectations = page_check
             .clone()
             .expects
-            .unwrap_or_default();
+            .unwrap_or_else(||
+                // provide own default page expectations if nothing defined in check input:
+                vec![
+                    PageExpectation::ValidCode(200),
+                    PageExpectation::ValidLength(100),
+                    PageExpectation::ValidContent("<body".to_string()),
+                ]
+            );
+        let debugmsg = format!("check_page::page_expectations -> {:#?}", page_expectations);
+        debug!("{}", debugmsg.magenta());
         let expected_code = Self::find_code_validation(&page_expectations);
         let expected_content = Self::find_content_validation(&page_expectations);
         let expected_content_length = Self::find_content_length_validation(&page_expectations);
