@@ -162,7 +162,7 @@ pub trait Checks<T> {
 
 
     /// Check page expectations
-    fn check_page(page_check: &Page) -> History {
+    fn check_page(page_check: &Page, multi: &Multi) -> History {
         let page_expectations = page_check
             .clone()
             .expects
@@ -181,130 +181,122 @@ pub trait Checks<T> {
         let expected_content_length = Self::find_content_length_validation(&page_expectations);
         let expected_final_address = Self::find_address_validation(&page_expectations);
 
-        // Proceed with check
-        let mut multi = Multi::new();
-        multi.pipelining(true, true).unwrap();
-        let handlers: Vec<_> = page_expectations
-            .iter()
-            .map(|_| {
-                // Initialize Curl, set URL
-                let mut curl = Easy2::new(Collector(Vec::new()));
-                curl.url(&page_check.url).unwrap();
-                debug!("{}", format!("Curl URL: {}", &page_check.url.cyan()).black());
+        // Initialize Curl, set URL
+        let mut curl = Easy2::new(Collector(Vec::new()));
+        curl.url(&page_check.url).unwrap();
+        debug!("{}", format!("Curl URL: {}", &page_check.url.cyan()).black());
 
-                // Load Curl request options from check:
-                let curl_options = page_check.clone().options.unwrap_or_default();
-                debug!("{}", format!("Curl options: {}", curl_options.to_string().cyan()).black());
+        // Load Curl request options from check:
+        let curl_options = page_check.clone().options.unwrap_or_default();
+        debug!("{}", format!("Curl options: {}", curl_options.to_string().cyan()).black());
 
-                // Setup Curl configuration based on given options
-                if curl_options.follow_redirects.unwrap_or_else(|| true) {
-                    debug!("{}", "Enabled following redirects".black());
-                    curl.follow_location(true).unwrap();
-                } else {
-                    debug!("{}", "Disabled following redirects".black());
-                    curl.follow_location(false).unwrap();
-                }
+        // Setup Curl configuration based on given options
+        if curl_options.follow_redirects.unwrap_or_else(|| true) {
+            debug!("{}", "Enabled following redirects".black());
+            curl.follow_location(true).unwrap();
+        } else {
+            debug!("{}", "Disabled following redirects".black());
+            curl.follow_location(false).unwrap();
+        }
 
-                if curl_options.verbose.unwrap_or_else(|| false) {
-                    debug!("{}", "Enabling Verbose mode".black());
-                    curl.verbose(true).unwrap();
-                } else {
-                    debug!("{}", "Disabling Verbose mode".black());
-                    curl.verbose(false).unwrap();
-                }
+        if curl_options.verbose.unwrap_or_else(|| false) {
+            debug!("{}", "Enabling Verbose mode".black());
+            curl.verbose(true).unwrap();
+        } else {
+            debug!("{}", "Disabling Verbose mode".black());
+            curl.verbose(false).unwrap();
+        }
 
-                // Setup Curl configuration based on given options
-                match curl_options.method {
-                    Some(Method::PUT) | Some(Method::POST) => {
-                        debug!("{}", "Curl method: PUT / POST".black());
-                        let post_data = curl_options
-                                            .post_data
-                                            .unwrap_or_default();
-                        curl
-                            .post(true)
-                            .unwrap();
-                        curl
-                            .post_field_size(post_data.len() as u64)
-                            .unwrap();
-                    },
-
-                    // fallbacks to GET
-                    Some(_) | None => {
-                        debug!("{}", "Curl method: GET".black());
-                        curl.get(true).unwrap();
-                    },
-                };
-
-                // Build List of HTTP headers
-                // ex. header:
-                //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
-                let mut list = List::new();
-                for header in curl_options
-                                .headers
-                                .unwrap_or_default() {
-                    debug!("{}", format!("Setting header: {}", header.cyan()).black());
-                    list
-                        .append(&header.to_owned())
-                        .unwrap();
-                }
+        // Setup Curl configuration based on given options
+        match curl_options.method {
+            Some(Method::PUT) | Some(Method::POST) => {
+                debug!("{}", "Curl method: PUT / POST".black());
+                let post_data = curl_options
+                                    .post_data
+                                    .unwrap_or_default();
                 curl
-                    .http_headers(list)
+                    .post(true)
                     .unwrap();
+                curl
+                    .post_field_size(post_data.len() as u64)
+                    .unwrap();
+            },
 
-                // Pass cookies
-                for cookie in curl_options
-                                .cookies
-                                .unwrap_or_default() {
-                    debug!("{}", format!("Setting cookie: {}", cookie.cyan()).black());
-                    curl
-                        .cookie(&cookie)
-                        .unwrap();
-                }
+            // fallbacks to GET
+            Some(_) | None => {
+                debug!("{}", "Curl method: GET".black());
+                curl.get(true).unwrap();
+            },
+        };
 
-                // Set agent
-                match curl_options.agent {
-                    Some(new_agent) => {
-                        debug!("{}", format!("Setting useragent: {}", &new_agent.cyan()).black());
-                        curl
-                            .useragent(&new_agent)
-                            .unwrap()
-                    },
-                    None => {
-                        debug!("{}", "Empty useragent".black());
-                    }
-                }
+        // Build List of HTTP headers
+        // ex. header:
+        //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
+        let mut list = List::new();
+        for header in curl_options
+                        .headers
+                        .unwrap_or_default() {
+            debug!("{}", format!("Setting header: {}", header.cyan()).black());
+            list
+                .append(&header.to_owned())
+                .unwrap();
+        }
+        curl
+            .http_headers(list)
+            .unwrap();
 
-                // Set connection and request timeout with default fallback to 30s for each
-                curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
-                curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT))).unwrap();
+        // Pass cookies
+        for cookie in curl_options
+                        .cookies
+                        .unwrap_or_default() {
+            debug!("{}", format!("Setting cookie: {}", cookie.cyan()).black());
+            curl
+                .cookie(&cookie)
+                .unwrap();
+        }
 
-                // Verify SSL PEER
-                if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
-                    debug!("{}", "Enabled TLS-PEER verification.".black());
-                    curl.ssl_verify_peer(true).unwrap();
-                } else {
-                    warn!("Disabled TLS-PEER verification!");
-                    curl.ssl_verify_peer(false).unwrap();
-                }
+        // Set agent
+        match curl_options.agent {
+            Some(new_agent) => {
+                debug!("{}", format!("Setting useragent: {}", &new_agent.cyan()).black());
+                curl
+                    .useragent(&new_agent)
+                    .unwrap()
+            },
+            None => {
+                debug!("{}", "Empty useragent".black());
+            }
+        }
 
-                // Verify SSL HOST
-                if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
-                    debug!("{}", "Enabled TLS-HOST verification.".black());
-                    curl.ssl_verify_host(true).unwrap();
-                } else {
-                    warn!("Disabled TLS-HOST verification!");
-                    curl.ssl_verify_host(false).unwrap();
-                }
+        // Set connection and request timeout with default fallback to 30s for each
+        curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
+        curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT))).unwrap();
 
-                // Max connections is 10 per check
-                curl.max_connects(CHECK_MAX_CONNECTIONS).unwrap();
+        // Verify SSL PEER
+        if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
+            debug!("{}", "Enabled TLS-PEER verification.".black());
+            curl.ssl_verify_peer(true).unwrap();
+        } else {
+            warn!("Disabled TLS-PEER verification!");
+            curl.ssl_verify_peer(false).unwrap();
+        }
 
-                // Max reconnections is 10 per check
-                curl.max_redirections(CHECK_MAX_REDIRECTIONS).unwrap();
+        // Verify SSL HOST
+        if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
+            debug!("{}", "Enabled TLS-HOST verification.".black());
+            curl.ssl_verify_host(true).unwrap();
+        } else {
+            warn!("Disabled TLS-HOST verification!");
+            curl.ssl_verify_host(false).unwrap();
+        }
 
-                multi.add2(curl)
-            })
-            .collect();
+        // Max connections is 10 per check
+        curl.max_connects(CHECK_MAX_CONNECTIONS).unwrap();
+
+        // Max reconnections is 10 per check
+        curl.max_redirections(CHECK_MAX_REDIRECTIONS).unwrap();
+
+        let handler = multi.add2(curl);
 
         // perform async checks
         while multi
@@ -316,34 +308,29 @@ pub trait Checks<T> {
         }
 
         // gather handlers, perform validations, produce stories…
+        let a_handler = handler.unwrap();
+        let handle = a_handler.get_ref();
+        let raw_page_content = String::from_utf8_lossy(&handle.0);
+
+        // Gather Story from expectations
+        let content_story = Self::handle_page_content_expectation(&page_check.url, &raw_page_content, expected_content);
+        let content_length_story = Self::handle_page_length_expectation(&page_check.url, &raw_page_content, expected_content_length);
+
+        let mut result_handler = multi.remove2(a_handler).unwrap();
+        let result_final_address = result_handler.effective_url().unwrap_or_default();
+        let result_final_address_story = Self::handle_page_address_expectation(&page_check.url, &result_final_address.unwrap_or_default(), expected_final_address);
+        let result_handler_story = Self::handle_page_httpcode_expectation(&page_check.url, result_handler.response_code().map_err(|err| Error::new(ErrorKind::Other, err.to_string())), expected_code);
+
         History::new_from(
-            handlers
-                .into_iter()
-                .flat_map(|handler| {
-                    let a_handler = handler.unwrap();
-                    let handle = a_handler.get_ref();
-                    let raw_page_content = String::from_utf8_lossy(&handle.0);
-
-                    // Gather Story from expectations
-                    let content_story = Self::handle_page_content_expectation(&page_check.url, &raw_page_content, expected_content);
-                    let content_length_story = Self::handle_page_length_expectation(&page_check.url, &raw_page_content, expected_content_length);
-
-                    let mut result_handler = multi.remove2(a_handler).unwrap();
-                    let result_final_address = result_handler.effective_url().unwrap_or_default();
-                    let result_final_address_story = Self::handle_page_address_expectation(&page_check.url, &result_final_address.unwrap_or_default(), expected_final_address);
-                    let result_handler_story = Self::handle_page_httpcode_expectation(&page_check.url, result_handler.response_code().map_err(|err| Error::new(ErrorKind::Other, err.to_string())), expected_code);
-
-                    // Collect the history results
-                    History::new_from(
-                        [
-                            History::new(content_story).stories(),
-                            History::new(content_length_story).stories(),
-                            History::new(result_handler_story).stories(),
-                            History::new(result_final_address_story).stories(),
-                        ].concat()
-                    ).stories()
-                })
-                .collect()
+            // Collect the history results
+            History::new_from(
+                [
+                    History::new(content_story).stories(),
+                    History::new(content_length_story).stories(),
+                    History::new(result_handler_story).stories(),
+                    History::new(result_final_address_story).stories(),
+                ].concat()
+            ).stories()
         )
     }
 
@@ -474,13 +461,16 @@ pub trait Checks<T> {
 
     /// Check pages
     fn check_pages(pages: Option<Pages>) -> History {
+        let mut multi = Multi::new();
+        multi.pipelining(true, true).unwrap();
+
         match pages {
             Some(pages) => {
                 History::new_from(
                     pages
                         .iter()
                         .flat_map(|check| {
-                            Self::check_page(&check).stories()
+                            Self::check_page(&check, &multi).stories()
                         })
                         .collect()
                     )
