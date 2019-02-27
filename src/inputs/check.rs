@@ -192,10 +192,6 @@ pub trait Checks<T> {
             );
         let debugmsg = format!("check_page::page_expectations -> {:#?}", page_expectations);
         debug!("{}", debugmsg.magenta());
-        let expected_code = Self::find_code_validation(&page_expectations);
-        let expected_content = Self::find_content_validation(&page_expectations);
-        let expected_content_length = Self::find_content_length_validation(&page_expectations);
-        let expected_final_address = Self::find_address_validation(&page_expectations);
 
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
