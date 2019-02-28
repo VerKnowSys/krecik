@@ -19,7 +19,7 @@ use crate::products::history::*;
 /// Execute single check by path/name
 pub fn handler_check_execute_by_name(state: State) -> (State, History) {
     let uri = Uri::borrow_from(&state).to_string();
-    let check_path = format!("{}/{}", &CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, ""));
+    let check_path = format!("{}{}", &CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, ""));
     info!("Loading single check from path: {}", &check_path.cyan());
     (state,
         GenCheck::load(&check_path)
