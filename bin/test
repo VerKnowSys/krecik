@@ -33,7 +33,7 @@ if [ -n "${_maybe_server_in_background}" ]; then
         printf "%b\n" "${_request}" \
             | jq '.' 2>> "${_travmole_logfile}"
 
-        printf "Test successful: #%b.\n\n" "${_tst}"
+        printf "Test completed\n\n"
     else
         printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
     fi
