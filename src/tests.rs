@@ -15,9 +15,9 @@ mod tests {
     use crate::*;
     use crate::configuration::*;
     use crate::utilities::*;
-    use crate::inputs::file::*;
+    use crate::checks::*;
+    use crate::checks::generic::*;
     use crate::checks::domain::*;
-    use crate::inputs::check::*;
     use crate::checks::page::*;
     use crate::products::*;
     use crate::products::expected::*;
@@ -175,7 +175,7 @@ mod tests {
 
     #[test]
     fn test_filecheck_to_json_serialization() {
-        let check = FileCheck {
+        let check = GenCheck {
             domains: Some(vec!(
                Domain {
                    name: "nask.pl".to_string(),
@@ -200,7 +200,7 @@ mod tests {
 
     #[test]
     fn test_check_json_to_filecheck_deserialization() {
-        let check = FileCheck::load("checks/tests/test1.json").unwrap_or_default();
+        let check = GenCheck::load("checks/tests/test1.json").unwrap_or_default();
         assert!(check.pages.is_some());
         assert!(check.domains.is_some());
     }
@@ -208,8 +208,8 @@ mod tests {
 
     #[test]
     fn test_domain_check_history_length() {
-        let check = FileCheck::load("checks/tests/test1.json").unwrap_or_default();
-        let history = FileCheck::check_domains(check.domains);
+        let check = GenCheck::load("checks/tests/test1.json").unwrap_or_default();
+        let history = GenCheck::check_domains(check.domains);
         println!("TEST1({}): {}", history.length(), history.to_string());
         assert!(history.length() > 0);
         assert!(history.length() == 1);
@@ -222,7 +222,7 @@ mod tests {
 
     #[test]
     fn test_page_check_history_length() {
-        let check = FileCheck::load("checks/tests/test2.json").unwrap_or_default();
+        let check = GenCheck::load("checks/tests/test2.json").unwrap_or_default();
         let history = check.execute();
         println!("TEST2({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
@@ -234,7 +234,7 @@ mod tests {
 
     #[test]
     fn test_redirect_no_follow() {
-        let check = FileCheck::load("checks/tests/test3.json").unwrap_or_default();
+        let check = GenCheck::load("checks/tests/test3.json").unwrap_or_default();
         let history = check.execute();
         println!("TEST3({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
@@ -250,7 +250,7 @@ mod tests {
 
     #[test]
     fn test_gibberish_url_check() {
-        let check = FileCheck::load("checks/tests/test4.json").unwrap_or_default();
+        let check = GenCheck::load("checks/tests/test4.json").unwrap_or_default();
         let history = check.execute();
         println!("TEST4({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
@@ -264,7 +264,7 @@ mod tests {
 
     #[test]
     fn test_page_content_length_check() {
-        let check = FileCheck::load("checks/tests/test5.json").unwrap_or_default();
+        let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
         let page: &Page = &check.clone().pages.unwrap()[0];
         let options = page.options.clone().unwrap();
         let cookies = options.cookies;
@@ -283,7 +283,7 @@ mod tests {
 
     #[test]
     fn test_agent_check() {
-        let check = FileCheck::load("checks/tests/test5.json").unwrap_or_default();
+        let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
         let page: &Page = &check.clone().pages.unwrap()[0];
         let options = page.options.clone().unwrap();
         let agent = options.agent;
@@ -294,7 +294,7 @@ mod tests {
 
     #[test]
     fn test_when_everything_is_a_failure_test9() {
-        FileCheck::load("checks/tests/test9.json")
+        GenCheck::load("checks/tests/test9.json")
             .unwrap_or_default()
             .execute()
             .stories()
@@ -308,7 +308,7 @@ mod tests {
 
     #[test]
     fn test_parsing_bogus_validators() {
-        FileCheck::load("checks/tests/test10.json")
+        GenCheck::load("checks/tests/test10.json")
             .and_then(|check| {
                 Ok(assert!(false))
             })
@@ -320,7 +320,7 @@ mod tests {
 
     #[test]
     fn test_parsing_invalid_validator_value_type() {
-        FileCheck::load("checks/tests/test11.json")
+        GenCheck::load("checks/tests/test11.json")
             .and_then(|check| {
                 Ok(assert!(false))
             })
@@ -332,7 +332,7 @@ mod tests {
 
     #[test]
     fn test_empty_check() {
-        FileCheck::load("checks/tests/test12.json")
+        GenCheck::load("checks/tests/test12.json")
             .and_then(|check| {
                 assert!(check.pages.is_some());
                 assert!(check.domains.is_none());

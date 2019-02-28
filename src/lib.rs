@@ -52,9 +52,6 @@ pub mod utilities;
 /// Checks:
 pub mod checks;
 
-/// Resource inputs:
-pub mod inputs;
-
 /// Check products:
 pub mod products;
 

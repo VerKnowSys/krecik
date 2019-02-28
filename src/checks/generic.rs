@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use crate::configuration::*;
 use crate::utilities::*;
-use crate::inputs::check::*;
+use crate::checks::*;
 use crate::checks::page::*;
 use crate::checks::domain::*;
 use crate::products::expected::*;
@@ -20,8 +20,8 @@ use crate::products::history::*;
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-/// FileCheck structure
-pub struct FileCheck {
+/// Generic Check structure:
+pub struct GenCheck {
 
     /// Domains to check
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -42,10 +42,10 @@ pub struct FileCheck {
 }
 
 
-impl Checks<FileCheck> for FileCheck {
+impl Checks<GenCheck> for GenCheck {
 
 
-    fn load(name: &str) -> Result<FileCheck, Error> {
+    fn load(name: &str) -> Result<GenCheck, Error> {
         read_text_file(&name)
             .and_then(|file_contents| {
                 serde_json::from_str(&*file_contents)
@@ -57,8 +57,8 @@ impl Checks<FileCheck> for FileCheck {
     fn execute(&self) -> History {
         History::new_from(
             [
-                FileCheck::check_pages(self.pages.clone()).stories(),
-                FileCheck::check_domains(self.domains.clone()).stories(),
+                GenCheck::check_pages(self.pages.clone()).stories(),
+                GenCheck::check_domains(self.domains.clone()).stories(),
             ].concat()
         )
     }
@@ -67,9 +67,9 @@ impl Checks<FileCheck> for FileCheck {
 }
 
 
-impl Default for FileCheck {
-    fn default() -> FileCheck {
-        FileCheck {
+impl Default for GenCheck {
+    fn default() -> GenCheck {
+        GenCheck {
             pages: None,
             domains: None,
             alert_channel: None,

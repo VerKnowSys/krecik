@@ -7,15 +7,12 @@ use gotham::handler::{HandlerFuture, IntoHandlerError};
 use gotham::router::Router;
 use colored::Colorize;
 
-// use fern::colors::{Color, ColoredLevelConfig};
-
-
 use crate::configuration::*;
 use crate::products::expected::*;
 use crate::products::unexpected::*;
 use crate::utilities::*;
-use crate::inputs::check::*;
-use crate::inputs::file::*;
+use crate::checks::*;
+use crate::checks::generic::*;
 use crate::products::history::*;
 
 
@@ -25,7 +22,7 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
     let check_path = format!("{}/{}", &CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, ""));
     info!("Loading single check from path: {}", &check_path.cyan());
     (state,
-        FileCheck::load(&check_path)
+        GenCheck::load(&check_path)
             .and_then(|check| {
                 let debug = format!("Executing check: {:#?}", check);
                 debug!("{}", debug.magenta());
@@ -51,7 +48,7 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
                 .into_iter()
                 .flat_map(|check_file| {
                     let check = format!("{}/{}", check_path, check_file);
-                    FileCheck::load(&check)
+                    GenCheck::load(&check)
                         .and_then(|check| {
                             let debug = format!("Executing check: {:#?}", check);
                             debug!("{}", debug.magenta());
