@@ -87,12 +87,13 @@ pub trait Checks<T> {
                             let debugmsg = format!("check_domain::domain_expectations -> {:#?}", domain_expectations);
                             debug!("{}", debugmsg.magenta());
 
-                            History::new_from(domain_expectations
-                                .iter()
-                                .map(|domain_expectation| {
-                                    Self::check_ssl_expire(&domain_name, *domain_expectation)
-                                })
-                                .collect()
+                            History::new_from(
+                                domain_expectations
+                                    .iter()
+                                    .map(|domain_expectation| {
+                                        Self::check_ssl_expire(&domain_name, *domain_expectation)
+                                    })
+                                    .collect()
                             ).stories()
                         })
                         .collect()
