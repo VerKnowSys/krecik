@@ -48,7 +48,7 @@ impl Checks<FileCheck> for FileCheck {
     fn load(name: &str) -> Result<FileCheck, Error> {
         read_text_file(&name)
             .and_then(|file_contents| {
-                serde_json::from_str(&file_contents.to_string())
+                serde_json::from_str(&*file_contents)
                     .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
             })
     }

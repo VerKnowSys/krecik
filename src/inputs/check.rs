@@ -475,19 +475,16 @@ pub trait Checks<T> {
     fn check_pages(pages: Option<Pages>) -> History {
         let mut multi = Multi::new();
         multi.pipelining(true, true).unwrap();
-
         match pages {
             Some(pages) => {
-                // collect tuple of checks and handlers:
-                let process_handlers: Vec<(Page, CurlHandler)> =
-                    pages
+                // collect tuple of page-checks and Curl handler:
+                let process_handlers: Vec<_> // : Vec<(Page, CurlHandler)>
+                    = pages
                         .iter()
-                        .map(|check| {
-                            (check.clone(), Self::load_handler_for(&check, &multi))
-                        })
+                        .map(|check| (check, Self::load_handler_for(&check, &multi)))
                         .collect();
 
-                // perform all async checks
+                // perform all checks at once:
                 while multi
                         .perform()
                         .unwrap() > 0 {
@@ -496,7 +493,7 @@ pub trait Checks<T> {
                         .unwrap();
                 }
 
-                // Collect results
+                // Collect History of results:
                 History::new_from(
                     process_handlers
                         .into_iter()
