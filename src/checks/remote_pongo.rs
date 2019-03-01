@@ -25,7 +25,7 @@ pub struct PongoRemoteMapper {
 
 
     /// Check AMS only for specified subdomain
-    pub only_subdomain: String,
+    pub only_vhost_contains: String,
 
 }
 
@@ -35,7 +35,7 @@ impl PongoRemoteMapper {
     fn empty() -> Self {
         PongoRemoteMapper {
             url: "".to_string(),
-            only_subdomain: "".to_string(),
+            only_vhost_contains: "".to_string(),
         }
     }
 
@@ -83,7 +83,7 @@ impl Checks<GenCheck> for PongoHost {
                             .and_then(|vhosts| {
                                 vhosts
                                     .iter()
-                                    .filter(|vhost| !vhost.contains("*.") && vhost.contains(&mapper.only_subdomain)) // filter out wildcard domains
+                                    .filter(|vhost| !vhost.contains("*.") && vhost.contains(&mapper.only_vhost_contains)) // filter out wildcard domains
                                     .map(|vhost| {
                                         Some(
                                             Page {
