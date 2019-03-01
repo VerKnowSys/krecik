@@ -56,9 +56,9 @@ impl Checks<GenCheck> for PongoHost {
         easy.perform().unwrap();
         let contents = easy.get_ref();
         let remote_raw = String::from_utf8_lossy(&contents.0);
-        debug!("PongoRemoteMapper::load from URL: {}, RAW contents: {}",
+        debug!("PongoRemoteMapper::load from URL: {}, JSON RAW length: {}",
                mapper.url.replace(r"token=.*", "token=**masked**"),
-               &remote_raw.cyan());
+               &remote_raw.len());
 
         // now use default Pongo structure defined as default for PongoRemoteMapper
         let pongo_hosts: PongoHosts
@@ -80,7 +80,7 @@ impl Checks<GenCheck> for PongoHost {
                                 .map(|vhost| {
                                     Some(
                                         Page {
-                                            url: format!("https://{}", vhost),
+                                            url: format!("{}{}", CHECK_DEFAULT_PROTOCOL, vhost),
                                             expects: Some(Self::default_page_expectations()),
                                             options: None,
                                         }

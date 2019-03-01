@@ -42,5 +42,8 @@ pub const CHECKS_DIR: &str = "checks";
 /// Web-API endpoint
 pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute";
 
+/// Default Web proto:
+pub const CHECK_DEFAULT_PROTOCOL: &str = "https://";
+
 /// Remote Web-API endpoint
 pub const CHECK_API_EXECUTE_REMOTE_REQUEST_PATH: &str = "/check/execute_remote";
