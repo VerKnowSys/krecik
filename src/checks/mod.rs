@@ -8,7 +8,7 @@ pub mod page;
 pub mod generic;
 
 /// Mapper for default remote Checks lilst JSON resource: Pongo
-pub mod remote_pongo;
+pub mod pongo;
 
 
 use curl::MultiError;

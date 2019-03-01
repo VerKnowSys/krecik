@@ -19,7 +19,7 @@ mod tests {
     use crate::checks::generic::*;
     use crate::checks::domain::*;
     use crate::checks::page::*;
-    use crate::mappers::pongo::*;
+    use crate::checks::pongo::*;
     use crate::products::*;
     use crate::products::expected::*;
     use crate::products::unexpected::*;
