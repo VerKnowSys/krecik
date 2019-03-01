@@ -23,6 +23,10 @@ pub struct PongoRemoteMapper {
     /// Resource URL
     pub url: String,
 
+
+    /// Check AMS only for specified subdomain
+    pub only_subdomain: String,
+
 }
 
 
@@ -31,6 +35,7 @@ impl PongoRemoteMapper {
     fn empty() -> Self {
         PongoRemoteMapper {
             url: "".to_string(),
+            only_subdomain: "".to_string(),
         }
     }
 
@@ -69,6 +74,7 @@ impl Checks<GenCheck> for PongoHost {
                 .clone()
                 .into_iter()
                 .flat_map(|host| {
+                    let ams = host.data.ams.unwrap_or_default();
                     [ // merge two lists for URLs: "vhosts" and "showrooms":
                         host
                             .data
@@ -77,11 +83,11 @@ impl Checks<GenCheck> for PongoHost {
                             .and_then(|vhosts| {
                                 vhosts
                                     .iter()
-                                    .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
+                                    .filter(|vhost| !vhost.contains("*.") && vhost.contains(&mapper.only_subdomain)) // filter out wildcard domains
                                     .map(|vhost| {
                                         Some(
                                             Page {
-                                                url: format!("{}{}", CHECK_DEFAULT_PROTOCOL, vhost),
+                                                url: format!("{}{}/{}", CHECK_DEFAULT_PROTOCOL, vhost, ams),
                                                 expects: Some(Self::default_page_expectations()),
                                                 options: None,
                                             }
