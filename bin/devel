@@ -5,11 +5,4 @@
 
 . bin/common "dev"
 
-printf "Starting continuous code build (triggered by code changes)\n"
-DEBUG=1 \
-    cargo watch \
-        --clear \
-        --postpone \
-        --exec clippy \
-        --shell "${SHELL}" \
-        --watch "src"
+continuous_development

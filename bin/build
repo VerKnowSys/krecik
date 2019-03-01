@@ -5,20 +5,7 @@
 
 . bin/common "${*}"
 
-
-printf "Building project: %b\n" "${_project_name}"
-cargo build ${_cargo_release_flag}
-if [ "0" != "${?}" ]; then
-    echo "Build Failed!" \
-        && exit 1
-fi
-
-
-# printf "Building: Library: %b\n" "${_project_name}"
-# cargo build \
-#     --verbose \
-#     --lib ${_cargo_release_flag}
-# if [ "0" != "${?}" ]; then
-#     echo "Build: Library: Failed!" \
-#         && exit 1
-# fi
+setup_environment
+sanity_checks
+print_project_info
+build_project

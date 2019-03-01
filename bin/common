@@ -12,77 +12,150 @@ _cargo_project_dir="$(pwd 2>/dev/null)"
 _release_type="${1:-release}"
 _project_name="TravMole"
 _bin_name="travmole"
+_debug_target="target/debug/${_bin_name}"
+_release_target="target/release/${_bin_name}"
+
 _travmole_webapi_endpoint="127.0.0.1:60666"
 _travmole_webapi_req_path="/check/execute"
 _travmole_dest_bin="/usr/bin/${_bin_name}"
-_travmole_logfile="logs/travmole.log"
-_travmole_supervisor_pidfile="logs/travmole.pid"
+_travmole_logfile="logs/${_bin_name}.log"
+_travmole_supervisor_pidfile="logs/${_bin_name}.pid"
 _bin_product_target="target/${_release_type}/${_bin_name}"
 _curl_software="/Software/Curl_lib"
 
-_cargo_release_flag="--release"
+_cargo_color_flag="--color always"
+_cargo_verbose_flag="--verbose"
 if [ "release" != "${_release_type}" ]; then
-    unset _cargo_release_flag
+    export RUST_BACKTRACE=1
+    export DEBUG=1
+    _cargo_flags="--jobs 4 ${_cargo_verbose_flag} ${_cargo_color_flag}"
+else
+    unset DEBUG RUST_BACKTRACE
+    _cargo_flags="--release ${_cargo_color_flag}"
 fi
 
 
 failure () {
-    printf "FAILURE: %b\n" "${@}"
+    printf "FATAL: %b\n" "${@}"
     exit 1
 }
 
 
-# used Shared Libraries
-case "${_uname}" in
-    Darwin|FreeBSD)
-        export LD_LIBRARY_PATH="${_curl_software}/lib"
-        export OPENSSL_LIB_DIR="${_curl_software}/lib"
-        export X86_64_APPLE_DARWIN_OPENSSL_LIB_DIR="${OPENSSL_LIB_DIR}"
-        export OPENSSL_INCLUDE_DIR="${_curl_software}/include"
-        export X86_64_APPLE_DARWIN_OPENSSL_INCLUDE_DIR="${OPENSSL_INCLUDE_DIR}"
-        export OPENSSL_DIR="${_curl_software}"
-        export X86_64_APPLE_DARWIN_OPENSSL_DIR="${OPENSSL_DIR}"
-        export PKG_CONFIG_PATH="${_curl_software}/lib/pkgconfig"
-        ;;
-
-    *)
-        printf "NOTE: On Linux hosts, you may need to install additional packages: libcurl*-openssl-dev, openssl*-dev and libnghttp2*-dev to build %b\n" "${_project_name}"
-        _curl_software="/usr/lib"
-        ;;
-esac
+print_project_info () {
+    printf "Project: %b\n" "${_project_name}"
+    printf "Project directory: %b\n" "${_cargo_project_dir}"
+    printf "Project build flags: %b\n" "${_cargo_flags}"
+    printf "System type: %b\n" "${_uname}"
+}
 
 
-# Sanity checks…
-if [ -x "${_curl_software}/bin/curl-config" ] \
-|| [ -x "/usr/bin/curl-config" ]
-then
-    printf "Curl: OK\n"
-else
-    failure "Unavailable Curl >= 7.64.0"
-fi
+sanity_checks () {
+    if [ ! -x "$(which curl)" ]; then
+        failure "Unavailable utility: Curl >= 7.x! (Expected 'curl' in \$PATH!)"
+    fi
 
-if [ ! -x "$(which rustc)" ] \
-|| [ ! -x "$(which cargo)" ]
-then
-    failure "Unavailable Rust >= 1.32.0"
-fi
+    if [ ! -x "$(which curl-config)" ]
+    then
+        failure "Unavailable devel-files of: Curl >= 7.x! (Expected 'curl-config' in \$PATH!)"
+    fi
 
-if [ ! -x "$(which jq)" ]
-then
-    failure "Unavailable utility: Jq >= 1.5"
-fi
+    if [ ! -x "$(which rustc)" ] \
+    || [ ! -x "$(which cargo)" ]
+    then
+        failure "Unavailable Rust compiler >= 1.32.0! (Expected 'rustc' and 'cargo' in \$PATH!)"
+    fi
 
-if [ ! -x "$(which grep)" ] \
-|| [ ! -x "$(which awk)" ] \
-|| [ ! -x "$(which head)" ] \
-|| [ ! -x "$(which seq)" ]
-then
-    failure "Unavailable base system utilities?!"
-fi
+    if [ ! -x "$(which jq)" ]
+    then
+        failure "Unavailable utility: Jq >= 1.5! (Expected: 'jq' in \$PATH)"
+    fi
+
+    if [ ! -x "$(which perl)" ]
+    then
+        failure "Unavailable Perl >= 5.x! (Expected 'perl' in \$PATH!)"
+    fi
+
+    if [ ! -x "$(which make)" ]
+    then
+        failure "Unavailable utility: Make! (Expected 'make' in \$PATH!)"
+    fi
+
+    if [ ! -x "$(which grep)" ] \
+    || [ ! -x "$(which awk)" ] \
+    || [ ! -x "$(which head)" ] \
+    || [ ! -x "$(which rm)" ] \
+    || [ ! -x "$(which ps)" ] \
+    || [ ! -x "$(which seq)" ]
+    then
+        failure "Unavailable base system utilities! (Expected utilities: 'curl', 'ps', 'grep', 'awk', 'head', 'seq', 'rm', 'perl'. 'make', …)"
+    fi
+}
 
 
-echo "Project directory: ${_cargo_project_dir}"
-echo "Project product: ${_bin_name}"
-echo "Project release type: ${_release_type}"
-echo "System type: ${_uname}"
-echo
+setup_environment () {
+    case "${_uname}" in
+        Darwin|FreeBSD)
+            export LD_LIBRARY_PATH="${_curl_software}/lib"
+            export OPENSSL_LIB_DIR="${_curl_software}/lib"
+            export X86_64_APPLE_DARWIN_OPENSSL_LIB_DIR="${OPENSSL_LIB_DIR}"
+            export OPENSSL_INCLUDE_DIR="${_curl_software}/include"
+            export X86_64_APPLE_DARWIN_OPENSSL_INCLUDE_DIR="${OPENSSL_INCLUDE_DIR}"
+            export OPENSSL_DIR="${_curl_software}"
+            export X86_64_APPLE_DARWIN_OPENSSL_DIR="${OPENSSL_DIR}"
+            export PKG_CONFIG_PATH="${_curl_software}/lib/pkgconfig"
+            ;;
+
+        *)
+            printf "NOTE: On Linux hosts, you may need to install additional packages: libcurl*-openssl-dev, openssl*-dev and libnghttp2*-dev to build %b\n" "${_project_name}"
+            _curl_software="/usr/lib"
+            ;;
+    esac
+}
+
+
+build_project () {
+    cargo build ${_cargo_flags}
+    if [ "0" != "${?}" ]; then
+        printf "Build Failed!\n" \
+            && exit 1
+    fi
+}
+
+
+run_project () {
+    case "${_release_type}" in
+        release)
+            bin/build \
+                && ${SHELL} -c "${_release_target}"
+            ;;
+
+        *)
+            bin/build "dev" \
+                && ${SHELL} -c "${_debug_target}"
+            ;;
+    esac
+}
+
+
+test_project () {
+    cargo test \
+        --jobs 4 \
+        --tests \
+        ${_cargo_color_flag} \
+        -- \
+        --nocapture \
+            || failure "Test failed!"
+}
+
+
+continuous_development () {
+    printf "Starting continuous code build (triggered by code changes)\n"
+    DEBUG=1 \
+        cargo watch \
+            --clear \
+            --postpone \
+            --exec clippy \
+            --shell "${SHELL}" \
+            --watch "src" \
+                || failure "Cargo watch failed!"
+}
