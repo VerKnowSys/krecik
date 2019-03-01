@@ -69,26 +69,49 @@ impl Checks<GenCheck> for PongoHost {
                 .clone()
                 .into_iter()
                 .flat_map(|host| {
-                    host
-                        .data
-                        .host
-                        .vhosts
-                        .and_then(|vhosts| {
-                            vhosts
-                                .iter()
-                                .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
-                                .map(|vhost| {
-                                    Some(
-                                        Page {
-                                            url: format!("{}{}", CHECK_DEFAULT_PROTOCOL, vhost),
-                                            expects: Some(Self::default_page_expectations()),
-                                            options: None,
-                                        }
-                                    )
-                                })
-                                .collect::<Option<Pages>>()
-                        })
-                        .unwrap_or_default()
+                    [ // merge two lists for URLs: "vhosts" and "showrooms":
+                        host
+                            .data
+                            .host
+                            .vhosts
+                            .and_then(|vhosts| {
+                                vhosts
+                                    .iter()
+                                    .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
+                                    .map(|vhost| {
+                                        Some(
+                                            Page {
+                                                url: format!("{}{}", CHECK_DEFAULT_PROTOCOL, vhost),
+                                                expects: Some(Self::default_page_expectations()),
+                                                options: None,
+                                            }
+                                        )
+                                    })
+                                    .collect::<Option<Pages>>()
+                            })
+                            .unwrap_or_default(),
+
+                        host
+                            .data
+                            .host
+                            .showroom_urls
+                            .and_then(|showrooms| {
+                                showrooms
+                                    .iter()
+                                    .map(|vhost| {
+                                        Some(
+                                            Page {
+                                                url: vhost.to_string(),
+                                                expects: Some(Self::default_page_expectations()),
+                                                options: None,
+                                            }
+                                        )
+                                    })
+                                    .collect::<Option<Pages>>()
+                            })
+                            .unwrap_or_default()
+
+                    ].concat()
                 })
                 .collect();
         let domain_checks
