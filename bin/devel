@@ -1,0 +1,15 @@
+#!/bin/sh
+# blame: @dmilith
+# 2019-03-01-2344-1551480248
+
+
+. bin/common "dev"
+
+printf "Starting continuous code build (triggered by code changes)\n"
+DEBUG=1 \
+    cargo watch \
+        --clear \
+        --postpone \
+        --exec clippy \
+        --shell "${SHELL}" \
+        --watch "src"
