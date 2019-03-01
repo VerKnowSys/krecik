@@ -144,7 +144,7 @@ impl Checks<GenCheck> for PongoHost {
                     serde_json::from_str(&file_contents)
                         .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
                 })
-                .unwrap_or_else(|_| PongoRemoteMapper::default());
+                .unwrap_or_default();
 
         let mut easy = Easy2::new(Collector(Vec::new()));
         easy.get(true).unwrap();
