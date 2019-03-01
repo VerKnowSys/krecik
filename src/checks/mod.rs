@@ -206,7 +206,7 @@ pub trait Checks<T> {
     /// Provide own default domain expectations if nothing defined in check input:
     fn default_domain_expectations() -> DomainExpectations {
         vec![
-            DomainExpectation::ValidExpiryPeriod(14)
+            // DomainExpectation::ValidExpiryPeriod(14)
         ]
     }
 
