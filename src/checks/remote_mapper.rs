@@ -76,6 +76,7 @@ impl Checks<GenCheck> for PongoHost {
                         .and_then(|vhosts| {
                             vhosts
                                 .iter()
+                                .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
                                 .map(|vhost| {
                                     Some(
                                         Page {
@@ -102,6 +103,7 @@ impl Checks<GenCheck> for PongoHost {
                         .and_then(|vhosts| {
                             vhosts
                                 .iter()
+                                .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
                                 .map(|vhost| {
                                     Some(
                                         Domain {
