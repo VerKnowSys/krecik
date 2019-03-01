@@ -57,8 +57,8 @@ impl Checks<GenCheck> for GenCheck {
     fn execute(&self) -> History {
         History::new_from(
             [
-                GenCheck::check_pages(self.pages.clone()).stories(),
-                GenCheck::check_domains(self.domains.clone()).stories(),
+                Self::check_pages(self.pages.clone()).stories(),
+                Self::check_domains(self.domains.clone()).stories(),
             ].concat()
         )
     }

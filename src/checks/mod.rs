@@ -7,6 +7,9 @@ pub mod page;
 /// JSON generic Check:
 pub mod generic;
 
+/// Mapper for remote Check resource:
+pub mod remote_mapper;
+
 
 use curl::MultiError;
 use curl::multi::{Easy2Handle, Multi};

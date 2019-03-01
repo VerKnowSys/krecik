@@ -55,6 +55,9 @@ pub mod checks;
 /// Check products:
 pub mod products;
 
+/// input data Mappers:
+pub mod mappers;
+
 /// Web:
 pub mod web;
 
