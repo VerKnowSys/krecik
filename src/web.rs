@@ -67,6 +67,36 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
 }
 
 
+/// Remote PongoHost check request
+fn handler_check_execute_all_from_remote_from_path(state: State) -> (State, History) {
+    let uri = Uri::borrow_from(&state).to_string();
+    let check_path = format!("{}{}", CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REMOTE_REQUEST_PATH, ""));
+    info!("Loading remote checks from url: {}", &check_path.cyan());
+    (state,
+        History::new_from(
+            list_check_files_from(&check_path)
+                .into_iter()
+                .flat_map(|check_file| {
+                    let check = format!("{}/{}", check_path, check_file);
+                    PongoHost::load(&check)
+                        .and_then(|check| {
+                            let debug = format!("Executing check: {:#?}", check);
+                            debug!("{}", debug.magenta());
+                            Ok(check.execute())
+                        })
+                        .unwrap_or_else(|err| {
+                            let error = format!("Failed to load check from file: {}. Error details: {}", &check, err);
+                            error!("{}", error.red());
+                            History::new(Story::new_error(Some(Unexpected::CheckParseProblem(error))))
+                        })
+                        .stories()
+                })
+                .collect()
+        )
+    )
+}
+
+
 /// Web router:
 pub fn router() -> Router {
     // use gotham::handler::assets::*;
@@ -89,6 +119,16 @@ pub fn router() -> Router {
                     handler
                         .get()
                         .to(handler_check_execute_by_name);
+                }
+            );
+
+        // remote Pongo checks all at once:
+        route
+            .associate(
+                &format!("{}/:path", CHECK_API_EXECUTE_REMOTE_REQUEST_PATH), |handler| {
+                    handler
+                        .get()
+                        .to(handler_check_execute_all_from_remote_from_path);
                 }
             );
 
