@@ -7,8 +7,8 @@ pub mod page;
 /// JSON generic Check:
 pub mod generic;
 
-/// Mapper for remote Check resource:
-pub mod remote_mapper;
+/// Mapper for default remote Checks lilst JSON resource: Pongo
+pub mod remote_pongo;
 
 
 use curl::MultiError;
