@@ -75,6 +75,10 @@ impl Checks<GenCheck> for PongoHost {
                 .into_iter()
                 .flat_map(|host| {
                     let ams = host.data.ams.unwrap_or_default();
+                    let active = host.active.unwrap_or_else(|| false);
+                    let client = host.client.unwrap_or_default();
+                    debug!("Pongo: URL: {}, CLIENT: {}, AMS: {}. ACTIVE: {}",
+                           &mapper.url.cyan(), &client.cyan(), &ams.cyan(), format!("{}", active).cyan());
                     [ // merge two lists for URLs: "vhosts" and "showrooms":
                         host
                             .data
@@ -85,13 +89,18 @@ impl Checks<GenCheck> for PongoHost {
                                     .iter()
                                     .filter(|vhost| !vhost.contains("*.") && vhost.contains(&mapper.only_vhost_contains)) // filter out wildcard domains
                                     .map(|vhost| {
-                                        Some(
-                                            Page {
-                                                url: format!("{}{}/{}", CHECK_DEFAULT_PROTOCOL, vhost, ams),
-                                                expects: Some(Self::default_page_expectations()),
-                                                options: None,
-                                            }
-                                        )
+                                        if active {
+                                            Some(
+                                                Page {
+                                                    url: format!("{}{}/{}", CHECK_DEFAULT_PROTOCOL, vhost, ams),
+                                                    expects: Some(Self::default_page_expectations()),
+                                                    options: None,
+                                                }
+                                            )
+                                        } else {
+                                            debug!("Skipping not active client: {}", &client);
+                                            None
+                                        }
                                     })
                                     .collect::<Option<Pages>>()
                             })
@@ -105,13 +114,18 @@ impl Checks<GenCheck> for PongoHost {
                                 showrooms
                                     .iter()
                                     .map(|vhost| {
-                                        Some(
-                                            Page {
-                                                url: vhost.to_string(),
-                                                expects: Some(Self::default_page_expectations()),
-                                                options: None,
-                                            }
-                                        )
+                                        if active {
+                                            Some(
+                                                Page {
+                                                    url: vhost.to_string(),
+                                                    expects: Some(Self::default_page_expectations()),
+                                                    options: None,
+                                                }
+                                            )
+                                        } else {
+                                            debug!("Skipping not active client: {}", &client);
+                                            None
+                                        }
                                     })
                                     .collect::<Option<Pages>>()
                             })

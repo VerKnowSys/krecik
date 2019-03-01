@@ -39,6 +39,9 @@ pub struct PongoHost {
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHostData {
 
+    /// Client name:
+    pub client: Option<String>,
+
     /// Client application environment:
     #[serde(skip_serializing_if = "Option::is_none")]
     pub env: Option<String>,
