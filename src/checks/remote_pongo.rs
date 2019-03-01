@@ -54,16 +54,13 @@ impl Checks<GenCheck> for PongoHost {
                 })
                 .unwrap_or_else(|_| PongoRemoteMapper::empty());
 
-        debug!("Loaded mapper: {:#?}", mapper);
         let mut easy = Easy2::new(Collector(Vec::new()));
         easy.get(true).unwrap();
         easy.url(&mapper.url).unwrap();
         easy.perform().unwrap();
         let contents = easy.get_ref();
         let remote_raw = String::from_utf8_lossy(&contents.0);
-        debug!("PongoRemoteMapper::load from URL: {}, JSON RAW length: {}",
-               mapper.url.replace(r"token=.*", "token=**masked**"),
-               &remote_raw.len());
+        debug!("PongoRemoteMapper::load REMOTE-JSON length: {}", &remote_raw.len().to_string().cyan());
 
         // now use default Pongo structure defined as default for PongoRemoteMapper
         let pongo_hosts: PongoHosts
