@@ -81,12 +81,12 @@ fn handler_check_execute_all_from_remote_from_path(state: State) -> (State, Hist
                     let check = format!("{}/{}", check_path, check_file);
                     PongoHost::load(&check)
                         .and_then(|check| {
-                            let debug = format!("Executing check: {:#?}", check);
+                            let debug = format!("Executing remote check: {:#?}", check);
                             debug!("{}", debug.magenta());
                             Ok(check.execute())
                         })
                         .unwrap_or_else(|err| {
-                            let error = format!("Failed to load check from file: {}. Error details: {}", &check, err);
+                            let error = format!("Failed to load remote check from file: {}. Error details: {}", &check, err);
                             error!("{}", error.red());
                             History::new(Story::new_error(Some(Unexpected::CheckParseProblem(error))))
                         })
