@@ -6,21 +6,19 @@
 . bin/common "${*}"
 
 
-printf "Building: Library: %b\n" "${_project_name}"
-cargo build \
-    --verbose \
-    --lib ${_cargo_release_flag}
+printf "Building project: %b\n" "${_project_name}"
+cargo build ${_cargo_release_flag}
 if [ "0" != "${?}" ]; then
-    echo "Build: Library: Failed!" \
+    echo "Build Failed!" \
         && exit 1
 fi
 
-printf "\n\nBuilding: Binary: %b\n" "${_project_name}"
-cargo build \
-    --verbose \
-    --bin "${_bin_name}" \
-    ${_cargo_release_flag}
-if [ "0" != "${?}" ]; then
-    echo "Build: Binary: Failed!" \
-        && exit 1
-fi
+
+# printf "Building: Library: %b\n" "${_project_name}"
+# cargo build \
+#     --verbose \
+#     --lib ${_cargo_release_flag}
+# if [ "0" != "${?}" ]; then
+#     echo "Build: Library: Failed!" \
+#         && exit 1
+# fi
