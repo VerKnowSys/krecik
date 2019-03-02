@@ -492,7 +492,27 @@ pub trait Checks<T> {
                         process_handlers
                             .into_iter()
                             .flat_map(|(check, handler)| {
-                                Self::process_page_handler(&check, handler, &multi).stories()
+                                Self::process_page_handler(&check, handler, &multi)
+                                    .stories()
+                                    .into_iter()
+                                    .map(|new_story| {
+                                        let a_story = new_story.clone();
+                                        match new_story {
+                                            Story{ timestamp: _, count: _, success: Some(success_msg), error: None } =>
+                                                info!("CHECK: SUCCESS: {}", success_msg.to_string().green()),
+
+                                            Story{ timestamp: _, count: _, success: None, error: Some(error_msg) } =>
+                                                error!("CHECK: FAILURE: {}", error_msg.to_string().red()),
+
+                                            Story{ timestamp: _, count: _, success: None, error: None } =>
+                                                warn!("CHECK: Ambiguous Story that lacks both success and error?!"),
+
+                                            Story{ timestamp: _, count: _, success: Some(_), error: Some(_) } =>
+                                                warn!("CHECK: Ambiguous Story with success and failure at the same time?!"),
+                                        };
+                                        a_story
+                                    })
+                                    .collect::<Vec<Story>>()
                             })
                             .collect()
                     )
