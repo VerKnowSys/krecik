@@ -97,12 +97,12 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 # Development:
 
 
-## Lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
+Lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
 
 `bin/devel`
 
 
-## Eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compiles code immediately):
+Eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compiles code immediately):
 
 `bin/devel dev`
 
@@ -111,12 +111,12 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 # Building:
 
 
-- Fast ("dev" mode):
+Fast ("dev" mode):
 
 `bin/build dev`
 
 
-- Slow ("release" mode):
+Slow ("release" mode):
 
 `bin/build`
 
@@ -125,12 +125,12 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 # Running:
 
 
-- Launch "dev" server:
+Launch "dev" server:
 
 `bin/run dev`
 
 
-- Launch "release" server:
+Launch "release" server:
 
 `bin/run`
 
@@ -138,9 +138,9 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 
 # Testing:
 
-`bin/test`
-
 NOTE: If one of servers mentioned above… is started, the script mentioned below will do additional round of built in tests over HTTP2-Check-API:
+
+`bin/test`
 
 
 
