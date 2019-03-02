@@ -42,7 +42,7 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
 pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
     let uri = Uri::borrow_from(&state).to_string();
     let check_path = format!("{}{}", CHECKS_DIR, uri.replace(CHECK_API_EXECUTE_REQUEST_PATH, ""));
-    info!("Loading all checks from path: {}", &check_path.cyan());
+    info!("Loading all checks from remote resource: {}", &check_path.cyan());
     (state,
         History::new_from(
             list_check_files_from(&check_path)
