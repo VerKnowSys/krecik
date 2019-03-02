@@ -97,12 +97,12 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 ## Development:
 
 
-Lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
+Lazy mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, watch awaits for code change for first run):
 
 `bin/devel`
 
 
-Eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compiles code immediately):
+Eager mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, watch compiles code immediately):
 
 `bin/devel dev`
 
