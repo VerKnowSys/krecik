@@ -1,23 +1,38 @@
-## Krecik
+# Krecik
 
-> Asynchronous, parallel service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL.
+> Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL.
 
 
 ![krecik](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik.png?raw=true)
 
 
-### Author:
 
-> Daniel (@dmilith) Dettlaff
+## Author:
 
-
-### Requirements:
-
-- HardenedBSD | Darwin => `Curl_lib` software bundle (`/Software/Curl_lib`), built with all required features enabled by default.
-- Linux                => `curl-dev`, `openssl-dev`, 'nghttp2-dev'
+Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
-### Few words about design solutions…
+
+## Software requirements:
+
+- Rust >= 1.32.0
+- Curl >= 7.x
+- OpenSSL >= 1.1.1a
+- NgHTTP2 >= 1.36.0
+- Jq >= 1.5
+
+
+
+### Additional build requirements:
+
+- Clang >= 6.x
+- Make >= 3.x
+- Perl >= 5.x
+- POSIX compliant base-system (tested on systems: FreeBSD/ HardenedBSD/ Darwin and Linux)
+
+
+
+## Few words about design solutions…
 
 … and especially about current state of linking with shared dynamic libraries
 by Cargo on LLVM-driven FreeBSD systems…
@@ -33,21 +48,56 @@ considered to be unethical choice (but still… choice of the many…).
 
 Ugly solution is ugly, but at least solves problem for development time…
 
-NOTE: Krtecek at current stage will use static linking by default.
+NOTE: Krecik at current stage will use static linking by default.
 This means that each release will encapsulate exact versions of:
 Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
-### Features:
 
-- Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP)
+## Features:
 
-- HTTP2 used as default protocol, with fallback to HTTP1.1.
+- Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP), but focused on: HTTP, HTTPS and FILE.
+
+- HTTP2 is default protocol, with fallback to HTTP1.1.
 
 - TLS1.3, TLS1.2, TLS1.1 as default TLS/SSL protocol versions.
 
-- OpenSSL 1.1.1a+ as base for TLS/SSL and domain expiry checks.
+- Provides OpenSSL 1.1.1a+ features, including "TLS-cert expiry validation" functionality.
 
+
+
+## Caveats. Solutions for potential problems:
+
+
+Krecik relies on fully featured build of Curl, which is available via Sofin binary-bundle: `Curl_lib`. To install prebuilt "Curl_lib" on supported system:
+
+```bash
+_myusername="${USER}"
+sudo mkdir "/Software"
+sudo chown "${_myusername}" "/Software"
+cd "/Software"
+curl -O "http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz"
+tar xfJ "Curl_lib-7.64.0-Darwin-10.11-x86_64.txz" --directory "/Software"
+```
+
+Prebuilt versions of `Curl_lib` bundle is available for systems:
+
+- [Darwin-10.11.x](http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz)
+
+- [Darwin-10.14.x](http://software.verknowsys.com/binary/Darwin-10.14-x86_64/Curl_lib-7.64.0-Darwin-10.14-x86_64.txz)
+
+- [HardenedBSD-11.x](http://software.verknowsys.com/binary/FreeBSD-11.0-amd64/Curl_lib-7.64.0-FreeBSD-11.0-amd64.zfsx) - NOTE Under HardenedBSD, binary-bundle file is NOT a tar file, but XZ compressed ZFS dataset of software bundle.
+
+
+
+### Development lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
+
+`bin/devel`
+
+
+### Development eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compiles code immediately):
+
+`bin/devel dev`
 
 
 ### Build fast ("dev" mode):
@@ -80,7 +130,8 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 `bin/test`
 
 
-### Mapper configuration for remote resources:
+
+## Mapper configuration for remote resources:
 
 For now, the only defined remote resource type is: "PongoHost".
 
@@ -97,7 +148,8 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 >         If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
 
 
-### External JSON resources repositories support:
+
+## External JSON resources repositories support:
 
 1. Create new repository with JSON files with definitions of your checks. Check file-format examples can be found in: `checks/tests/*.json`. Commit your checks.
 
@@ -110,8 +162,8 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 5. Use provided WebAPI to perform checks. Examples below.
 
 
-### WebAPI usage examples (NOTE: early stage, details may change in future):
 
+## WebAPI usage examples (NOTE: early stage, details may change in future):
 
 1. Perform all checks from local "frontends" resource: `curl http://127.0.0.1:60666/check/execute/frontends`
 
@@ -119,4 +171,9 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 
 3. Perform all checks provided by Pongo remote resource (requires valid mapper configuration per remote resource): `curl http://127.0.0.1:60666/check/execute_remote/remotes`
 
-…
+
+
+### Why "Krecik"?
+
+- It's my favorite cartoon :)
+
