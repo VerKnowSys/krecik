@@ -10,13 +10,25 @@ pub struct Page {
     pub url: String,
 
     /// Page expectations
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", default = "default_page_expectations")]
     pub expects: Option<PageExpectations>,
 
     /// Curl options
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<PageOptions>,
 
+}
+
+
+/// Provide own default page expectations if nothing defined in check input:
+fn default_page_expectations() -> Option<PageExpectations> {
+    Some(
+        vec![
+            PageExpectation::ValidCode(200),
+            PageExpectation::ValidLength(100),
+            PageExpectation::ValidContent("<body".to_string()),
+        ]
+    )
 }
 
 

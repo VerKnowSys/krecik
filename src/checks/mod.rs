@@ -90,7 +90,7 @@ pub trait Checks<T> {
                                 let domain_expectations
                                     = domain_check
                                         .expects
-                                        .unwrap_or_else(Self::default_domain_expectations);
+                                        .unwrap_or_default();
                                 debug!("check_domain::domain_expectations: {}", format!("{:?}", domain_expectations).magenta());
 
                                 // Process Domain expectations using parallel iterator (Rayon):
@@ -194,24 +194,6 @@ pub trait Checks<T> {
                 .unwrap_or_default();
         };
         list
-    }
-
-
-    /// Provide own default page expectations if nothing defined in check input:
-    fn default_page_expectations() -> PageExpectations {
-        vec![
-            PageExpectation::ValidCode(200),
-            PageExpectation::ValidLength(100),
-            PageExpectation::ValidContent("<body".to_string()),
-        ]
-    }
-
-
-    /// Provide own default domain expectations if nothing defined in check input:
-    fn default_domain_expectations() -> DomainExpectations {
-        vec![
-            DomainExpectation::ValidExpiryPeriod(14)
-        ]
     }
 
 
@@ -353,7 +335,7 @@ pub trait Checks<T> {
             = page_check
                 .clone()
                 .expects
-                .unwrap_or_else(Self::default_page_expectations);
+                .unwrap_or_default();
         debug!("process_page_handler::page_expectations: {}",
                format!("{:?}", page_expectations).magenta());
 

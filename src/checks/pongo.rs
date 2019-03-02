@@ -183,7 +183,7 @@ impl Checks<GenCheck> for PongoHost {
                                             Some(
                                                 Page {
                                                     url: format!("{}{}/{}", CHECK_DEFAULT_PROTOCOL, vhost, ams),
-                                                    expects: Some(Self::default_page_expectations()),
+                                                    expects: Some(PageExpectations::default()),
                                                     options: None,
                                                 }
                                             )
@@ -208,7 +208,7 @@ impl Checks<GenCheck> for PongoHost {
                                             Some(
                                                 Page {
                                                     url: vhost.to_string(),
-                                                    expects: Some(Self::default_page_expectations()),
+                                                    expects: Some(PageExpectations::default()),
                                                     options: None,
                                                 }
                                             )
@@ -241,7 +241,7 @@ impl Checks<GenCheck> for PongoHost {
                                     Some(
                                         Domain {
                                             name: vhost.to_string(),
-                                            expects: Some(Self::default_domain_expectations()),
+                                            expects: Some(DomainExpectations::default()),
                                         }
                                     )
                                 })
