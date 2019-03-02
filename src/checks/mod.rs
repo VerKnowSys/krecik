@@ -190,7 +190,7 @@ pub trait Checks<T> {
             debug!("Setting Curl header: {}", header.magenta());
             list
                 .append(&header.to_owned())
-                .unwrap();
+                .unwrap_or_default();
         };
         list
     }
@@ -218,28 +218,34 @@ pub trait Checks<T> {
     fn load_handler_for(page_check: &Page, multi: &Multi) -> CurlHandler {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
-        curl.url(&page_check.url).unwrap();
+        curl
+            .url(&page_check.url)
+            .unwrap_or_default();
         debug!("Curl URL:: {}", format!("{}", &page_check.url.magenta()));
 
         // Load Curl request options from check:
-        let curl_options = page_check.clone().options.unwrap_or_default();
+        let curl_options
+            = page_check
+                .clone()
+                .options
+                .unwrap_or_default();
         debug!("Curl options: {}", format!("{}", curl_options.to_string().magenta()));
 
         // Setup Curl configuration based on given options
         if curl_options.follow_redirects.unwrap_or_else(|| true) {
             debug!("Enabled following redirects.");
-            curl.follow_location(true).unwrap();
+            curl.follow_location(true).unwrap_or_default();
         } else {
             debug!("Disabled following redirects.");
-            curl.follow_location(false).unwrap();
+            curl.follow_location(false).unwrap_or_default();
         }
 
         if curl_options.verbose.unwrap_or_else(|| false) {
             debug!("Enabling Verbose mode.");
-            curl.verbose(true).unwrap();
+            curl.verbose(true).unwrap_or_default();
         } else {
             debug!("Disabling Verbose mode.");
-            curl.verbose(false).unwrap();
+            curl.verbose(false).unwrap_or_default();
         }
 
         // Setup Curl configuration based on given options
@@ -252,13 +258,13 @@ pub trait Checks<T> {
                         .unwrap_or_default();
                 curl
                     .get(false)
-                    .unwrap();
+                    .unwrap_or_default();
                 curl
                     .post(true)
-                    .unwrap();
+                    .unwrap_or_default();
                 curl
                     .post_field_size(post_data.len() as u64)
-                    .unwrap();
+                    .unwrap_or_default();
             },
 
             // fallbacks to GET
@@ -266,28 +272,28 @@ pub trait Checks<T> {
                 debug!("Curl method: {}", "GET".magenta());
                 curl
                     .put(false)
-                    .unwrap();
+                    .unwrap_or_default();
                 curl
                     .post(false)
-                    .unwrap();
+                    .unwrap_or_default();
                 curl
                     .get(true)
-                    .unwrap();
+                    .unwrap_or_default();
             },
         };
 
+        // Pass headers and cookies
         curl
             .http_headers(Self::list_of_headers(curl_options.headers))
-            .unwrap();
-
-        // Pass cookies
-        for cookie in curl_options
-                        .cookies
-                        .unwrap_or_default() {
+            .unwrap_or_default();
+        for cookie in
+            curl_options
+                .cookies
+                .unwrap_or_default() {
             debug!("Setting cookie: {}", format!("{}", cookie.magenta()));
             curl
                 .cookie(&cookie)
-                .unwrap();
+                .unwrap_or_default();
         }
 
         // Set agent
@@ -296,7 +302,7 @@ pub trait Checks<T> {
                 debug!("Setting useragent: {}", format!("{}", &new_agent.magenta()));
                 curl
                     .useragent(&new_agent)
-                    .unwrap()
+                    .unwrap_or_default()
             },
             None => {
                 debug!("Empty useragent");
@@ -306,34 +312,34 @@ pub trait Checks<T> {
         // Set connection and request timeout with default fallback to 30s for each
         curl
             .connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT)))
-            .unwrap();
+            .unwrap_or_default();
         curl
             .timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT)))
-            .unwrap();
+            .unwrap_or_default();
 
         // Verify SSL PEER
         if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
             debug!("Enabled TLS-PEER verification.");
-            curl.ssl_verify_peer(true).unwrap();
+            curl.ssl_verify_peer(true).unwrap_or_default();
         } else {
             warn!("Disabled TLS-PEER verification!");
-            curl.ssl_verify_peer(false).unwrap();
+            curl.ssl_verify_peer(false).unwrap_or_default();
         }
 
         // Verify SSL HOST
         if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
             debug!("Enabled TLS-HOST verification.");
-            curl.ssl_verify_host(true).unwrap();
+            curl.ssl_verify_host(true).unwrap_or_default();
         } else {
             warn!("Disabled TLS-HOST verification!");
-            curl.ssl_verify_host(false).unwrap();
+            curl.ssl_verify_host(false).unwrap_or_default();
         }
 
         // Max connections is 10 per check
-        curl.max_connects(CHECK_MAX_CONNECTIONS).unwrap();
+        curl.max_connects(CHECK_MAX_CONNECTIONS).unwrap_or_default();
 
         // Max reconnections is 10 per check
-        curl.max_redirections(CHECK_MAX_REDIRECTIONS).unwrap();
+        curl.max_redirections(CHECK_MAX_REDIRECTIONS).unwrap_or_default();
 
         // let handler: CurlHandler = multi.add2(curl);
         multi.add2(curl)
@@ -484,7 +490,7 @@ pub trait Checks<T> {
     /// Check pages
     fn check_pages(pages: Option<Pages>) -> History {
         let mut multi = Multi::new();
-        multi.pipelining(true, true).unwrap();
+        multi.pipelining(true, true).unwrap_or_default();
         pages
             .and_then(|pages| {
                 // collect tuple of page-checks and Curl handler:
@@ -497,10 +503,10 @@ pub trait Checks<T> {
                 // perform all checks at once:
                 while multi
                         .perform()
-                        .unwrap() > 0 {
+                        .unwrap_or_default() > 0 {
                     multi
                         .wait(&mut [], Duration::from_secs(1))
-                        .unwrap();
+                        .unwrap_or_default();
                 }
 
                 // Collect History of results:
