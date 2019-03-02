@@ -47,8 +47,8 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
         History::new_from(
             list_check_files_from(&check_path)
                 .into_iter()
-                .flat_map(|check_file| {
-                    let check = format!("{}/{}", check_path, check_file);
+                .flat_map(|check_resource| {
+                    let check = format!("{}/{}", check_path, check_resource);
                     GenCheck::load(&check)
                         .and_then(|check| {
                             let debug = format!("Executing check: {:#?}", check);
