@@ -148,9 +148,9 @@ impl Checks<GenCheck> for PongoHost {
                 .unwrap_or_default();
 
         let mut easy = Easy2::new(Collector(Vec::new()));
-        easy.get(true).unwrap();
-        easy.url(&mapper.url).unwrap();
-        easy.perform().unwrap();
+        easy.get(true).unwrap_or_default();
+        easy.url(&mapper.url).unwrap_or_default();
+        easy.perform().unwrap_or_default();
         let contents = easy.get_ref();
         let remote_raw = String::from_utf8_lossy(&contents.0);
         debug!("PongoRemoteMapper::load REMOTE-JSON length: {}", &remote_raw.len().to_string().cyan());
