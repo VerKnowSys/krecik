@@ -14,6 +14,23 @@
 - Linux                => `curl-dev`, `openssl-dev`, 'nghttp2-dev'
 
 
+### Configuration:
+
+For now, the only defined remote type is: "PongoHost".
+
+To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
+
+```JSON
+{
+    "url": "https://pongo-api.your.domain.tld/api/ping?token=your-secret-token",
+    "only_vhost_contains": "services-domain.tld"
+}
+```
+
+> NOTE:   If "only_vhost_contains" is "" - no domain filtering is applied (all defined hosts always accepted).
+>         If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
+
+
 ### Few words about design solutions…
 
 … and especially about current state of linking with shared dynamic libraries
