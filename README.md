@@ -66,6 +66,10 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
+![krecik-build](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_build.png?raw=true)
+
+
+
 ## Caveats. Solutions for potential problems:
 
 
@@ -170,6 +174,10 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 2. Perform only checks defined in a single check-file of local "frontends" resource: "lexington.json": `curl http://127.0.0.1:60666/check/execute/frontends/lexington.json`
 
 3. Perform all checks provided by Pongo remote resource (requires valid mapper configuration per remote resource): `curl http://127.0.0.1:60666/check/execute_remote/remotes`
+
+
+
+![krecik-ojej](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_ojej.png?raw=true)
 
 
 
