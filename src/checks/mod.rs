@@ -18,7 +18,7 @@ use curl::easy::{Easy2, List, Handler, WriteError};
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 use colored::Colorize;
-
+use rayon::prelude::*;
 
 use crate::configuration::*;
 use crate::utilities::*;
@@ -90,7 +90,7 @@ pub trait Checks<T> {
             Some(domains) => {
                 History::new_from(
                     domains
-                        .iter()
+                        .into_par_iter()
                         .flat_map(|defined_check| {
                             let domain_check = defined_check.clone();
                             let domain_name = domain_check.name;
@@ -101,7 +101,6 @@ pub trait Checks<T> {
                             debug!("{}", debugmsg.magenta());
 
                             // Process Domain expectations using parallel iterator (Rayon):
-                            use rayon::prelude::*;
                             History::new_from(
                                 domain_expectations
                                     .into_par_iter()
@@ -126,8 +125,8 @@ pub trait Checks<T> {
     /// Find and extract code validation from validations
     fn find_code_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
-            .iter()
-            .find(|exp| {
+            .par_iter()
+            .find_any(|exp| {
                 match exp {
                     PageExpectation::ValidCode(_) => true,
                     _ => false
@@ -140,8 +139,8 @@ pub trait Checks<T> {
     /// Find and extract content validation from validations
     fn find_content_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
-            .iter()
-            .find(|exp| {
+            .par_iter()
+            .find_any(|exp| {
                 match exp {
                     PageExpectation::ValidContent(_) => true,
                     _ => false,
@@ -154,8 +153,8 @@ pub trait Checks<T> {
     /// Find and extract content length validation from validations
     fn find_content_length_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
-            .iter()
-            .find(|exp| {
+            .par_iter()
+            .find_any(|exp| {
                 match exp {
                     PageExpectation::ValidLength(_) => true,
                     _ => false,
@@ -168,8 +167,8 @@ pub trait Checks<T> {
     /// Find and extract address validation from validations
     fn find_address_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
-            .iter()
-            .find(|exp| {
+            .par_iter()
+            .find_any(|exp| {
                 match exp {
                     PageExpectation::ValidAddress(_) => true,
                     _ => false,

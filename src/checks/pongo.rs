@@ -3,6 +3,7 @@ use ssl_expiration::SslExpiration;
 use curl::easy::{Easy2, Handler, WriteError};
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
+use rayon::prelude::*;
 
 use crate::configuration::*;
 use crate::utilities::*;
@@ -161,7 +162,7 @@ impl Checks<GenCheck> for PongoHost {
         let pongo_checks
             = pongo_hosts
                 .clone()
-                .into_iter()
+                .into_par_iter()
                 .flat_map(|host| {
                     let ams = host.data.ams.unwrap_or_default();
                     let active = host.active.unwrap_or_else(|| false);
@@ -175,7 +176,7 @@ impl Checks<GenCheck> for PongoHost {
                             .vhosts
                             .and_then(|vhosts| {
                                 vhosts
-                                    .iter()
+                                    .par_iter()
                                     .filter(|vhost| !vhost.contains("*.") && vhost.contains(&mapper.only_vhost_contains)) // filter out wildcard domains
                                     .map(|vhost| {
                                         if active {
@@ -201,7 +202,7 @@ impl Checks<GenCheck> for PongoHost {
                             .showroom_urls
                             .and_then(|showrooms| {
                                 showrooms
-                                    .iter()
+                                    .par_iter()
                                     .map(|vhost| {
                                         if active {
                                             Some(
@@ -226,7 +227,7 @@ impl Checks<GenCheck> for PongoHost {
         let domain_checks
             = pongo_hosts
                 .clone()
-                .into_iter()
+                .into_par_iter()
                 .flat_map(|host| {
                     host
                         .data
@@ -234,7 +235,7 @@ impl Checks<GenCheck> for PongoHost {
                         .vhosts
                         .and_then(|vhosts| {
                             vhosts
-                                .iter()
+                                .par_iter()
                                 .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
                                 .map(|vhost| {
                                     Some(
