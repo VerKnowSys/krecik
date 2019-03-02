@@ -9,3 +9,4 @@ web/*.html
 web/views/*
 logs/*
 .*
+checks
