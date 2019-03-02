@@ -234,10 +234,14 @@ pub trait Checks<T> {
         // Setup Curl configuration based on given options
         match curl_options.method {
             Some(Method::PUT) | Some(Method::POST) => {
-                debug!("{}", "Curl method: PUT / POST".black());
-                let post_data = curl_options
-                                    .post_data
-                                    .unwrap_or_default();
+                debug!("Curl method: {}", "POST".magenta());
+                let post_data
+                    = curl_options
+                        .post_data
+                        .unwrap_or_default();
+                curl
+                    .get(false)
+                    .unwrap();
                 curl
                     .post(true)
                     .unwrap();
@@ -248,8 +252,16 @@ pub trait Checks<T> {
 
             // fallbacks to GET
             Some(_) | None => {
-                debug!("{}", "Curl method: GET".black());
-                curl.get(true).unwrap();
+                debug!("Curl method: {}", "GET".magenta());
+                curl
+                    .put(false)
+                    .unwrap();
+                curl
+                    .post(false)
+                    .unwrap();
+                curl
+                    .get(true)
+                    .unwrap();
             },
         };
 
