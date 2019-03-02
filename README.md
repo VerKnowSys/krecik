@@ -17,23 +17,6 @@
 - Linux                => `curl-dev`, `openssl-dev`, 'nghttp2-dev'
 
 
-### Configuration:
-
-For now, the only defined remote resource type is: "PongoHost".
-
-To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
-
-```JSON
-{
-    "url": "https://pongo-api.your.domain.tld/api/ping?token=your-secret-token",
-    "only_vhost_contains": "services-domain.tld"
-}
-```
-
-> NOTE:   If "only_vhost_contains" is "" - no domain filtering is applied (all defined hosts always accepted).
->         If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
-
-
 ### Few words about design solutions…
 
 … and especially about current state of linking with shared dynamic libraries
@@ -96,3 +79,44 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 `bin/test`
 
+
+### Mapper configuration for remote resources:
+
+For now, the only defined remote resource type is: "PongoHost".
+
+To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
+
+```JSON
+{
+    "url": "https://pongo-api.your.domain.tld/api/ping?token=your-secret-token",
+    "only_vhost_contains": "services-domain.tld"
+}
+```
+
+> NOTE:   If "only_vhost_contains" is "" - no domain filtering is applied (all defined hosts always accepted).
+>         If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
+
+
+### External JSON resources repositories support:
+
+1. Create new repository with JSON files with definitions of your checks. Check file-format examples can be found in: `checks/tests/*.json`. Commit your checks.
+
+2. Now in `krecik` repository do: `cd krecik/checks`.
+
+3. Clone your checks-resource repository, here I called it "frontends": `git clone git@github.com:my-company-id/krecik-frontends.git frontends`.
+
+4. Start `krecik` web-server in dev mode: `bin/run dev` (starts MUCH faster in dev mode).
+
+5. Use provided WebAPI to perform checks. Examples below.
+
+
+### WebAPI usage examples (NOTE: early stage, details may change in future):
+
+
+1. Perform all checks from local "frontends" resource: `curl http://127.0.0.1:60666/check/execute/frontends`
+
+2. Perform only checks defined in a single check-file of local "frontends" resource: "lexington.json": `curl http://127.0.0.1:60666/check/execute/frontends/lexington.json`
+
+3. Perform all checks provided by Pongo remote resource (requires valid mapper configuration per remote resource): `curl http://127.0.0.1:60666/check/execute_remote/remotes`
+
+…
