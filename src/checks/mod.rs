@@ -26,6 +26,7 @@ use crate::checks::page::*;
 use crate::checks::domain::*;
 use crate::products::expected::*;
 use crate::products::unexpected::*;
+use crate::products::story::*;
 use crate::products::history::*;
 
 
