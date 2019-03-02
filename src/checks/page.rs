@@ -21,14 +21,12 @@ pub struct Page {
 
 
 /// Provide own default page expectations if nothing defined in check input:
-fn default_page_expectations() -> Option<PageExpectations> {
-    Some(
-        vec![
-            PageExpectation::ValidCode(200),
-            PageExpectation::ValidLength(100),
-            PageExpectation::ValidContent("<body".to_string()),
-        ]
-    )
+pub fn default_page_expectations() -> PageExpectations {
+    vec![
+        PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),
+        PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT),
+        PageExpectation::ValidContent(CHECK_DEFAULT_CONTENT_EXPECTATION.to_string()),
+    ]
 }
 
 

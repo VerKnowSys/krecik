@@ -63,7 +63,7 @@ pub enum DomainExpectation {
 
 impl Default for DomainExpectation {
     fn default() -> DomainExpectation {
-        DomainExpectation::ValidExpiryPeriod(CHECK_SSL_DAYS_EXPIRATION)
+        DomainExpectation::ValidExpiryPeriod(CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY)
     }
 }
 

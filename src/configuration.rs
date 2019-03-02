@@ -28,13 +28,16 @@ pub const CHECK_MAX_CONNECTIONS: u32 = 10;
 pub const CHECK_MAX_REDIRECTIONS: u32 = 10;
 
 /// Minimum SSL certificate validity in days
-pub const CHECK_SSL_DAYS_EXPIRATION: i32 = 14;
+pub const CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY: i32 = 14;
 
 /// Default successful HTTP code: 200
 pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;
 
 /// Default minimum length of HTTP content
-pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 16;
+pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 128;
+
+/// Default page content expectation:
+pub const CHECK_DEFAULT_CONTENT_EXPECTATION: &str = "body";
 
 /// Checks directory:
 pub const CHECKS_DIR: &str = "checks";

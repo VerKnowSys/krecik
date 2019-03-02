@@ -180,13 +180,13 @@ mod tests {
             domains: Some(vec!(
                Domain {
                    name: "nask.pl".to_string(),
-                   expects: Some(vec!(DomainExpectation::ValidExpiryPeriod(CHECK_SSL_DAYS_EXPIRATION))),
+                   expects: vec!(DomainExpectation::ValidExpiryPeriod(CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY)),
                }
             )),
             pages: Some(vec!(
                 Page {
                     url: "http://rust-lang.org/".to_string(),
-                    expects: Some(vec!(PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE))),
+                    expects: vec!(PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE)),
                     options: Some(PageOptions::default())
                 }
             )),
