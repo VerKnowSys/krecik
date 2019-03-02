@@ -249,7 +249,7 @@ impl Checks<GenCheck> for PongoHost {
                         .unwrap_or_default()
                 })
                 .collect();
-        debug!("Pongo hosts: {:#?}", pongo_hosts);
+        // debug!("Pongo hosts: {:#?}", pongo_hosts);
         debug!("Pongo domains: {:#?}", domain_checks);
         debug!("Pongo pongo_checks: {:#?}", pongo_checks);
 
