@@ -32,25 +32,25 @@ impl Story {
 
 
     /// New story
-    pub fn new(success: Option<Expected>) -> Story {
+    pub fn new(success: Expected) -> Story {
         let local_now = Local::now();
         Story {
             count: 1,
             timestamp: local_now.to_rfc3339(),
-            success,
+            success: Some(success),
             error: None,
         }
     }
 
 
     /// New error story
-    pub fn new_error(error: Option<Unexpected>) -> Story {
+    pub fn new_error(error: Unexpected) -> Story {
         let local_now = Local::now();
         Story {
             count: 1,
             timestamp: local_now.to_rfc3339(),
             success: None,
-            error,
+            error: Some(error),
         }
     }
 

@@ -10,8 +10,8 @@ pub struct Page {
     pub url: String,
 
     /// Page expectations
-    #[serde(skip_serializing_if = "Option::is_none", default = "default_page_expectations")]
-    pub expects: Option<PageExpectations>,
+    #[serde(default = "default_page_expectations")]
+    pub expects: PageExpectations,
 
     /// Curl options
     #[serde(skip_serializing_if = "Option::is_none")]

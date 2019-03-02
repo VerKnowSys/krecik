@@ -1,3 +1,4 @@
+use crate::configuration::*;
 use crate::products::expected::*;
 
 
@@ -9,8 +10,8 @@ pub struct Domain {
     pub name: String,
 
     /// Domain expectations
-    #[serde(skip_serializing_if = "Option::is_none", default = "default_domain_expectations")]
-    pub expects: Option<DomainExpectations>,
+    #[serde(default = "default_domain_expectations")]
+    pub expects: DomainExpectations,
 
 }
 
@@ -20,10 +21,8 @@ pub type Domains = Vec<Domain>;
 
 
 /// Provide own default domain expectations if nothing defined in check input:
-fn default_domain_expectations() -> Option<DomainExpectations> {
-    Some(
-        vec![
-            DomainExpectation::ValidExpiryPeriod(14)
-        ]
-    )
+pub fn default_domain_expectations() -> DomainExpectations {
+    vec![
+        DomainExpectation::ValidExpiryPeriod(CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY)
+    ]
 }
