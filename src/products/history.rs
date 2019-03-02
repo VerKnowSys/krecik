@@ -142,3 +142,12 @@ impl ToString for History {
             .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}"))
     }
 }
+
+
+/// Implement JSON serialization on .to_string():
+impl ToString for Story {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self)
+            .unwrap_or_else(|_| String::from("{\"status\": \"Story serialization failure\"}"))
+    }
+}
