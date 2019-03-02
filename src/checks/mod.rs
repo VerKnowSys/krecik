@@ -60,27 +60,18 @@ pub trait Checks<T> {
     /// Check SSL certificate expiration using OpenSSL function
     fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
          SslExpiration::from_domain_name(&domain_name)
-             .and_then(|ssl_validator| {
+             .and_then(|ssl_validator|
                  match domain_expectation {
-                    DomainExpectation::ValidExpiryPeriod(expected_days) => {
+                    DomainExpectation::ValidExpiryPeriod(expected_days) =>
                          if ssl_validator.days() < expected_days
                          || ssl_validator.is_expired() {
-                            let err_msg = Unexpected::TLSDomainExpired(domain_name.to_string()).to_string();
-                            error!("{}", err_msg.red());
-                            Err(err_msg.into())
+                            Ok(Story::new_error(Some(Unexpected::TLSDomainExpired(domain_name.to_string()))))
                          } else {
-                            let info_msg = Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), expected_days);
-                            info!("{}", info_msg.to_string().green());
-                            Ok(Story::new(Some(info_msg)))
+                            Ok(Story::new(Some(Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), expected_days))))
                          }
-                     }
                  }
-             })
-             .unwrap_or_else(|err| {
-                let unexpected = Unexpected::InternalProtocolProblem(domain_name.to_string(), err.0.to_string());
-                error!("{}", unexpected.to_string().red());
-                Story::new_error(Some(unexpected))
-             })
+             )
+             .unwrap_or_else(|err| Story::new_error(Some(Unexpected::InternalProtocolProblem(domain_name.to_string(), err.0.to_string()))))
     }
 
 
@@ -106,10 +97,10 @@ pub trait Checks<T> {
                                     domain_expectations
                                         .into_par_iter()
                                         .map(|domain_expectation| {
-                                    })
-                                    .collect()
-                            ).stories()
-                        })
+                                            let story_of_some_domain = Self::check_ssl_expire(&domain_name, domain_expectation);
+                                            debug!("check_domains::domain_expectation: Domain: {} -> Story: {}",
+                                                   &domain_name.magenta(), &format!("{:?}",story_of_some_domain).magenta());
+                                            story_of_some_domain
                                         })
                                         .collect()
                                 ).stories()
@@ -185,7 +176,7 @@ pub trait Checks<T> {
         //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
         let mut list = List::new();
         for header in headers.unwrap_or_default() {
-            debug!("{}", format!("Setting header: {}", header.cyan()).black());
+            debug!("Setting Curl header: {}", header.magenta());
             list
                 .append(&header.to_owned())
                 .unwrap();
@@ -217,26 +208,26 @@ pub trait Checks<T> {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
         curl.url(&page_check.url).unwrap();
-        debug!("{}", format!("Curl URL: {}", &page_check.url.cyan()).black());
+        debug!("Curl URL:: {}", format!("{}", &page_check.url.magenta()));
 
         // Load Curl request options from check:
         let curl_options = page_check.clone().options.unwrap_or_default();
-        debug!("{}", format!("Curl options: {}", curl_options.to_string().cyan()).black());
+        debug!("Curl options: {}", format!("{}", curl_options.to_string().magenta()));
 
         // Setup Curl configuration based on given options
         if curl_options.follow_redirects.unwrap_or_else(|| true) {
-            debug!("{}", "Enabled following redirects".black());
+            debug!("Enabled following redirects.");
             curl.follow_location(true).unwrap();
         } else {
-            debug!("{}", "Disabled following redirects".black());
+            debug!("Disabled following redirects.");
             curl.follow_location(false).unwrap();
         }
 
         if curl_options.verbose.unwrap_or_else(|| false) {
-            debug!("{}", "Enabling Verbose mode".black());
+            debug!("Enabling Verbose mode.");
             curl.verbose(true).unwrap();
         } else {
-            debug!("{}", "Disabling Verbose mode".black());
+            debug!("Disabling Verbose mode.");
             curl.verbose(false).unwrap();
         }
 
@@ -270,7 +261,7 @@ pub trait Checks<T> {
         for cookie in curl_options
                         .cookies
                         .unwrap_or_default() {
-            debug!("{}", format!("Setting cookie: {}", cookie.cyan()).black());
+            debug!("Setting cookie: {}", format!("{}", cookie.magenta()));
             curl
                 .cookie(&cookie)
                 .unwrap();
@@ -279,23 +270,27 @@ pub trait Checks<T> {
         // Set agent
         match curl_options.agent {
             Some(new_agent) => {
-                debug!("{}", format!("Setting useragent: {}", &new_agent.cyan()).black());
+                debug!("Setting useragent: {}", format!("{}", &new_agent.magenta()));
                 curl
                     .useragent(&new_agent)
                     .unwrap()
             },
             None => {
-                debug!("{}", "Empty useragent".black());
+                debug!("Empty useragent");
             }
         }
 
         // Set connection and request timeout with default fallback to 30s for each
-        curl.connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT))).unwrap();
-        curl.timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT))).unwrap();
+        curl
+            .connect_timeout(Duration::from_secs(curl_options.connection_timeout.unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT)))
+            .unwrap();
+        curl
+            .timeout(Duration::from_secs(curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT)))
+            .unwrap();
 
         // Verify SSL PEER
         if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
-            debug!("{}", "Enabled TLS-PEER verification.".black());
+            debug!("Enabled TLS-PEER verification.");
             curl.ssl_verify_peer(true).unwrap();
         } else {
             warn!("Disabled TLS-PEER verification!");
@@ -304,7 +299,7 @@ pub trait Checks<T> {
 
         // Verify SSL HOST
         if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
-            debug!("{}", "Enabled TLS-HOST verification.".black());
+            debug!("Enabled TLS-HOST verification.");
             curl.ssl_verify_host(true).unwrap();
         } else {
             warn!("Disabled TLS-HOST verification!");
@@ -324,31 +319,49 @@ pub trait Checks<T> {
 
     /// Process Curl page requests using given handler
     fn process_page_handler(page_check: &Page, handler: CurlHandler, multi: &Multi) -> History {
-        let page_expectations = page_check
-            .clone()
-            .expects
-            .unwrap_or_else(Self::default_page_expectations);
-        let debugmsg = format!("process_page_handler::page_expectations -> {:#?}", page_expectations);
-        debug!("{}", debugmsg.magenta());
+        let page_expectations
+            = page_check
+                .clone()
+                .expects
+                .unwrap_or_else(Self::default_page_expectations);
+        debug!("process_page_handler::page_expectations: {}",
+               format!("{:?}", page_expectations).magenta());
 
-        // gather handlers, perform validations, produce stories…
+        // take control over curl handler, perform validations, produce stories…
         let a_handler = handler.unwrap();
         let handle = a_handler.get_ref();
         let raw_page_content = String::from_utf8_lossy(&handle.0);
-
+        debug!("process_page_handler::raw_page_content: {}",
+               format!("{}", raw_page_content).magenta());
         let expected_code = Self::find_code_validation(&page_expectations);
+        debug!("process_page_handler::expected_code: {}",
+               format!("{}", expected_code).magenta());
         let expected_content = Self::find_content_validation(&page_expectations);
+        debug!("process_page_handler::expected_content: {}",
+               format!("{}", expected_content).magenta());
         let expected_content_length = Self::find_content_length_validation(&page_expectations);
+        debug!("process_page_handler::expected_content_length: {}",
+               format!("{}", expected_content_length).magenta());
         let expected_final_address = Self::find_address_validation(&page_expectations);
+        debug!("process_page_handler::expected_final_address: {}",
+               format!("{}", expected_final_address).magenta());
 
         // Gather Story from expectations
         let content_story = Self::handle_page_content_expectation(&page_check.url, &raw_page_content, expected_content);
+        debug!("process_page_handler::content_story: {}",
+               format!("{:?}", content_story).magenta());
         let content_length_story = Self::handle_page_length_expectation(&page_check.url, &raw_page_content, expected_content_length);
+        debug!("process_page_handler::content_length_story: {}",
+               format!("{:?}", content_length_story).magenta());
 
         let mut result_handler = multi.remove2(a_handler).unwrap();
         let result_final_address = result_handler.effective_url().unwrap_or_default();
         let result_final_address_story = Self::handle_page_address_expectation(&page_check.url, &result_final_address.unwrap_or_default(), expected_final_address);
+        debug!("process_page_handler::result_final_address_story: {}",
+               format!("{:?}", result_final_address_story).magenta());
         let result_handler_story = Self::handle_page_httpcode_expectation(&page_check.url, result_handler.response_code().map_err(|err| Error::new(ErrorKind::Other, err.to_string())), expected_code);
+        debug!("process_page_handler::handle_page_httpcode_expectation: {}",
+               format!("{:?}", result_handler_story).magenta());
 
         // Collect the history results
         History::new_from(
@@ -365,29 +378,18 @@ pub trait Checks<T> {
     /// Build a Story from a Length PageExpectation
     fn handle_page_content_expectation(url: &str, raw_page_content: &str, expected_content: &PageExpectation) -> Story {
         match expected_content {
-            &PageExpectation::ValidContent(ref content) => {
+            &PageExpectation::ValidContent(ref content) =>
                 if raw_page_content.contains(content) {
-                    let info_msg = Expected::Content(url.to_string(), content.to_string());
-                    info!("{}", info_msg.to_string().green());
-                    Story::new(Some(info_msg))
+                    Story::new(Some(Expected::Content(url.to_string(), content.to_string())))
                 } else {
-                    let error_msg = Unexpected::ContentInvalid(url.to_string(), content.to_string());
-                    error!("{}", error_msg.to_string().red());
-                    Story::new_error(Some(error_msg))
-                }
-            },
+                    Story::new_error(Some(Unexpected::ContentInvalid(url.to_string(), content.to_string())))
+                },
 
-            &PageExpectation::ValidNoContent => {
-                let info_msg = Expected::EmptyContent(url.to_string());
-                info!("{}", info_msg.to_string().green());
-                Story::new(Some(info_msg))
-            },
+            &PageExpectation::ValidNoContent =>
+                Story::new(Some(Expected::EmptyContent(url.to_string()))),
 
-            edge_case => {
-                let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
-                warn!("{}", warn_msg.to_string().yellow());
-                Story::new_error(Some(warn_msg))
-            }
+            edge_case =>
+                Story::new_error(Some(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string())))
         }
     }
 
@@ -395,29 +397,18 @@ pub trait Checks<T> {
     /// Build a Story from a Length PageExpectation
     fn handle_page_length_expectation(url: &str, raw_page_content: &str, expected_content_length: &PageExpectation) -> Story {
         match expected_content_length {
-            &PageExpectation::ValidLength(ref requested_length) => {
+            &PageExpectation::ValidLength(ref requested_length) =>
                 if raw_page_content.len() >= *requested_length {
-                    let info_msg = Expected::ContentLength(url.to_string(), *requested_length);
-                    info!("{}", info_msg.to_string().green());
-                    Story::new(Some(info_msg))
+                    Story::new(Some(Expected::ContentLength(url.to_string(), *requested_length)))
                 } else {
-                    let unexpected = Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length);
-                    error!("{}", unexpected.to_string().red());
-                    Story::new_error(Some(unexpected))
-                }
-            },
+                    Story::new_error(Some(Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length)))
+                },
 
-            &PageExpectation::ValidNoLength => {
-                let info_msg = Expected::NoContentLength(url.to_string());
-                info!("{}", info_msg.to_string().green());
-                Story::new(Some(info_msg))
-            },
+            &PageExpectation::ValidNoLength =>
+                Story::new(Some(Expected::NoContentLength(url.to_string()))),
 
-            edge_case => {
-                let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
-                warn!("{}", warn_msg.to_string().yellow());
-                Story::new_error(Some(warn_msg))
-            },
+            edge_case =>
+                Story::new_error(Some(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string())))
         }
     }
 
@@ -425,29 +416,18 @@ pub trait Checks<T> {
     /// Build a Story from a Address PageExpectation
     fn handle_page_address_expectation(url: &str, address: &str, expected_address: &PageExpectation) -> Story {
         match expected_address {
-            &PageExpectation::ValidAddress(ref an_address) => {
+            &PageExpectation::ValidAddress(ref an_address) =>
                 if address.contains(an_address) {
-                    let info_msg = Expected::Address(url.to_string(), address.to_string());
-                    info!("{}", info_msg.to_string().green());
-                    Story::new(Some(info_msg))
+                    Story::new(Some(Expected::Address(url.to_string(), address.to_string())))
                 } else {
-                    let error_msg = Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string());
-                    error!("{}", error_msg.to_string().red());
-                    Story::new_error(Some(error_msg))
-                }
-            },
+                    Story::new_error(Some(Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string())))
+                },
 
-            &PageExpectation::ValidNoAddress => {
-                let info_msg = Expected::Address(url.to_string(), url.to_string());
-                info!("{}", info_msg.to_string().green());
-                Story::new(Some(info_msg))
-            },
+            &PageExpectation::ValidNoAddress =>
+                Story::new(Some(Expected::Address(url.to_string(), url.to_string()))),
 
-            edge_case => {
-                let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
-                warn!("{}", warn_msg.to_string().yellow());
-                Story::new_error(Some(warn_msg))
-            }
+            edge_case =>
+                Story::new_error(Some(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string())))
         }
     }
 
@@ -455,33 +435,19 @@ pub trait Checks<T> {
     /// Build a Story from a HttpCode PageExpectation
     fn handle_page_httpcode_expectation(url: &str, response_code: Result<u32, Error>, expected_code: &PageExpectation) -> Story {
         match response_code {
-            Ok(responded_code) => {
+            Ok(responded_code) =>
                 match expected_code {
-                    &PageExpectation::ValidCode(the_code) if responded_code == the_code => {
-                       let info_msg = Expected::HttpCode(url.to_string(), the_code);
-                       info!("{}", info_msg.to_string().green());
-                       Story::new(Some(info_msg))
-                    },
+                    &PageExpectation::ValidCode(the_code) if responded_code == the_code =>
+                       Story::new(Some(Expected::HttpCode(url.to_string(), the_code))),
 
-                    &PageExpectation::ValidCode(the_code) => {
-                        let unexpected = Unexpected::HttpCodeInvalid(url.to_string(), responded_code, the_code);
-                        error!("{}", unexpected.to_string().red());
-                        Story::new_error(Some(unexpected))
-                    },
+                    &PageExpectation::ValidCode(the_code) =>
+                        Story::new_error(Some(Unexpected::HttpCodeInvalid(url.to_string(), responded_code, the_code))),
 
-                    edge_case => {
-                        let warn_msg = Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string());
-                        warn!("{}", warn_msg.to_string().yellow());
-                        Story::new_error(Some(warn_msg))
-                    }
-                }
-            },
+                    edge_case =>
+                        Story::new_error(Some(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string())))
+                },
 
-            Err(err) => {
-                let unexpected = Unexpected::URLConnectionProblem(url.to_string(), err.to_string());
-                error!("{}", unexpected.to_string().red());
-                Story::new_error(Some(unexpected))
-            }
+            Err(err) => Story::new_error(Some(Unexpected::URLConnectionProblem(url.to_string(), err.to_string())))
        }
     }
 

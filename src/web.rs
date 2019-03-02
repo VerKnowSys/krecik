@@ -25,8 +25,7 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
     (state,
         GenCheck::load(&check_path)
             .and_then(|check| {
-                let debug = format!("Executing check: {:#?}", check);
-                debug!("{}", debug.magenta());
+                debug!("Executing check: {}", format!("{:?}", check).magenta());
                 Ok(check.execute())
             })
             .unwrap_or_else(|err| {
@@ -51,8 +50,8 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
                     let check = format!("{}/{}", check_path, check_resource);
                     GenCheck::load(&check)
                         .and_then(|check| {
-                            let debug = format!("Executing check: {:#?}", check);
-                            debug!("{}", debug.magenta());
+                            let debug = format!("{:?}", check);
+                            debug!("Executing check: {}", debug.magenta());
                             Ok(check.execute())
                         })
                         .unwrap_or_else(|err| {
@@ -81,7 +80,7 @@ fn handler_check_execute_all_from_remote_from_path(state: State) -> (State, Hist
                     let check = format!("{}/{}", check_path, check_file);
                     PongoHost::load(&check)
                         .and_then(|check| {
-                            let debug = format!("Executing remote check: {:#?}", check);
+                            let debug = format!("Executing remote check: {:?}", check);
                             debug!("{}", debug.magenta());
                             Ok(check.execute())
                         })
