@@ -1,5 +1,5 @@
 [package]
-name = "travmole"
+name = "krecik"
 version = "0.6.3"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 edition = '2018'
@@ -7,14 +7,14 @@ build = "build.rs"
 
 
 [lib]
-name = "travmole"
+name = "krecik"
 path = "src/lib.rs"
 crate-type = ["rlib"]
 
 
 [[bin]]
-name = "travmole"
-path = "src/travmole.rs"
+name = "krecik"
+path = "src/krecik.rs"
 
 
 [dependencies]

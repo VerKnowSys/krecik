@@ -3,7 +3,7 @@
 # 2018-12-20-1942-1545331365
 
 
-. bin/common "${*}"
+. bin/common "test"
 
 test_project
 
@@ -17,12 +17,12 @@ if [ -n "${_maybe_server_in_background}" ]; then
     kill -0 "${_maybe_server_in_background}"
     if [ "0" = "${?}" ]; then
         printf "Spawning all tests at once…\n"
-        _request="$(curl -s "http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests" 2>> "${_travmole_logfile}")"
+        _request="$(curl -s "http://${_webapi_endpoint}${_webapi_request_path}/tests" 2>> "${_krecik_logfile}")"
         if [ "0" != "${?}" ]; then
-            failure "Test: HTTP test #${_tst} has failed: http://${_travmole_webapi_endpoint}${_travmole_webapi_req_path}/tests"
+            failure "Test: HTTP test #${_tst} has failed: http://${_webapi_endpoint}${_webapi_request_path}/tests"
         fi
         printf "%b\n" "${_request}" \
-            | jq '.' 2>> "${_travmole_logfile}"
+            | jq '.' 2>> "${_krecik_logfile}"
 
         printf "Test completed\n\n"
     else

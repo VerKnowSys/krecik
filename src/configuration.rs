@@ -4,10 +4,10 @@
 
 
 /// Default project directory:
-pub const PROJECT_DIRECTORY: &str = "/Projects/travmole";
+pub const PROJECT_DIRECTORY: &str = "/Projects/krecik";
 
 /// Default log file:
-pub const DEFAULT_LOG_FILE: &str = "logs/travmole.log";
+pub const DEFAULT_LOG_FILE: &str = "logs/krecik.log";
 
 /// Default stdout:
 pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";

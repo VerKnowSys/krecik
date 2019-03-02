@@ -1,4 +1,4 @@
-//! Traversing Mole - main worker
+//! Krecik - main worker
 
 
 #![deny(
@@ -32,8 +32,8 @@ use std::fs::File;
 use fern::colors::{Color, ColoredLevelConfig};
 use tokio::runtime::Runtime;
 
-use travmole::configuration::*;
-use travmole::web::router;
+use krecik::configuration::*;
+use krecik::web::router;
 
 
 /// Start a server and use a `Router` to dispatch requests

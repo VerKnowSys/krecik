@@ -1,4 +1,4 @@
-## Krtecek/ travMole
+## Krecik
 
 > Asynchronous, parallel service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL.
 
@@ -16,7 +16,7 @@
 
 ### Configuration:
 
-For now, the only defined remote type is: "PongoHost".
+For now, the only defined remote resource type is: "PongoHost".
 
 To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
 
@@ -49,7 +49,7 @@ Ugly solution is ugly, but at least solves problem for development time…
 
 NOTE: Krtecek at current stage will use static linking by default.
 This means that each release will encapsulate exact versions of:
-Curl, OpenSSL and ngHTTP2 libraries - linked directly into travmole binary.
+Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 ### Features:
