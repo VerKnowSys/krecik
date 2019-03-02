@@ -3,7 +3,7 @@
 > Asynchronous, parallel service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL.
 
 
-![krecik](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik2.svg?raw=true)
+![krecik](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik.png?raw=true)
 
 
 ### Author:
