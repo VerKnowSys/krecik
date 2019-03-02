@@ -1,6 +1,6 @@
 [package]
 name = "travmole"
-version = "0.6.2"
+version = "0.6.3"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 edition = '2018'
 build = "build.rs"
