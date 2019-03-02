@@ -99,16 +99,16 @@ pub trait Checks<T> {
                                         .map(|domain_expectation| {
                                             let domain_story = Self::check_ssl_expire(&domain_name, domain_expectation);
                                             match domain_story.clone() {
-                                                Story{ timestamp: _, count: _, success: Some(success_msg), error: None } =>
+                                                Story{ success: Some(success_msg), error: None, .. } =>
                                                     info!("Domain TLS-cert validity Story of: SUCCESS: {}", success_msg.to_string().green()),
 
-                                                Story{ timestamp: _, count: _, success: None, error: Some(error_msg) } =>
+                                                Story{ success: None, error: Some(error_msg), .. } =>
                                                     error!("Domain TLS-cert validity Story of: FAILURE: {}", error_msg.to_string().red()),
 
-                                                Story{ timestamp: _, count: _, success: None, error: None } =>
+                                                Story{ success: None, error: None, .. } =>
                                                     warn!("Domain TLS-cert validity Story of: WARNING: {}", "Ambiguous Story that lacks both success and error?!".yellow()),
 
-                                                Story{ timestamp: _, count: _, success: Some(_), error: Some(_) } =>
+                                                Story{ success: Some(_), error: Some(_), .. } =>
                                                     warn!("Domain TLS-cert validity Story of: WARNING: {}", "Ambiguous Story with success and failure at the same time?!".yellow()),
                                             };
                                             domain_story
@@ -520,16 +520,16 @@ pub trait Checks<T> {
                                     .into_par_iter()
                                     .map(|new_story| {
                                         match new_story.clone() {
-                                            Story{ timestamp: _, count: _, success: Some(success_msg), error: None } =>
+                                            Story{ success: Some(success_msg), error: None, .. } =>
                                                 info!("Web-page Story of: SUCCESS: {}", success_msg.to_string().green()),
 
-                                            Story{ timestamp: _, count: _, success: None, error: Some(error_msg) } =>
+                                            Story{ success: None, error: Some(error_msg), .. } =>
                                                 error!("Web-page Story of: FAILURE: {}", error_msg.to_string().red()),
 
-                                            Story{ timestamp: _, count: _, success: None, error: None } =>
+                                            Story{ success: None, error: None, .. } =>
                                                 warn!("Web-page Story of: WARNING: {}", "Ambiguous Story that lacks both success and error?!".yellow()),
 
-                                            Story{ timestamp: _, count: _, success: Some(_), error: Some(_) } =>
+                                            Story{ success: Some(_), error: Some(_), .. } =>
                                                 warn!("Web-page Story of: WARNING: {}", "Ambiguous Story with success and failure at the same time?!".yellow()),
                                         };
                                         new_story
