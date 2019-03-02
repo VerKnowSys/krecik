@@ -13,7 +13,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-# Software requirements:
+### Software requirements:
 
 - Rust >= 1.32.0
 - Curl >= 7.x
@@ -23,7 +23,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-## Additional build requirements:
+### Additional build requirements:
 
 - Clang >= 6.x
 - Make >= 3.x
@@ -32,7 +32,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-# Few words about design solutions…
+## Few words about design solutions…
 
 … and especially about current state of linking with shared dynamic libraries
 by Cargo on LLVM-driven FreeBSD systems…
@@ -54,7 +54,7 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
-# Krecik features:
+## Features:
 
 - Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP), but focused on: HTTP, HTTPS and FILE.
 
@@ -70,7 +70,7 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
-# Caveats. Solutions for potential problems:
+## Caveats. Solutions for potential problems:
 
 
 Krecik relies on fully featured build of Curl, which is available via Sofin binary-bundle: `Curl_lib`. To install prebuilt "Curl_lib" on supported system:
@@ -94,7 +94,7 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 
 
 
-# Development:
+## Development:
 
 
 Lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
@@ -108,7 +108,7 @@ Eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compi
 
 
 
-# Building:
+## Building:
 
 
 Fast ("dev" mode):
@@ -122,7 +122,7 @@ Slow ("release" mode):
 
 
 
-# Running:
+## Running:
 
 
 Launch "dev" server:
@@ -136,7 +136,7 @@ Launch "release" server:
 
 
 
-# Testing:
+## Testing:
 
 NOTE: If one of servers mentioned above… is started, the script mentioned below will do additional round of built in tests over HTTP2-Check-API:
 
@@ -148,7 +148,7 @@ NOTE: If one of servers mentioned above… is started, the script mentioned belo
 
 
 
-# Mapping remote configuration resources:
+## Mapping remote configuration resources:
 
 For now, the only defined remote resource type is: "PongoHost". To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
 
@@ -163,7 +163,7 @@ NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defin
 
 
 
-# External JSON resources repositories support:
+## External JSON resources repositories support:
 
 1. Create new repository with JSON files with definitions of your checks. Check file-format examples can be found in: `checks/tests/*.json`. Commit your checks.
 
@@ -177,7 +177,7 @@ NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defin
 
 
 
-# WebAPI usage examples
+## WebAPI usage examples
 
 NOTE: early stage, details may change in future!
 
@@ -189,7 +189,7 @@ NOTE: early stage, details may change in future!
 
 
 
-# Why "Krecik"?
+## Why "Krecik"?
 
 It's been my favorite cartoon… It's a little tribute for mr Zdeněk Miler as well :)
 
