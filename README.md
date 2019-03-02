@@ -13,7 +13,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-## Software requirements:
+# Software requirements:
 
 - Rust >= 1.32.0
 - Curl >= 7.x
@@ -23,7 +23,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-### Additional build requirements:
+## Additional build requirements:
 
 - Clang >= 6.x
 - Make >= 3.x
@@ -32,7 +32,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-## Few words about design solutions…
+# Few words about design solutions…
 
 … and especially about current state of linking with shared dynamic libraries
 by Cargo on LLVM-driven FreeBSD systems…
@@ -54,7 +54,7 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
-## Features:
+# Krecik features:
 
 - Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP), but focused on: HTTP, HTTPS and FILE.
 
@@ -66,11 +66,11 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
-![krecik-build](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_build.png?raw=true)
+![krecik-ojej](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_ojej.png?raw=true)
 
 
 
-## Caveats. Solutions for potential problems:
+# Caveats. Solutions for potential problems:
 
 
 Krecik relies on fully featured build of Curl, which is available via Sofin binary-bundle: `Curl_lib`. To install prebuilt "Curl_lib" on supported system:
@@ -94,52 +94,63 @@ Prebuilt versions of `Curl_lib` bundle is available for systems:
 
 
 
-### Development lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
+# Development:
+
+
+## Lazy mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch awaits for code change for first run):
 
 `bin/devel`
 
 
-### Development eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compiles code immediately):
+## Eager mode (using `cargp-watch` + `cargp-clippy`, warnings: enabled, watch compiles code immediately):
 
 `bin/devel dev`
 
 
-### Build fast ("dev" mode):
+
+# Building:
+
+
+- Fast ("dev" mode):
 
 `bin/build dev`
 
 
-### Build slow ("release" mode):
+- Slow ("release" mode):
 
 `bin/build`
 
 
-### Run "dev" server:
+
+# Running:
+
+
+- Launch "dev" server:
 
 `bin/run dev`
 
 
-### Run "release" server:
+- Launch "release" server:
 
 `bin/run`
 
 
-### Run tests:
 
-> NOTE: If one of servers mentioned above… is started,
->       the script mentioned below will do additional
->       round of built in tests over HTTP2-Check-API
->       implemented by server.
+# Testing:
 
 `bin/test`
 
+NOTE: If one of servers mentioned above… is started, the script mentioned below will do additional round of built in tests over HTTP2-Check-API:
 
 
-## Mapper configuration for remote resources:
 
-For now, the only defined remote resource type is: "PongoHost".
+![krecik-build](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_build.png?raw=true)
 
-To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
+
+
+# Mapping remote configuration resources:
+
+For now, the only defined remote resource type is: "PongoHost". To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
 
 ```JSON
 {
@@ -148,12 +159,11 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 }
 ```
 
-> NOTE:   If "only_vhost_contains" is "" - no domain filtering is applied (all defined hosts always accepted).
->         If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
+NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defined hosts always accepted). If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
 
 
 
-## External JSON resources repositories support:
+# External JSON resources repositories support:
 
 1. Create new repository with JSON files with definitions of your checks. Check file-format examples can be found in: `checks/tests/*.json`. Commit your checks.
 
@@ -167,7 +177,9 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 
 
 
-## WebAPI usage examples (NOTE: early stage, details may change in future):
+# WebAPI usage examples
+
+NOTE: early stage, details may change in future!
 
 1. Perform all checks from local "frontends" resource: `curl http://127.0.0.1:60666/check/execute/frontends`
 
@@ -177,11 +189,7 @@ To configure Pongo API resource, create file: `checks/remotes/yourname.json` wit
 
 
 
-![krecik-ojej](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_ojej.png?raw=true)
+# Why "Krecik"?
 
-
-
-### Why "Krecik"?
-
-- It's my favorite cartoon :)
+It's been my favorite cartoon… It's a little tribute for mr Zdeněk Miler as well :)
 
