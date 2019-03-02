@@ -8,3 +8,4 @@ web/img/brand/**
 web/*.html
 web/views/*
 logs/*
+.*
