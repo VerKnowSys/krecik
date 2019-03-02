@@ -3,6 +3,6 @@
 # 2019-03-01-2344-1551480248
 
 
-. bin/common "dev"
+. bin/common "${*}"
 
-continuous_development "now"
+continuous_development "${*}"
