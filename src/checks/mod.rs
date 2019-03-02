@@ -62,14 +62,14 @@ pub trait Checks<T> {
          SslExpiration::from_domain_name(&domain_name)
              .and_then(|ssl_validator| {
                  match domain_expectation {
-                    DomainExpectation::ValidExpiryPeriod(days) => {
-                         if ssl_validator.days() < days
+                    DomainExpectation::ValidExpiryPeriod(expected_days) => {
+                         if ssl_validator.days() < expected_days
                          || ssl_validator.is_expired() {
                             let err_msg = Unexpected::TLSDomainExpired(domain_name.to_string()).to_string();
                             error!("{}", err_msg.red());
                             Err(err_msg.into())
                          } else {
-                            let info_msg = Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), days);
+                            let info_msg = Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), expected_days);
                             info!("{}", info_msg.to_string().green());
                             Ok(Story::new(Some(info_msg)))
                          }
