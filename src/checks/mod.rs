@@ -100,11 +100,13 @@ pub trait Checks<T> {
                             let debugmsg = format!("check_domain::domain_expectations -> {:#?}", domain_expectations);
                             debug!("{}", debugmsg.magenta());
 
+                            // Process Domain expectations using parallel iterator (Rayon):
+                            use rayon::prelude::*;
                             History::new_from(
                                 domain_expectations
-                                    .iter()
+                                    .into_par_iter()
                                     .map(|domain_expectation| {
-                                        Self::check_ssl_expire(&domain_name, *domain_expectation)
+                                        Self::check_ssl_expire(&domain_name, domain_expectation)
                                     })
                                     .collect()
                             ).stories()
@@ -206,7 +208,7 @@ pub trait Checks<T> {
     /// Provide own default domain expectations if nothing defined in check input:
     fn default_domain_expectations() -> DomainExpectations {
         vec![
-            // DomainExpectation::ValidExpiryPeriod(14)
+            DomainExpectation::ValidExpiryPeriod(14)
         ]
     }
 
