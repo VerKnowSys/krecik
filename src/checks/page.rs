@@ -89,7 +89,7 @@ pub struct PageOptions {
 impl ToString for PageOptions {
     fn to_string(&self) -> String {
         serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}"))
+            .unwrap_or_else(|_| String::from("{\"status\": \"PageOptions serialization failure\"}"))
     }
 }
 

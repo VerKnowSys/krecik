@@ -126,12 +126,12 @@ pub trait Checks<T> {
     fn find_code_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
+            .find_any(|exp|
                 match exp {
                     PageExpectation::ValidCode(_) => true,
                     _ => false
                 }
-            })
+            )
             .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE))
     }
 
@@ -140,12 +140,12 @@ pub trait Checks<T> {
     fn find_content_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
+            .find_any(|exp|
                 match exp {
                     PageExpectation::ValidContent(_) => true,
                     _ => false,
                 }
-            })
+            )
             .unwrap_or_else(|| &PageExpectation::ValidNoContent)
     }
 
@@ -154,12 +154,12 @@ pub trait Checks<T> {
     fn find_content_length_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
+            .find_any(|exp|
                 match exp {
                     PageExpectation::ValidLength(_) => true,
                     _ => false,
                 }
-            })
+            )
             .unwrap_or_else(|| &PageExpectation::ValidNoLength)
     }
 
@@ -168,12 +168,12 @@ pub trait Checks<T> {
     fn find_address_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
+            .find_any(|exp|
                 match exp {
                     PageExpectation::ValidAddress(_) => true,
                     _ => false,
                 }
-            })
+            )
             .unwrap_or_else(|| &PageExpectation::ValidNoAddress)
     }
 
@@ -489,7 +489,7 @@ pub trait Checks<T> {
                      History::new_from(
                         process_handlers
                             .into_iter()
-                            .flat_map(|(check, handler)| {
+                            .flat_map(|(check, handler)|
                                 Self::process_page_handler(&check, handler, &multi)
                                     .stories()
                                     .into_par_iter()
@@ -510,7 +510,7 @@ pub trait Checks<T> {
                                         new_story
                                     })
                                     .collect::<Vec<Story>>()
-                            })
+                            )
                             .collect()
                     )
                 )

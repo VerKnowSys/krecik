@@ -142,10 +142,10 @@ impl Checks<GenCheck> for PongoHost {
     fn load(remote_file_name: &str) -> Result<GenCheck, Error> {
         let mapper: PongoRemoteMapper
             = read_text_file(&remote_file_name)
-                .and_then(|file_contents| {
+                .and_then(|file_contents|
                     serde_json::from_str(&file_contents)
                         .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
-                })
+                )
                 .unwrap_or_default();
 
         let mut easy = Easy2::new(Collector(Vec::new()));
@@ -168,7 +168,7 @@ impl Checks<GenCheck> for PongoHost {
                     let client = host.client.unwrap_or_default();
 
                     let pongo_private_token = Regex::new(r"\?token=[A-Za-z0-9_-]*").unwrap();
-                    let safe_url = pongo_private_token.replace(&mapper.url, "*[token-masked]*");
+                    let safe_url = pongo_private_token.replace(&mapper.url, "[[token-masked]]");
                     debug!("Pongo: URL: {}, CLIENT: {}, AMS: {}. ACTIVE: {}",
                            &safe_url.cyan(), &client.cyan(), &ams.cyan(), format!("{}", active).cyan());
                     [ // merge two lists for URLs: "vhosts" and "showrooms":
@@ -193,19 +193,19 @@ impl Checks<GenCheck> for PongoHost {
                                             debug!("Skipping not active client: {}", &client);
                                             None
                                         }
-                                    })
+                                    )
                                     .collect::<Option<Pages>>()
-                            })
+                            )
                             .unwrap_or_default(),
 
                         host
                             .data
                             .host
                             .showroom_urls
-                            .and_then(|showrooms| {
+                            .and_then(|showrooms|
                                 showrooms
                                     .par_iter()
-                                    .map(|vhost| {
+                                    .map(|vhost|
                                         if active {
                                             Some(
                                                 Page {
@@ -218,11 +218,10 @@ impl Checks<GenCheck> for PongoHost {
                                             debug!("Skipping not active client: {}", &client);
                                             None
                                         }
-                                    })
+                                    )
                                     .collect::<Option<Pages>>()
-                            })
+                            )
                             .unwrap_or_default()
-
                     ].concat()
                 })
                 .collect();
@@ -230,7 +229,7 @@ impl Checks<GenCheck> for PongoHost {
             = pongo_hosts
                 .clone()
                 .into_par_iter()
-                .flat_map(|host| {
+                .flat_map(|host|
                     host
                         .data
                         .host
@@ -246,11 +245,11 @@ impl Checks<GenCheck> for PongoHost {
                                             expects: default_domain_expectations(),
                                         }
                                     )
-                                })
+                                )
                                 .collect::<Option<Domains>>()
-                        })
+                        )
                         .unwrap_or_default()
-                })
+                )
                 .collect();
         // debug!("Pongo hosts: {:#?}", pongo_hosts);
         debug!("Pongo domains: {:#?}", domain_checks);
