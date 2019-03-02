@@ -149,13 +149,24 @@ test_project () {
 
 
 continuous_development () {
-    printf "Starting continuous code build (triggered by code changes)\n"
-    DEBUG=1 \
-        cargo watch \
-            --clear \
-            --postpone \
-            --exec clippy \
-            --shell "${SHELL}" \
-            --watch "src" \
-                || failure "Cargo watch failed!"
+    if [ -z "${1}" ]; then
+        printf "Initializing continuous code watch (build triggered by code changes)\n"
+        DEBUG=1 \
+            cargo watch \
+                --clear \
+                --postpone \
+                --exec clippy \
+                --shell "${SHELL}" \
+                --watch "src" \
+                    || failure "Cargo watch failed!"
+    else
+        printf "Starting code watch on continuous build\n"
+        DEBUG=1 \
+            cargo watch \
+                --clear \
+                --exec clippy \
+                --shell "${SHELL}" \
+                --watch "src" \
+                    || failure "Cargo watch failed!"
+    fi
 }
