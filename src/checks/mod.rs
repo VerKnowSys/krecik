@@ -97,10 +97,21 @@ pub trait Checks<T> {
                                     domain_expectations
                                         .into_par_iter()
                                         .map(|domain_expectation| {
-                                            let story_of_some_domain = Self::check_ssl_expire(&domain_name, domain_expectation);
-                                            debug!("check_domains::domain_expectation: Domain: {} -> Story: {}",
-                                                   &domain_name.magenta(), &format!("{:?}",story_of_some_domain).magenta());
-                                            story_of_some_domain
+                                            let domain_story = Self::check_ssl_expire(&domain_name, domain_expectation);
+                                            match domain_story.clone() {
+                                                Story{ timestamp: _, count: _, success: Some(success_msg), error: None } =>
+                                                    info!("Domain TLS-cert validity Story of: SUCCESS: {}", success_msg.to_string().green()),
+
+                                                Story{ timestamp: _, count: _, success: None, error: Some(error_msg) } =>
+                                                    error!("Domain TLS-cert validity Story of: FAILURE: {}", error_msg.to_string().red()),
+
+                                                Story{ timestamp: _, count: _, success: None, error: None } =>
+                                                    warn!("Domain TLS-cert validity Story of: WARNING: {}", "Ambiguous Story that lacks both success and error?!".yellow()),
+
+                                                Story{ timestamp: _, count: _, success: Some(_), error: Some(_) } =>
+                                                    warn!("Domain TLS-cert validity Story of: WARNING: {}", "Ambiguous Story with success and failure at the same time?!".yellow()),
+                                            };
+                                            domain_story
                                         })
                                         .collect()
                                 ).stories()
@@ -494,23 +505,22 @@ pub trait Checks<T> {
                             .flat_map(|(check, handler)| {
                                 Self::process_page_handler(&check, handler, &multi)
                                     .stories()
-                                    .into_iter()
+                                    .into_par_iter()
                                     .map(|new_story| {
-                                        let a_story = new_story.clone();
-                                        match new_story {
+                                        match new_story.clone() {
                                             Story{ timestamp: _, count: _, success: Some(success_msg), error: None } =>
-                                                info!("CHECK: SUCCESS: {}", success_msg.to_string().green()),
+                                                info!("Web-page Story of: SUCCESS: {}", success_msg.to_string().green()),
 
                                             Story{ timestamp: _, count: _, success: None, error: Some(error_msg) } =>
-                                                error!("CHECK: FAILURE: {}", error_msg.to_string().red()),
+                                                error!("Web-page Story of: FAILURE: {}", error_msg.to_string().red()),
 
                                             Story{ timestamp: _, count: _, success: None, error: None } =>
-                                                warn!("CHECK: Ambiguous Story that lacks both success and error?!"),
+                                                warn!("Web-page Story of: WARNING: {}", "Ambiguous Story that lacks both success and error?!".yellow()),
 
                                             Story{ timestamp: _, count: _, success: Some(_), error: Some(_) } =>
-                                                warn!("CHECK: Ambiguous Story with success and failure at the same time?!"),
+                                                warn!("Web-page Story of: WARNING: {}", "Ambiguous Story with success and failure at the same time?!".yellow()),
                                         };
-                                        a_story
+                                        new_story
                                     })
                                     .collect::<Vec<Story>>()
                             })
