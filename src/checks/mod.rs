@@ -351,7 +351,13 @@ pub trait Checks<T> {
                format!("{:?}", page_expectations).magenta());
 
         // take control over curl handler, perform validations, produce stories…
-        let a_handler = handler.unwrap();
+        let a_handler = match handler {
+            Ok(handle) => handle,
+            Err(err) => {
+                error!("Curl-handler FAILURE: URL: {}. Error details: {:?}", page_check.url.cyan(), err.to_string().red());
+                return History::empty()
+            }
+        };
         let handle = a_handler.get_ref();
         let raw_page_content = String::from_utf8_lossy(&handle.0);
         debug!("process_page_handler::raw_page_content: {}",
