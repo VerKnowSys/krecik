@@ -97,16 +97,17 @@ impl ToString for PageOptions {
 impl Default for PageOptions {
     fn default() -> PageOptions {
         PageOptions {
+            method: Some(Method::default()), // GET
+            timeout: Some(CHECK_TIMEOUT),
+            connection_timeout: Some(CHECK_CONNECTION_TIMEOUT),
+            ssl_verify_peer: Some(true),
+            ssl_verify_host: Some(true),
+            follow_redirects: Some(true),
+
             agent: None,
             cookies: None,
             headers: None,
             post_data: None,
-            ssl_verify_peer: Some(true),
-            ssl_verify_host: Some(true),
-            follow_redirects: Some(true),
-            method: Some(Method::default()),
-            timeout: Some(CHECK_TIMEOUT),
-            connection_timeout: Some(CHECK_CONNECTION_TIMEOUT),
             verbose: None,
         }
     }
