@@ -210,7 +210,7 @@ impl Checks<GenCheck> for PongoHost {
                                             Some(
                                                 Page {
                                                     url: vhost.to_string(),
-                                                    expects: PageExpectations::default(),
+                                                    expects: default_page_expectations(),
                                                     options: None,
                                                 }
                                             )
