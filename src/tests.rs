@@ -50,11 +50,11 @@ mod tests {
     #[test]
     fn test_curl_basic_test() {
         let mut easy = Easy2::new(CollectorForTests(Vec::new()));
-        easy.get(true).unwrap();
-        // easy.verbose(true).unwrap();
-        easy.url("https://www.rust-lang.org/").unwrap();
-        easy.perform().unwrap();
-        assert_eq!(easy.response_code().unwrap(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        easy.get(true).unwrap_or_default();
+        // easy.verbose(true).unwrap_or_default();
+        easy.url("https://www.rust-lang.org/").unwrap_or_default();
+        easy.perform().unwrap_or_default();
+        assert_eq!(easy.response_code().unwrap_or_default(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
@@ -70,37 +70,37 @@ mod tests {
         let url2 = "https://www.centra.com/";
 
         let mut easy1 = Easy2::new(CollectorForTests(Vec::new()));
-        easy1.get(true).unwrap();
-        easy1.follow_location(true).unwrap();
-        // easy1.verbose(true).unwrap();
-        easy1.url("https://www.rust-lang.org/").unwrap();
-        easy1.max_connects(10).unwrap();
-        easy1.max_redirections(10).unwrap();
+        easy1.get(true).unwrap_or_default();
+        easy1.follow_location(true).unwrap_or_default();
+        // easy1.verbose(true).unwrap_or_default();
+        easy1.url("https://www.rust-lang.org/").unwrap_or_default();
+        easy1.max_connects(10).unwrap_or_default();
+        easy1.max_redirections(10).unwrap_or_default();
 
         let mut easy2 = Easy2::new(CollectorForTests(Vec::new()));
-        easy2.get(true).unwrap();
-        easy2.follow_location(true).unwrap();
-        // easy2.verbose(true).unwrap();
-        easy2.url("https://docs.rs/").unwrap();
-        easy2.max_connects(10).unwrap();
-        easy2.max_redirections(10).unwrap();
+        easy2.get(true).unwrap_or_default();
+        easy2.follow_location(true).unwrap_or_default();
+        // easy2.verbose(true).unwrap_or_default();
+        easy2.url("https://docs.rs/").unwrap_or_default();
+        easy2.max_connects(10).unwrap_or_default();
+        easy2.max_redirections(10).unwrap_or_default();
 
         let mut easy3 = Easy2::new(CollectorForTests(Vec::new()));
-        easy3.get(true).unwrap();
-        easy3.follow_location(true).unwrap();
-        // easy3.verbose(true).unwrap();
-        easy3.url("http://sdfsdfsdfdsfdsfds.pl/").unwrap();
-        easy3.max_connects(10).unwrap();
-        easy3.max_redirections(10).unwrap();
+        easy3.get(true).unwrap_or_default();
+        easy3.follow_location(true).unwrap_or_default();
+        // easy3.verbose(true).unwrap_or_default();
+        easy3.url("http://sdfsdfsdfdsfdsfds.pl/").unwrap_or_default();
+        easy3.max_connects(10).unwrap_or_default();
+        easy3.max_redirections(10).unwrap_or_default();
 
         let mut multi = Multi::new();
-        multi.pipelining(true, true).unwrap();
+        multi.pipelining(true, true).unwrap_or_default();
         let easy1handle = multi.add2(easy1).unwrap();
         let easy2handle = multi.add2(easy2).unwrap();
         let easy3handle = multi.add2(easy3).unwrap();
 
-        while multi.perform().unwrap() > 0 {
-            multi.wait(&mut [], Duration::from_secs(1)).unwrap();
+        while multi.perform().unwrap_or_default() > 0 {
+            multi.wait(&mut [], Duration::from_secs(1)).unwrap_or_default();
         }
 
         // 1
@@ -122,49 +122,49 @@ mod tests {
         assert!(raw_page.len() == 0);
 
         let mut handler1after = multi.remove2(easy1handle).unwrap();
-        assert!(handler1after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
-        assert!(handler1after.download_size().unwrap() > 0f64);
+        assert!(handler1after.response_code().unwrap_or_default() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert!(handler1after.download_size().unwrap_or_default() > 0f64);
 
         let mut handler2after = multi.remove2(easy2handle).unwrap();
-        assert!(handler2after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
-        assert!(handler2after.download_size().unwrap() > 0f64);
+        assert!(handler2after.response_code().unwrap_or_default() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert!(handler2after.download_size().unwrap_or_default() > 0f64);
 
         let mut handler3after = multi.remove2(easy3handle).unwrap();
-        assert!(handler3after.response_code().unwrap() == 0); // NOTE: 0 since no connection is possible to non existing server
-        assert!(handler2after.download_size().unwrap() > 0f64); // even if connection failed, we sent some bytes
+        assert!(handler3after.response_code().unwrap_or_default() == 0); // NOTE: 0 since no connection is possible to non existing server
+        assert!(handler2after.download_size().unwrap_or_default() > 0f64); // even if connection failed, we sent some bytes
 
-        multi.close().unwrap();
+        multi.close().unwrap_or_default();
     }
 
 
     #[test]
     fn test_curl_all_options_test() {
         let mut easy = Easy2::new(CollectorForTests(Vec::new()));
-        easy.get(true).unwrap();
-        easy.follow_location(true).unwrap();
-        easy.ssl_verify_peer(true).unwrap();
-        easy.ssl_verify_host(true).unwrap();
-        easy.connect_timeout(Duration::from_secs(30)).unwrap();
-        easy.timeout(Duration::from_secs(30)).unwrap();
-        easy.max_connects(10).unwrap();
-        easy.max_redirections(10).unwrap();
+        easy.get(true).unwrap_or_default();
+        easy.follow_location(true).unwrap_or_default();
+        easy.ssl_verify_peer(true).unwrap_or_default();
+        easy.ssl_verify_host(true).unwrap_or_default();
+        easy.connect_timeout(Duration::from_secs(30)).unwrap_or_default();
+        easy.timeout(Duration::from_secs(30)).unwrap_or_default();
+        easy.max_connects(10).unwrap_or_default();
+        easy.max_redirections(10).unwrap_or_default();
 
         let url = "http://rust-lang.org/";
-        easy.url(&url).unwrap();
-        easy.perform().unwrap();
+        easy.url(&url).unwrap_or_default();
+        easy.perform().unwrap_or_default();
 
         println!("URL: {}", &url);
-        println!("Redirect count: {:?}", easy.redirect_count().unwrap());
-        // println!("Final URL: {:?}", easy.redirect_url().unwrap());
-        println!("Effective URL: {:?}", easy.effective_url().unwrap());
-        println!("Local IPv4: {:?}", easy.local_ip().unwrap());
-        println!("Remote IPv4: {:?}", easy.primary_ip().unwrap());
-        println!("Content type: {:?}", easy.content_type().unwrap());
+        println!("Redirect count: {:?}", easy.redirect_count().unwrap_or_default());
+        // println!("Final URL: {:?}", easy.redirect_url().unwrap_or_default());
+        println!("Effective URL: {:?}", easy.effective_url().unwrap_or_default());
+        println!("Local IPv4: {:?}", easy.local_ip().unwrap_or_default());
+        println!("Remote IPv4: {:?}", easy.primary_ip().unwrap_or_default());
+        println!("Content type: {:?}", easy.content_type().unwrap_or_default());
         println!("Cookies: {:?}", easy.cookies().unwrap());
         println!("TIMINGS: Connect time: {:?}, Name lookup time: {:?}, Redirect time: {:?}, Total time: {:?}",
-                 easy.connect_time().unwrap(), easy.namelookup_time().unwrap(), easy.redirect_time().unwrap(), easy.total_time().unwrap());
+                 easy.connect_time().unwrap_or_default(), easy.namelookup_time().unwrap_or_default(), easy.redirect_time().unwrap_or_default(), easy.total_time().unwrap_or_default());
 
-        assert_eq!(easy.response_code().unwrap(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert_eq!(easy.response_code().unwrap_or_default(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
@@ -193,7 +193,7 @@ mod tests {
             alert_webhook: None,
             alert_channel: None,
         };
-        let output = serde_json::to_string(&check).unwrap();
+        let output = serde_json::to_string(&check).unwrap_or_default();
         println!("Output: {}", output);
         assert!(output.len() > 100);
     }
@@ -266,8 +266,8 @@ mod tests {
     #[test]
     fn test_page_content_length_check() {
         let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
-        let page: &Page = &check.clone().pages.unwrap()[0];
-        let options = page.options.clone().unwrap();
+        let page: &Page = &check.clone().pages.unwrap_or_default()[0];
+        let options = page.options.clone().unwrap_or_default();
         let cookies = options.cookies;
         let headers = options.headers;
         let history = check.execute();
@@ -285,11 +285,11 @@ mod tests {
     #[test]
     fn test_agent_check() {
         let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
-        let page: &Page = &check.clone().pages.unwrap()[0];
-        let options = page.options.clone().unwrap();
+        let page: &Page = &check.clone().pages.unwrap_or_default()[0];
+        let options = page.options.clone().unwrap_or_default();
         let agent = options.agent;
         assert!(agent.is_some());
-        assert!(agent.unwrap() == "Krtecek-Underground-Agent");
+        assert!(agent.unwrap_or_default() == "Krtecek-Underground-Agent");
     }
 
 
