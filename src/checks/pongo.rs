@@ -4,6 +4,7 @@ use curl::easy::{Easy2, Handler, WriteError};
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 use rayon::prelude::*;
+use regex::Regex;
 
 use crate::configuration::*;
 use crate::utilities::*;
@@ -156,9 +157,7 @@ impl Checks<GenCheck> for PongoHost {
         debug!("PongoRemoteMapper::load REMOTE-JSON length: {}", &remote_raw.len().to_string().cyan());
 
         // now use default Pongo structure defined as default for PongoRemoteMapper
-        let pongo_hosts: PongoHosts
-            = serde_json::from_str(&remote_raw)
-                .unwrap_or_default();
+        let pongo_hosts: PongoHosts = serde_json::from_str(&remote_raw).unwrap_or_default();
         let pongo_checks
             = pongo_hosts
                 .clone()
@@ -167,8 +166,11 @@ impl Checks<GenCheck> for PongoHost {
                     let ams = host.data.ams.unwrap_or_default();
                     let active = host.active.unwrap_or_else(|| false);
                     let client = host.client.unwrap_or_default();
+
+                    let pongo_private_token = Regex::new(r"\?token=[A-Za-z0-9_-]*").unwrap();
+                    let safe_url = pongo_private_token.replace(&mapper.url, "*[token-masked]*");
                     debug!("Pongo: URL: {}, CLIENT: {}, AMS: {}. ACTIVE: {}",
-                           &mapper.url.cyan(), &client.cyan(), &ams.cyan(), format!("{}", active).cyan());
+                           &safe_url.cyan(), &client.cyan(), &ams.cyan(), format!("{}", active).cyan());
                     [ // merge two lists for URLs: "vhosts" and "showrooms":
                         host
                             .data
