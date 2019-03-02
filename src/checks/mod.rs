@@ -86,39 +86,39 @@ pub trait Checks<T> {
 
     /// Check domains
     fn check_domains(domains: Option<Domains>) -> History {
-        match domains {
-            Some(domains) => {
-                History::new_from(
-                    domains
-                        .into_par_iter()
-                        .flat_map(|defined_check| {
-                            let domain_check = defined_check.clone();
-                            let domain_name = domain_check.name;
-                            let domain_expectations = domain_check
-                                .expects
-                                .unwrap_or_else(Self::default_domain_expectations);
-                            let debugmsg = format!("check_domain::domain_expectations -> {:#?}", domain_expectations);
-                            debug!("{}", debugmsg.magenta());
+        domains
+            .and_then(|domains|
+                Some(
+                    History::new_from(
+                        domains
+                            .into_par_iter()
+                            .flat_map(|defined_check| {
+                                let domain_check = defined_check.clone();
+                                let domain_name = domain_check.name;
+                                let domain_expectations
+                                    = domain_check
+                                        .expects
+                                        .unwrap_or_else(Self::default_domain_expectations);
+                                debug!("check_domain::domain_expectations: {}", format!("{:?}", domain_expectations).magenta());
 
-                            // Process Domain expectations using parallel iterator (Rayon):
-                            History::new_from(
-                                domain_expectations
-                                    .into_par_iter()
-                                    .map(|domain_expectation| {
-                                        Self::check_ssl_expire(&domain_name, domain_expectation)
+                                // Process Domain expectations using parallel iterator (Rayon):
+                                History::new_from(
+                                    domain_expectations
+                                        .into_par_iter()
+                                        .map(|domain_expectation| {
                                     })
                                     .collect()
                             ).stories()
                         })
-                        .collect()
-                    )
-            },
-
-            None => {
-                debug!("{}", "Execute: No domains to check.".black());
-                History::empty()
-            }
-        }
+                                        })
+                                        .collect()
+                                ).stories()
+                            })
+                            .collect()
+                        )
+                )
+            )
+            .unwrap_or_else(History::empty)
     }
 
 
@@ -490,8 +490,8 @@ pub trait Checks<T> {
     fn check_pages(pages: Option<Pages>) -> History {
         let mut multi = Multi::new();
         multi.pipelining(true, true).unwrap();
-        match pages {
-            Some(pages) => {
+        pages
+            .and_then(|pages| {
                 // collect tuple of page-checks and Curl handler:
                 let process_handlers: Vec<_> // : Vec<(Page, CurlHandler)>
                     = pages
@@ -509,21 +509,18 @@ pub trait Checks<T> {
                 }
 
                 // Collect History of results:
-                History::new_from(
-                    process_handlers
-                        .into_iter()
-                        .flat_map(|(check, handler)| {
-                            Self::process_page_handler(&check, handler, &multi).stories()
-                        })
-                        .collect()
+                Some(
+                     History::new_from(
+                        process_handlers
+                            .into_iter()
+                            .flat_map(|(check, handler)| {
+                                Self::process_page_handler(&check, handler, &multi).stories()
+                            })
+                            .collect()
+                    )
                 )
-            },
-
-            None => {
-                debug!("{}", "Execute: No pages to check.".black());
-                History::empty()
-            }
-        }
+            })
+            .unwrap_or_else(History::empty)
     }
 
 
