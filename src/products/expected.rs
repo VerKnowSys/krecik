@@ -39,13 +39,6 @@ pub enum PageExpectation {
 }
 
 
-impl Default for PageExpectation {
-    fn default() -> PageExpectation {
-        PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE)
-    }
-}
-
-
 /// Page expectations type
 pub type PageExpectations = Vec<PageExpectation>;
 
@@ -58,13 +51,6 @@ pub enum DomainExpectation {
     #[fail(display = "ValidExpiryPeriod: {} days.", _0)]
     ValidExpiryPeriod (i32),
 
-}
-
-
-impl Default for DomainExpectation {
-    fn default() -> DomainExpectation {
-        DomainExpectation::ValidExpiryPeriod(CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY)
-    }
 }
 
 

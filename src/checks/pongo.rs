@@ -176,11 +176,11 @@ impl Checks<GenCheck> for PongoHost {
                             .data
                             .host
                             .vhosts
-                            .and_then(|vhosts| {
+                            .and_then(|vhosts|
                                 vhosts
                                     .par_iter()
-                                    .filter(|vhost| !vhost.contains("*.") && vhost.contains(&mapper.only_vhost_contains)) // filter out wildcard domains
-                                    .map(|vhost| {
+                                    .filter(|vhost| !vhost.starts_with("*.") && vhost.contains(&mapper.only_vhost_contains)) // filter out wildcard domains and pick only these matching value of only_vhost_contains field
+                                    .map(|vhost|
                                         if active {
                                             Some(
                                                 Page {
@@ -235,11 +235,11 @@ impl Checks<GenCheck> for PongoHost {
                         .data
                         .host
                         .vhosts
-                        .and_then(|vhosts| {
+                        .and_then(|vhosts|
                             vhosts
                                 .par_iter()
-                                .filter(|vhost| !vhost.contains("*.")) // filter out wildcard domains
-                                .map(|vhost| {
+                                .filter(|vhost| !vhost.starts_with("*.")) // filter out wildcard domains
+                                .map(|vhost|
                                     Some(
                                         Domain {
                                             name: vhost.to_string(),
