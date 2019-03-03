@@ -510,7 +510,7 @@ pub trait Checks<T> {
                                         };
                                         new_story
                                     })
-                                    .collect::<Vec<Story>>()
+                                    .collect::<Stories>()
                             )
                             .collect()
                     )

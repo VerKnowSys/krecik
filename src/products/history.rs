@@ -10,7 +10,7 @@ use crate::products::unexpected::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// History is list of Stories
-pub struct History(Vec<Story>);
+pub struct History(Stories);
 
 
 impl History {
@@ -29,13 +29,13 @@ impl History {
 
 
     /// New History with stories list
-    pub fn new_from(stories: Vec<Story>) -> History {
+    pub fn new_from(stories: Stories) -> History {
         History(stories)
     }
 
 
     /// Stories extractor
-    pub fn stories(&self) -> Vec<Story> {
+    pub fn stories(&self) -> Stories {
         self.0.clone()
     }
 
