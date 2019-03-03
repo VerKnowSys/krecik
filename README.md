@@ -193,3 +193,11 @@ NOTE: early stage, details may change in future!
 
 It's been my favorite cartoon… It's a little tribute for mr Zdeněk Miler as well :)
 
+
+
+## License
+
+- BSD
+
+- MIT
+
