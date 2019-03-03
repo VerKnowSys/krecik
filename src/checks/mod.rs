@@ -392,12 +392,11 @@ pub trait Checks<T> {
     /// Build a Story from a Length PageExpectation
     fn handle_page_content_expectation(url: &str, raw_page_content: &str, expected_content: &PageExpectation) -> Story {
         match expected_content {
+            &PageExpectation::ValidContent(ref content) if raw_page_content.contains(content) =>
+                Story::new(Expected::Content(url.to_string(), content.to_string())),
+
             &PageExpectation::ValidContent(ref content) =>
-                if raw_page_content.contains(content) {
-                    Story::new(Expected::Content(url.to_string(), content.to_string()))
-                } else {
-                    Story::new_error(Unexpected::ContentInvalid(url.to_string(), content.to_string()))
-                },
+                Story::new_error(Unexpected::ContentInvalid(url.to_string(), content.to_string())),
 
             &PageExpectation::ValidNoContent =>
                 Story::new(Expected::EmptyContent(url.to_string())),
@@ -411,12 +410,11 @@ pub trait Checks<T> {
     /// Build a Story from a Length PageExpectation
     fn handle_page_length_expectation(url: &str, raw_page_content: &str, expected_content_length: &PageExpectation) -> Story {
         match expected_content_length {
+            &PageExpectation::ValidLength(ref requested_length) if raw_page_content.len() >= *requested_length =>
+                Story::new(Expected::ContentLength(url.to_string(), *requested_length)),
+
             &PageExpectation::ValidLength(ref requested_length) =>
-                if raw_page_content.len() >= *requested_length {
-                    Story::new(Expected::ContentLength(url.to_string(), *requested_length))
-                } else {
-                    Story::new_error(Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length))
-                },
+                Story::new_error(Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length)),
 
             &PageExpectation::ValidNoLength =>
                 Story::new(Expected::NoContentLength(url.to_string())),
@@ -430,12 +428,11 @@ pub trait Checks<T> {
     /// Build a Story from a Address PageExpectation
     fn handle_page_address_expectation(url: &str, address: &str, expected_address: &PageExpectation) -> Story {
         match expected_address {
+            &PageExpectation::ValidAddress(ref an_address) if address.contains(an_address) =>
+                Story::new(Expected::Address(url.to_string(), address.to_string())),
+
             &PageExpectation::ValidAddress(ref an_address) =>
-                if address.contains(an_address) {
-                    Story::new(Expected::Address(url.to_string(), address.to_string()))
-                } else {
-                    Story::new_error(Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string()))
-                },
+                Story::new_error(Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string())),
 
             &PageExpectation::ValidNoAddress =>
                 Story::new(Expected::Address(url.to_string(), url.to_string())),
