@@ -7,6 +7,10 @@ use crate::products::expected::*;
 use crate::products::unexpected::*;
 
 
+/// Alias Type for Vec<Story>
+pub type Stories = Vec<Story>;
+
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Story holds errornous state
 pub struct Story {
