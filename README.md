@@ -56,14 +56,13 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 # Features:
 
-- Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP), but focused on: HTTP, HTTPS and FILE.
+- Asynchronous and multithreaded by default.
 
-- HTTP2 is default protocol, with fallback to HTTP1.1.
+- JSON format used for both checks (input) and products (output).
 
-- TLS1.3, TLS1.2, TLS1.1 as default TLS/SSL protocol versions.
+- Uses OpenSSL 1.1.1a+ to provide "TLS-cert expiration check" functionality.
 
-- Provides OpenSSL 1.1.1a+ features, including "TLS-cert expiry validation" functionality.
-
+- HTTP2 used as default.
 
 
 ![krecik-ojej](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_ojej.png?raw=true)
