@@ -1,6 +1,6 @@
 [package]
 name = "krecik"
-version = "0.6.4"
+version = "0.6.5"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 edition = '2018'
 build = "build.rs"
