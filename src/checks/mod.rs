@@ -362,7 +362,13 @@ pub trait Checks<T> {
         debug!("process_page_handler::content_length_story: {}",
                format!("{:?}", content_length_story).magenta());
 
-        let mut result_handler = multi.remove2(a_handler).unwrap();
+        let mut result_handler = match multi.remove2(a_handler) {
+            Ok(res_handler) => res_handler,
+            Err(err) => {
+                error!("Curl-result-handler FAILURE: URL: {}. Error details: {:?}", page_check.url.cyan(), err.to_string().red());
+                return History::empty()
+            }
+        };
         let result_final_address = result_handler.effective_url().unwrap_or_default();
         let result_final_address_story = Self::handle_page_address_expectation(&page_check.url, &result_final_address.unwrap_or_default(), expected_final_address);
         debug!("process_page_handler::result_final_address_story: {}",
