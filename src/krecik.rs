@@ -13,13 +13,8 @@
     unused_qualifications)]
 
 
-#[allow(unused_imports)]
 #[macro_use]
 extern crate log;
-
-#[allow(unused_imports)]
-#[macro_use]
-extern crate serde_derive;
 
 
 use fern::log_file;
