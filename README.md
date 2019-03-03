@@ -7,13 +7,13 @@
 
 
 
-## Author:
+# Author:
 
-Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
+Daniel ([@dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-### Software requirements:
+## Software requirements:
 
 - Rust >= 1.32.0
 - Curl >= 7.x
@@ -23,7 +23,7 @@ Daniel ([dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-### Additional build requirements:
+## Additional build requirements:
 
 - Clang >= 6.x
 - Make >= 3.x
@@ -54,7 +54,7 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
-## Features:
+# Features:
 
 - Supports all protocols supported by Curl (FILE, FTP, FTPS, GOPHER, HTTP, HTTPS, IMAP, IMAPS, LDAP, LDAPS, POP3, POP3S, RTSP, SMB, SMBS, SMTP, SMTPS, TELNET, TFTP, SFTP, SCP), but focused on: HTTP, HTTPS and FILE.
 
@@ -84,7 +84,7 @@ curl -O "http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64
 tar xfJ "Curl_lib-7.64.0-Darwin-10.11-x86_64.txz" --directory "/Software"
 ```
 
-Prebuilt versions of `Curl_lib` bundle is available for systems:
+Prebuilt version of `Curl_lib` bundle is available for systems:
 
 - [Darwin-10.11.x](http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz)
 
@@ -148,7 +148,7 @@ NOTE: If one of servers mentioned above… is started, the script mentioned belo
 
 
 
-## Mapping remote configuration resources:
+# Mapping remote configuration resources:
 
 For now, the only defined remote resource type is: "PongoHost". To configure Pongo API resource, create file: `checks/remotes/yourname.json` with contents:
 
@@ -163,7 +163,7 @@ NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defin
 
 
 
-## External JSON resources repositories support:
+# External JSON resources repositories support:
 
 1. Create new repository with JSON files with definitions of your checks. Check file-format examples can be found in: `checks/tests/*.json`. Commit your checks.
 
@@ -177,19 +177,19 @@ NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defin
 
 
 
-## WebAPI usage examples
+# WebAPI usage examples
 
 NOTE: early stage, details may change in future!
 
 1. Perform all checks from local "frontends" resource: `curl http://127.0.0.1:60666/check/execute/frontends`
 
-2. Perform only checks defined in a single check-file of local "frontends" resource: "lexington.json": `curl http://127.0.0.1:60666/check/execute/frontends/lexington.json`
+2. Perform only checks defined in a single check-file of local "frontends" resource: "your-name.json": `curl http://127.0.0.1:60666/check/execute/frontends/your-name.json`
 
 3. Perform all checks provided by Pongo remote resource (requires valid mapper configuration per remote resource): `curl http://127.0.0.1:60666/check/execute_remote/remotes`
 
 
 
-## Why "Krecik"?
+# Why "Krecik"?
 
 It's been my favorite cartoon… It's a little tribute for mr Zdeněk Miler as well :)
 
