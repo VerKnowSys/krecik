@@ -187,6 +187,11 @@ NOTE: early stage, details may change in future!
 
 
 
+
+![krecik-build](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_dyrygent.png?raw=true)
+
+
+
 # Why "Krecik"?
 
 It's been my favorite cartoon… It's a little tribute for mr Zdeněk Miler as well :)
