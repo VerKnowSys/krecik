@@ -9,7 +9,7 @@ use failure::Error;
 use crate::products::expected::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// Unexpected check result
 pub enum Unexpected {
 

@@ -59,7 +59,7 @@ pub type DomainExpectations = Vec<DomainExpectation>;
 
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// All response types for all supported expectations
 pub enum Expected {
 
