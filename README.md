@@ -13,6 +13,18 @@ Daniel ([@dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
+# Features:
+
+- Asynchronous and multithreaded by default.
+
+- JSON format used for both checks (input) and products (output).
+
+- Uses OpenSSL 1.1.1a+ to provide "TLS-cert expiration check" functionality.
+
+- HTTP2 used as default.
+
+
+
 ## Software requirements:
 
 - Rust >= 1.32.0
@@ -54,22 +66,11 @@ Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
 
 
 
-# Features:
-
-- Asynchronous and multithreaded by default.
-
-- JSON format used for both checks (input) and products (output).
-
-- Uses OpenSSL 1.1.1a+ to provide "TLS-cert expiration check" functionality.
-
-- HTTP2 used as default.
-
-
 ![krecik-ojej](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_ojej.png?raw=true)
 
 
 
-## Caveats. Solutions for potential problems:
+# Caveats. Solutions for potential problems:
 
 
 Krecik relies on fully featured build of Curl, which is available via Sofin binary-bundle: `Curl_lib`. To install prebuilt "Curl_lib" on supported system:
@@ -81,8 +82,8 @@ sudo chown "${_myusername}" "/Software"
 cd "/Software"
 curl -O "http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz"
 tar xfJ "Curl_lib-7.64.0-Darwin-10.11-x86_64.txz" --directory "/Software"
-```
 
+```
 Prebuilt version of `Curl_lib` bundle is available for systems:
 
 - [Darwin-10.11.x](http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz)
@@ -91,51 +92,49 @@ Prebuilt version of `Curl_lib` bundle is available for systems:
 
 - [HardenedBSD-11.x](http://software.verknowsys.com/binary/FreeBSD-11.0-amd64/Curl_lib-7.64.0-FreeBSD-11.0-amd64.zfsx) - NOTE Under HardenedBSD, binary-bundle file is NOT a tar file, but XZ compressed ZFS dataset of software bundle.
 
+NOTE: Curl_lib binary-bundle provides all Krecik library requirements: CURL, OpenSSL, ngHTTP2, (IDN, SSH).
 
 
-## Development:
+
+# Development:
 
 
-Lazy mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, watch awaits for code change for first run):
+## Build debug version:
+
+
+Lazy developer mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, watch awaits for code change for first run):
 
 `bin/devel`
 
 
-Eager mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, watch compiles code immediately):
+Eager developer mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, watch compiles code immediately):
 
 `bin/devel dev`
 
 
 
-## Building:
+## Build release version:
 
-
-Fast ("dev" mode):
-
-`bin/build dev`
-
-
-Slow ("release" mode):
 
 `bin/build`
 
 
 
-## Running:
+## Run:
 
 
-Launch "dev" server:
+Launch "dev" WebAPI server (NOTE: enables DEBUG logger level and makes cargo build process verbose):
 
 `bin/run dev`
 
 
-Launch "release" server:
+Launch "release" WebAPI server:
 
 `bin/run`
 
 
 
-## Testing:
+## Test:
 
 NOTE: If one of servers mentioned above… is started, the script mentioned below will do additional round of built in tests over HTTP2-Check-API:
 
