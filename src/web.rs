@@ -32,7 +32,7 @@ pub fn handler_check_execute_by_name(state: State) -> (State, History) {
             .unwrap_or_else(|err| {
                 let error = format!("Failed to load check from file: {}. Error details: {}", &check_path, err);
                 error!("{}", error.red());
-                History::new(Story::new_error(Unexpected::CheckParseProblem(error)))
+                History::new(Story::error(Unexpected::CheckParseProblem(error)))
             })
     )
 }
@@ -58,7 +58,7 @@ pub fn handler_check_execute_all_from_path(state: State) -> (State, History) {
                         .unwrap_or_else(|err| {
                             let error = format!("Failed to load check from file: {}. Error details: {}", &check, err);
                             error!("{}", error.red());
-                            History::new(Story::new_error(Unexpected::CheckParseProblem(error)))
+                            History::new(Story::error(Unexpected::CheckParseProblem(error)))
                         })
                         .stories()
                 })
@@ -88,7 +88,7 @@ fn handler_check_execute_all_from_remote_from_path(state: State) -> (State, Hist
                         .unwrap_or_else(|err| {
                             let error = format!("Failed to load remote check from file: {}. Error details: {}", &check, err);
                             error!("{}", error.red());
-                            History::new(Story::new_error(Unexpected::CheckParseProblem(error)))
+                            History::new(Story::error(Unexpected::CheckParseProblem(error)))
                         })
                         .stories()
                 })

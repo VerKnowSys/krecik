@@ -64,13 +64,13 @@ pub trait Checks<T> {
              .and_then(|ssl_validator|
                  match domain_expectation {
                     DomainExpectation::ValidExpiryPeriod(expected_days) if ssl_validator.days() < expected_days || ssl_validator.is_expired() =>
-                        Ok(Story::new_error(Unexpected::TLSDomainExpired(domain_name.to_string()))),
+                        Ok(Story::error(Unexpected::TLSDomainExpired(domain_name.to_string()))),
 
                     DomainExpectation::ValidExpiryPeriod(expected_days) =>
-                        Ok(Story::new(Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), expected_days)))
+                        Ok(Story::success(Expected::TLSCertificateFresh(domain_name.to_string(), ssl_validator.days(), expected_days)))
                  }
              )
-             .unwrap_or_else(|err| Story::new_error(Unexpected::InternalProtocolProblem(domain_name.to_string(), err.0.to_string())))
+             .unwrap_or_else(|err| Story::error(Unexpected::InternalProtocolProblem(domain_name.to_string(), err.0.to_string())))
     }
 
 
@@ -393,16 +393,16 @@ pub trait Checks<T> {
     fn handle_page_content_expectation(url: &str, raw_page_content: &str, expected_content: &PageExpectation) -> Story {
         match expected_content {
             &PageExpectation::ValidContent(ref content) if raw_page_content.contains(content) =>
-                Story::new(Expected::Content(url.to_string(), content.to_string())),
+                Story::success(Expected::Content(url.to_string(), content.to_string())),
 
             &PageExpectation::ValidContent(ref content) =>
-                Story::new_error(Unexpected::ContentInvalid(url.to_string(), content.to_string())),
+                Story::error(Unexpected::ContentInvalid(url.to_string(), content.to_string())),
 
             &PageExpectation::ValidNoContent =>
-                Story::new(Expected::EmptyContent(url.to_string())),
+                Story::success(Expected::EmptyContent(url.to_string())),
 
             edge_case =>
-                Story::new_error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
+                Story::error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
         }
     }
 
@@ -411,16 +411,16 @@ pub trait Checks<T> {
     fn handle_page_length_expectation(url: &str, raw_page_content: &str, expected_content_length: &PageExpectation) -> Story {
         match expected_content_length {
             &PageExpectation::ValidLength(ref requested_length) if raw_page_content.len() >= *requested_length =>
-                Story::new(Expected::ContentLength(url.to_string(), *requested_length)),
+                Story::success(Expected::ContentLength(url.to_string(), *requested_length)),
 
             &PageExpectation::ValidLength(ref requested_length) =>
-                Story::new_error(Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length)),
+                Story::error(Unexpected::ContentLengthInvalid(url.to_string(), raw_page_content.len(), *requested_length)),
 
             &PageExpectation::ValidNoLength =>
-                Story::new(Expected::NoContentLength(url.to_string())),
+                Story::success(Expected::NoContentLength(url.to_string())),
 
             edge_case =>
-                Story::new_error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
+                Story::error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
         }
     }
 
@@ -429,16 +429,16 @@ pub trait Checks<T> {
     fn handle_page_address_expectation(url: &str, address: &str, expected_address: &PageExpectation) -> Story {
         match expected_address {
             &PageExpectation::ValidAddress(ref an_address) if address.contains(an_address) =>
-                Story::new(Expected::Address(url.to_string(), address.to_string())),
+                Story::success(Expected::Address(url.to_string(), address.to_string())),
 
             &PageExpectation::ValidAddress(ref an_address) =>
-                Story::new_error(Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string())),
+                Story::error(Unexpected::AddressInvalid(url.to_string(), address.to_string(), an_address.to_string())),
 
             &PageExpectation::ValidNoAddress =>
-                Story::new(Expected::Address(url.to_string(), url.to_string())),
+                Story::success(Expected::Address(url.to_string(), url.to_string())),
 
             edge_case =>
-                Story::new_error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
+                Story::error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
         }
     }
 
@@ -449,16 +449,16 @@ pub trait Checks<T> {
             Ok(responded_code) =>
                 match expected_code {
                     &PageExpectation::ValidCode(the_code) if responded_code == the_code =>
-                       Story::new(Expected::HttpCode(url.to_string(), the_code)),
+                       Story::success(Expected::HttpCode(url.to_string(), the_code)),
 
                     &PageExpectation::ValidCode(the_code) =>
-                        Story::new_error(Unexpected::HttpCodeInvalid(url.to_string(), responded_code, the_code)),
+                        Story::error(Unexpected::HttpCodeInvalid(url.to_string(), responded_code, the_code)),
 
                     edge_case =>
-                        Story::new_error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
+                        Story::error(Unexpected::UnmatchedValidationCase(url.to_string(), edge_case.to_string()))
                 },
 
-            Err(err) => Story::new_error(Unexpected::URLConnectionProblem(url.to_string(), err.to_string()))
+            Err(err) => Story::error(Unexpected::URLConnectionProblem(url.to_string(), err.to_string()))
        }
     }
 

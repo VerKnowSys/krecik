@@ -35,24 +35,22 @@ pub struct Story {
 impl Story {
 
 
-    /// New story
-    pub fn new(success: Expected) -> Story {
-        let local_now = Local::now();
+    /// New success-story
+    pub fn success(success: Expected) -> Story {
         Story {
             count: 1,
-            timestamp: local_now.to_rfc3339(),
+            timestamp: Local::now().to_rfc3339(),
             success: Some(success),
             error: None,
         }
     }
 
 
-    /// New error story
-    pub fn new_error(error: Unexpected) -> Story {
-        let local_now = Local::now();
+    /// New error-story
+    pub fn error(error: Unexpected) -> Story {
         Story {
             count: 1,
-            timestamp: local_now.to_rfc3339(),
+            timestamp: Local::now().to_rfc3339(),
             success: None,
             error: Some(error),
         }
