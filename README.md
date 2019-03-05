@@ -90,7 +90,7 @@ Prebuilt version of `Curl_lib` bundle is available for systems:
 
 - [Darwin-10.14.x](http://software.verknowsys.com/binary/Darwin-10.14-x86_64/Curl_lib-7.64.0-Darwin-10.14-x86_64.txz)
 
-- [HardenedBSD-11.x](http://software.verknowsys.com/binary/FreeBSD-11.0-amd64/Curl_lib-7.64.0-FreeBSD-11.0-amd64.zfsx) - NOTE Under HardenedBSD, binary-bundle file is NOT a tar file, but XZ compressed ZFS dataset of software bundle.
+- [HardenedBSD-11.x](http://software.verknowsys.com/binary/FreeBSD-11.0-amd64/Curl_lib-7.64.0-FreeBSD-11.0-amd64.zfsx) - NOTE Under HardenedBSD, binary-bundle file is NOT a tar file, but Lz4 compressed ZFS dataset of software bundle.
 
 NOTE: Curl_lib binary-bundle provides all Krecik library requirements: CURL, OpenSSL, ngHTTP2, (IDN, SSH).
 
