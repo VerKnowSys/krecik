@@ -55,8 +55,8 @@ pub mod checks;
 /// Check products:
 pub mod products;
 
-/// Web:
-pub mod web;
+/// Checks API functions:
+pub mod api;
 
 
 //
