@@ -3,7 +3,6 @@
 mod tests {
 
     // Load all internal modules:
-    use gotham::test::TestServer;
     use regex::Regex;
     use ssl_expiration::SslExpiration;
     use std::io::{Error, ErrorKind};
@@ -23,7 +22,6 @@ mod tests {
     use crate::products::*;
     use crate::products::expected::*;
     use crate::products::unexpected::*;
-    use crate::web::router;
 
 
     struct CollectorForTests(Vec<u8>);
