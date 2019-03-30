@@ -1,8 +1,13 @@
 [package]
 name = "krecik"
-version = "0.6.5"
+version = "0.6.6"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
-edition = '2018'
+description = "Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL."
+keywords = ["curl", "web", "check", "tls-expire", "openssl"]
+categories = ["web"]
+homepage = "https://github.com/VerKnowSys/krecik"
+license = "MIT"
+edition = "2018"
 build = "build.rs"
 
 
