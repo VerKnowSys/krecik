@@ -3,9 +3,6 @@
 //
 
 
-/// Default project directory:
-pub const PROJECT_DIRECTORY: &str = "/Projects/krecik";
-
 /// Default log file:
 pub const DEFAULT_LOG_FILE: &str = "logs/krecik.log";
 
