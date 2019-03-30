@@ -1,8 +1,3 @@
-use hyper::*;
-use gotham::helpers::http::response::create_response;
-use gotham::state::State;
-use mime::APPLICATION_JSON;
-use gotham::handler::IntoResponse;
 use chrono::Local;
 use failure::Error;
 
