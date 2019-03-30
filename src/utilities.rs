@@ -1,7 +1,4 @@
 use std::io::{Error, ErrorKind};
-use gotham::state::State;
-use gotham::handler::IntoResponse;
-use hyper::{StatusCode, Body, Response};
 use serde_json;
 use std::io::prelude::*;
 use std::io::BufReader;

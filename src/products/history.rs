@@ -1,7 +1,4 @@
-use hyper::*;
-use mime::APPLICATION_JSON;
 use chrono::Local;
-use gotham::{handler::IntoResponse, state::State, helpers::http::response::create_response};
 
 use crate::products::story::*;
 use crate::products::expected::*;
@@ -68,20 +65,6 @@ impl History {
     }
 
 
-}
-
-
-/// Implement Gotham response for History:
-impl IntoResponse for History {
-    fn into_response(self, state: &State) -> Response<Body> {
-        create_response(
-            state,
-            StatusCode::OK,
-            APPLICATION_JSON,
-            self
-                .to_string()
-        )
-    }
 }
 
 

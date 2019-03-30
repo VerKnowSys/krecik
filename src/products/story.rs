@@ -1,7 +1,4 @@
-use hyper::*;
-use mime::APPLICATION_JSON;
 use chrono::Local;
-use gotham::{handler::IntoResponse, state::State, helpers::http::response::create_response};
 
 use crate::products::expected::*;
 use crate::products::unexpected::*;

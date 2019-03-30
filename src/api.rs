@@ -1,4 +1,3 @@
-use mime::*;
 use colored::Colorize;
 
 use crate::configuration::*;
