@@ -35,6 +35,7 @@ pub extern crate failure;
 pub extern crate serde_derive;
 
 
+use crate::checks::check::*;
 use crate::checks::domain::*;
 use crate::checks::generic::*;
 use crate::checks::page::*;

@@ -1,5 +1,4 @@
 use glob::glob;
-use serde_json;
 use std::fs;
 use std::io::prelude::*;
 use std::io::BufReader;
