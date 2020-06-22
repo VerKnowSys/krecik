@@ -6,6 +6,12 @@
 /// Default log file:
 pub const DEFAULT_LOG_FILE: &str = "logs/krecik.log";
 
+/// Default Notification name:
+pub const DEFAULT_SLACK_NAME: &str = "Krecik";
+
+/// Default Notification failure icon:
+pub const DEFAULT_SLACK_FAILURE_ICON: &str = ":krecik-failure:";
+
 /// Default stdout:
 pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
 

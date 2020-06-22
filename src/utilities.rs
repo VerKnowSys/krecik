@@ -1,10 +1,41 @@
 use glob::glob;
+use slack_hook::{PayloadBuilder, Slack};
 use std::fs;
 use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::{Error, ErrorKind};
 
 use crate::*;
+
+
+/// Sends generic notification over Slack
+pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str) {
+    Slack::new(webhook)
+        .and_then(|slack| {
+            PayloadBuilder::new()
+                .text(message)
+                .channel(channel)
+                .username(DEFAULT_SLACK_NAME)
+                .icon_emoji(icon)
+                .build()
+                .and_then(|payload| {
+                    debug!("Sending notification with payload: {:?}", &payload);
+                    slack.send(&payload)
+                })
+        })
+        .unwrap_or_default(); // just ignore case when notification throws an error
+}
+
+
+// pub fn notify_success(webhook: &str, channel: &str, message: &str) {
+//     notify(webhook, channel, message, ":fasterparrot:")
+// }
+
+
+/// Sends failure notification over Slack
+pub fn notify_failure(webhook: &str, channel: &str, message: &str) {
+    notify(webhook, channel, message, DEFAULT_SLACK_FAILURE_ICON)
+}
 
 
 /// Produce list of dirs/files matching given glob pattern:
