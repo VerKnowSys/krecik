@@ -1,7 +1,7 @@
 use chrono::Local;
 use failure::Error;
 
-use crate::products::expected::*;
+use crate::*;
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]

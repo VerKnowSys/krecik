@@ -1,5 +1,4 @@
-use crate::configuration::*;
-use crate::products::expected::*;
+use crate::checks::*;
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

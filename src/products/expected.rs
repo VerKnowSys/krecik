@@ -1,7 +1,6 @@
 use failure::Error;
 
-use crate::configuration::*;
-use crate::products::unexpected::*;
+use crate::*;
 
 
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]

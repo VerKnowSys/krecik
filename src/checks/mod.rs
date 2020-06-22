@@ -20,14 +20,7 @@ use ssl_expiration::SslExpiration;
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 
-use crate::checks::domain::*;
-use crate::checks::page::*;
-use crate::configuration::*;
-use crate::products::expected::*;
-use crate::products::history::*;
-use crate::products::story::*;
-use crate::products::unexpected::*;
-use crate::utilities::*;
+use crate::*;
 
 
 /// Collects async content from Curl:
@@ -97,7 +90,7 @@ pub trait Checks<T> {
                         domains
                             .into_par_iter()
                             .flat_map(|defined_check| {
-                                let domain_check = defined_check.clone();
+                                let domain_check = defined_check;
                                 let domain_name = domain_check.name;
                                 let domain_expectations = domain_check.expects;
                                 debug!("check_domain::domain_expectations: {}", format!("{:?}", domain_expectations).magenta());

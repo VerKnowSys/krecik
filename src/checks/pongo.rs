@@ -6,15 +6,7 @@ use ssl_expiration::SslExpiration;
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 
-use crate::checks::domain::*;
-use crate::checks::generic::*;
-use crate::checks::page::*;
 use crate::checks::*;
-use crate::configuration::*;
-use crate::products::expected::*;
-use crate::products::history::*;
-use crate::products::unexpected::*;
-use crate::utilities::*;
 
 
 //

@@ -1,14 +1,6 @@
 use colored::Colorize;
 
-use crate::checks::generic::*;
-use crate::checks::pongo::*;
-use crate::checks::*;
-use crate::configuration::*;
-use crate::products::expected::*;
-use crate::products::history::*;
-use crate::products::story::*;
-use crate::products::unexpected::*;
-use crate::utilities::*;
+use crate::*;
 
 
 /**

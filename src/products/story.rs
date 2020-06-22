@@ -1,7 +1,6 @@
 use chrono::Local;
 
-use crate::products::expected::*;
-use crate::products::unexpected::*;
+use crate::*;
 
 
 /// Alias Type for Vec<Story>

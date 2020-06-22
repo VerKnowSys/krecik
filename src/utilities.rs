@@ -5,10 +5,7 @@ use std::io::prelude::*;
 use std::io::BufReader;
 use std::io::{Error, ErrorKind};
 
-use crate::checks::domain::Domains;
-use crate::checks::page::Pages;
-use crate::configuration::CHECKS_DIR;
-use crate::products::expected::*;
+use crate::*;
 
 
 /// Produce list of dirs/files matching given glob pattern:

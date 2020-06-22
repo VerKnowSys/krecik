@@ -35,6 +35,19 @@ pub extern crate failure;
 pub extern crate serde_derive;
 
 
+use crate::checks::domain::*;
+use crate::checks::generic::*;
+use crate::checks::page::*;
+use crate::checks::pongo::*;
+use crate::checks::*;
+use crate::configuration::*;
+use crate::products::expected::*;
+use crate::products::history::*;
+use crate::products::story::*;
+use crate::products::unexpected::*;
+use crate::utilities::*;
+
+
 //
 // Public modules:
 //

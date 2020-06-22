@@ -4,14 +4,7 @@ use ssl_expiration::SslExpiration;
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 
-use crate::checks::domain::*;
-use crate::checks::page::*;
 use crate::checks::*;
-use crate::configuration::*;
-use crate::products::expected::*;
-use crate::products::history::*;
-use crate::products::unexpected::*;
-use crate::utilities::*;
 
 
 /// NOTE: Pigeon (previous implementation) supported list of checks per file. TravMole will require each JSON to be separate file.
