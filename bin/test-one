@@ -1,0 +1,11 @@
+#!/bin/sh
+# blame: @dmilith
+# 2018-12-20-1942-1545331365
+
+
+. bin/common "test"
+
+if [ -z "${@}" ]; then
+    failure "Specify test name to run!"
+fi
+cargo test --jobs 4 "${@}"
