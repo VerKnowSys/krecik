@@ -11,7 +11,6 @@ pub type Stories = Vec<Story>;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 /// Story holds errornous state
 pub struct Story {
-
     /// Story - timestamp
     pub timestamp: String,
 
@@ -25,13 +24,10 @@ pub struct Story {
     /// Story - keep history of unexpected results (failures)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<Unexpected>,
-
 }
 
 
 impl Story {
-
-
     /// New success-story
     pub fn success(success: Expected) -> Story {
         Story {
@@ -52,8 +48,6 @@ impl Story {
             error: Some(error),
         }
     }
-
-
 }
 
 

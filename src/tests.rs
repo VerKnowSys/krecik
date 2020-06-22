@@ -3,25 +3,25 @@
 mod tests {
 
     // Load all internal modules:
-    use regex::Regex;
-    use ssl_expiration::SslExpiration;
-    use std::io::{Error, ErrorKind};
     use curl::easy::{Easy, Easy2, Handler, WriteError};
     use curl::multi::{Easy2Handle, Multi};
-    use std::time::Duration;
-    use serde_json;
+    use regex::Regex;
 
-    use crate::*;
-    use crate::configuration::*;
-    use crate::utilities::*;
-    use crate::checks::*;
-    use crate::checks::generic::*;
+    use ssl_expiration::SslExpiration;
+    use std::io::{Error, ErrorKind};
+    use std::time::Duration;
+
     use crate::checks::domain::*;
+    use crate::checks::generic::*;
     use crate::checks::page::*;
     use crate::checks::pongo::*;
-    use crate::products::*;
+    use crate::checks::*;
+    use crate::configuration::*;
     use crate::products::expected::*;
     use crate::products::unexpected::*;
+    use crate::products::*;
+    use crate::utilities::*;
+    use crate::*;
 
 
     struct CollectorForTests(Vec<u8>);
@@ -33,7 +33,6 @@ mod tests {
             Ok(data.len())
         }
     }
-
 
 
     #[test]
@@ -52,7 +51,10 @@ mod tests {
         // easy.verbose(true).unwrap_or_default();
         easy.url("https://www.rust-lang.org/").unwrap_or_default();
         easy.perform().unwrap_or_default();
-        assert_eq!(easy.response_code().unwrap_or_default(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert_eq!(
+            easy.response_code().unwrap_or_default(),
+            CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
+        );
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
@@ -87,7 +89,9 @@ mod tests {
         easy3.get(true).unwrap_or_default();
         easy3.follow_location(true).unwrap_or_default();
         // easy3.verbose(true).unwrap_or_default();
-        easy3.url("http://sdfsdfsdfdsfdsfds.pl/").unwrap_or_default();
+        easy3
+            .url("http://sdfsdfsdfdsfdsfds.pl/")
+            .unwrap_or_default();
         easy3.max_connects(10).unwrap_or_default();
         easy3.max_redirections(10).unwrap_or_default();
 
@@ -98,7 +102,9 @@ mod tests {
         let easy3handle = multi.add2(easy3).unwrap();
 
         while multi.perform().unwrap_or_default() > 0 {
-            multi.wait(&mut [], Duration::from_secs(1)).unwrap_or_default();
+            multi
+                .wait(&mut [], Duration::from_secs(1))
+                .unwrap_or_default();
         }
 
         // 1
@@ -120,11 +126,17 @@ mod tests {
         assert!(raw_page.len() == 0);
 
         let mut handler1after = multi.remove2(easy1handle).unwrap();
-        assert!(handler1after.response_code().unwrap_or_default() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert!(
+            handler1after.response_code().unwrap_or_default()
+                == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
+        );
         assert!(handler1after.download_size().unwrap_or_default() > 0f64);
 
         let mut handler2after = multi.remove2(easy2handle).unwrap();
-        assert!(handler2after.response_code().unwrap_or_default() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert!(
+            handler2after.response_code().unwrap_or_default()
+                == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
+        );
         assert!(handler2after.download_size().unwrap_or_default() > 0f64);
 
         let mut handler3after = multi.remove2(easy3handle).unwrap();
@@ -142,7 +154,8 @@ mod tests {
         easy.follow_location(true).unwrap_or_default();
         easy.ssl_verify_peer(true).unwrap_or_default();
         easy.ssl_verify_host(true).unwrap_or_default();
-        easy.connect_timeout(Duration::from_secs(30)).unwrap_or_default();
+        easy.connect_timeout(Duration::from_secs(30))
+            .unwrap_or_default();
         easy.timeout(Duration::from_secs(30)).unwrap_or_default();
         easy.max_connects(10).unwrap_or_default();
         easy.max_redirections(10).unwrap_or_default();
@@ -152,17 +165,34 @@ mod tests {
         easy.perform().unwrap_or_default();
 
         println!("URL: {}", &url);
-        println!("Redirect count: {:?}", easy.redirect_count().unwrap_or_default());
+        println!(
+            "Redirect count: {:?}",
+            easy.redirect_count().unwrap_or_default()
+        );
         // println!("Final URL: {:?}", easy.redirect_url().unwrap_or_default());
-        println!("Effective URL: {:?}", easy.effective_url().unwrap_or_default());
+        println!(
+            "Effective URL: {:?}",
+            easy.effective_url().unwrap_or_default()
+        );
         println!("Local IPv4: {:?}", easy.local_ip().unwrap_or_default());
         println!("Remote IPv4: {:?}", easy.primary_ip().unwrap_or_default());
-        println!("Content type: {:?}", easy.content_type().unwrap_or_default());
+        println!(
+            "Content type: {:?}",
+            easy.content_type().unwrap_or_default()
+        );
         println!("Cookies: {:?}", easy.cookies().unwrap());
-        println!("TIMINGS: Connect time: {:?}, Name lookup time: {:?}, Redirect time: {:?}, Total time: {:?}",
-                 easy.connect_time().unwrap_or_default(), easy.namelookup_time().unwrap_or_default(), easy.redirect_time().unwrap_or_default(), easy.total_time().unwrap_or_default());
+        println!(
+            "TIMINGS: Connect time: {:?}, Name lookup time: {:?}, Redirect time: {:?}, Total time: {:?}",
+            easy.connect_time().unwrap_or_default(),
+            easy.namelookup_time().unwrap_or_default(),
+            easy.redirect_time().unwrap_or_default(),
+            easy.total_time().unwrap_or_default()
+        );
 
-        assert_eq!(easy.response_code().unwrap_or_default(), CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert_eq!(
+            easy.response_code().unwrap_or_default(),
+            CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
+        );
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
@@ -175,19 +205,19 @@ mod tests {
     #[test]
     fn test_filecheck_to_json_serialization() {
         let check = GenCheck {
-            domains: Some(vec!(
-               Domain {
-                   name: "nask.pl".to_string(),
-                   expects: vec!(DomainExpectation::ValidExpiryPeriod(CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY)),
-               }
-            )),
-            pages: Some(vec!(
-                Page {
-                    url: "http://rust-lang.org/".to_string(),
-                    expects: vec!(PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE)),
-                    options: Some(PageOptions::default())
-                }
-            )),
+            domains: Some(vec![Domain {
+                name: "nask.pl".to_string(),
+                expects: vec![DomainExpectation::ValidExpiryPeriod(
+                    CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY,
+                )],
+            }]),
+            pages: Some(vec![Page {
+                url: "http://rust-lang.org/".to_string(),
+                expects: vec![PageExpectation::ValidCode(
+                    CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
+                )],
+                options: Some(PageOptions::default()),
+            }]),
             alert_webhook: None,
             alert_channel: None,
         };
@@ -237,13 +267,10 @@ mod tests {
         let history = check.execute();
         println!("TEST3({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
-        history
-            .stories()
-            .iter()
-            .for_each(|story| {
-                assert!(story.success.is_some());
-                assert!(story.error.is_none());
-            });
+        history.stories().iter().for_each(|story| {
+            assert!(story.success.is_some());
+            assert!(story.error.is_none());
+        });
     }
 
 
@@ -308,11 +335,12 @@ mod tests {
     #[test]
     fn test_parsing_bogus_validators() {
         GenCheck::load("checks/tests/test10.json")
-            .and_then(|check| {
-                Ok(assert!(false))
-            })
+            .and_then(|check| Ok(assert!(false)))
             .unwrap_or_else(|err| {
-                assert!(err.to_string().contains("unknown variant `ValidMoonFlower`"));
+                assert!(
+                    err.to_string()
+                        .contains("unknown variant `ValidMoonFlower`")
+                );
             });
     }
 
@@ -320,9 +348,7 @@ mod tests {
     #[test]
     fn test_parsing_invalid_validator_value_type() {
         GenCheck::load("checks/tests/test11.json")
-            .and_then(|check| {
-                Ok(assert!(false))
-            })
+            .and_then(|check| Ok(assert!(false)))
             .unwrap_or_else(|err| {
                 assert!(err.to_string().contains("invalid type: string"));
             });
@@ -335,21 +361,14 @@ mod tests {
             .and_then(|check| {
                 assert!(check.pages.is_some());
                 assert!(check.domains.is_none());
-                check
-                    .execute()
-                    .stories()
-                    .iter()
-                    .for_each(|story| {
-                        assert!(story.success.is_some());
-                        assert!(story.error.is_none());
-                    });
+                check.execute().stories().iter().for_each(|story| {
+                    assert!(story.success.is_some());
+                    assert!(story.error.is_none());
+                });
                 Ok(())
             })
-            .unwrap_or_else(|err| {
-                assert!(false)
-            });
+            .unwrap_or_else(|err| assert!(false));
     }
 
     // test POST
-
 }

@@ -5,7 +5,6 @@ use crate::products::expected::*;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Page check structure
 pub struct Page {
-
     /// Page URL
     pub url: String,
 
@@ -16,7 +15,6 @@ pub struct Page {
     /// Curl options
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<PageOptions>,
-
 }
 
 
@@ -37,7 +35,6 @@ pub type Pages = Vec<Page>;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Page options - passed to Curl
 pub struct PageOptions {
-
     /// HTTP headers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<Vec<String>>,
@@ -81,15 +78,15 @@ pub struct PageOptions {
     /// TLS host verification
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ssl_verify_host: Option<bool>,
-
 }
 
 
 /// Implement JSON serialization on .to_string():
 impl ToString for PageOptions {
     fn to_string(&self) -> String {
-        serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("{\"status\": \"PageOptions serialization failure\"}"))
+        serde_json::to_string(&self).unwrap_or_else(|_| {
+            String::from("{\"status\": \"PageOptions serialization failure\"}")
+        })
     }
 }
 
@@ -114,11 +111,9 @@ impl Default for PageOptions {
 }
 
 
-
 #[derive(Debug, Copy, Clone, Serialize, Deserialize)]
 /// HTTP methods allowed
 pub enum Method {
-
     /// HTTP HEAD
     HEAD,
 
@@ -133,7 +128,6 @@ pub enum Method {
 
     /// HTTP DELETE
     DELETE,
-
 }
 
 

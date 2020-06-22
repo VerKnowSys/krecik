@@ -13,13 +13,8 @@
     unused_import_braces,
     unused_qualifications
 )]
-
 // For development:
-#![allow(
-    dead_code,
-    unused_imports,
-    unused_variables,
-)]
+#![allow(dead_code, unused_imports, unused_variables)]
 
 
 /// Use Jemalloc as default allocator:

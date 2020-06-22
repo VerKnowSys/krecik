@@ -1,7 +1,7 @@
 use chrono::Local;
 
-use crate::products::story::*;
 use crate::products::expected::*;
+use crate::products::story::*;
 use crate::products::unexpected::*;
 
 
@@ -11,17 +11,15 @@ pub struct History(Stories);
 
 
 impl History {
-
-
     /// New empty history
     pub fn empty() -> History {
-        History(vec!())
+        History(vec![])
     }
 
 
     /// New History with first element
     pub fn new(first: Story) -> History {
-        History(vec!(first))
+        History(vec![first])
     }
 
 
@@ -51,27 +49,24 @@ impl History {
 
     /// Append Story to History
     pub fn append(&self, story: Story) -> History {
-        History([self.0.clone(), vec!(story)].concat())
+        History([self.0.clone(), vec![story]].concat())
     }
 
 
     /// Merge History with another History
     pub fn merge(&self, a_history: History) -> History {
         match a_history {
-            History(stories) => {
-                History([self.0.clone(), stories].concat())
-            }
+            History(stories) => History([self.0.clone(), stories].concat()),
         }
     }
-
-
 }
 
 
 /// Implement JSON serialization on .to_string():
 impl ToString for History {
     fn to_string(&self) -> String {
-        serde_json::to_string(&self.0)
-            .unwrap_or_else(|_| String::from("{\"status\": \"History serialization failure\"}"))
+        serde_json::to_string(&self.0).unwrap_or_else(|_| {
+            String::from("{\"status\": \"History serialization failure\"}")
+        })
     }
 }

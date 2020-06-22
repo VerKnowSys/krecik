@@ -1,34 +1,32 @@
-use std::io::{Error, ErrorKind};
+use glob::glob;
 use serde_json;
+use std::fs;
 use std::io::prelude::*;
 use std::io::BufReader;
-use std::fs;
-use glob::glob;
+use std::io::{Error, ErrorKind};
 
-use crate::products::expected::*;
-use crate::checks::page::Pages;
 use crate::checks::domain::Domains;
+use crate::checks::page::Pages;
 use crate::configuration::CHECKS_DIR;
+use crate::products::expected::*;
 
 
 /// Produce list of dirs/files matching given glob pattern:
 pub fn produce_list(glob_pattern: &str) -> Vec<String> {
-    let mut list = vec!();
+    let mut list = vec![];
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
                 if let Some(element) = path.file_name() {
-                    element
-                        .to_str()
-                        .and_then(|elem| {
-                            list.push(elem.to_string());
-                            Some(elem.to_string())
-                        });
+                    element.to_str().and_then(|elem| {
+                        list.push(elem.to_string());
+                        Some(elem.to_string())
+                    });
                 }
-            },
+            }
             Err(err) => {
                 error!("Error: produce_list(): {}", err);
-            },
+            }
         }
     }
     debug!("produce_list(): Elements: {:?}", list);
