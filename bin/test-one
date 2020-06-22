@@ -8,4 +8,4 @@
 if [ -z "${@}" ]; then
     failure "Specify test name to run!"
 fi
-cargo test --jobs 4 "${@}"
+cargo test --jobs 4 "${@}" -- --nocapture

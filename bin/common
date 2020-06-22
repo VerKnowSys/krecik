@@ -143,7 +143,6 @@ test_project () {
         --tests \
         ${_cargo_color_flag} \
         -- \
-        --nocapture \
             || failure "Test failed!"
 }
 
