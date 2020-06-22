@@ -42,13 +42,36 @@ impl Checks<GenCheck> for GenCheck {
 
 
     fn execute(&self) -> History {
-        History::new_from(
+        let history = History::new_from(
             [
                 Self::check_pages(self.pages.clone()).stories(),
                 Self::check_domains(self.domains.clone()).stories(),
             ]
             .concat(),
-        )
+        );
+        match (&self.alert_webhook, &self.alert_channel) {
+            (Some(webhook), Some(channel)) => {
+                let failures = history
+                    .stories()
+                    .iter()
+                    .filter(|story| story.error.is_some())
+                    .map(|story| {
+                        if let Some(error) = &story.error {
+                            format!("{}, ", error)
+                        } else {
+                            String::new()
+                        }
+                    })
+                    .collect::<String>();
+
+                debug!("Executing notification to channel: {}", &channel);
+                notify_failure(webhook, channel, &failures);
+            }
+            (..) => {
+                info!("Notifications not configured hence skipped…");
+            }
+        };
+        history
     }
 }
 
