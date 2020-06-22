@@ -5,7 +5,7 @@
             "url": "http://centra.com/",
             "expects": [
                 {
-                    "ValidCode": 301
+                    "ValidCode": 308
                 },
                 {
                     "ValidLength": 0
