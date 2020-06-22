@@ -46,6 +46,21 @@ use crate::products::history::*;
 use crate::products::story::*;
 use crate::products::unexpected::*;
 use crate::utilities::*;
+use colored::Colorize;
+use curl::easy::{Handler, WriteError};
+
+
+/// Collects async content from Curl:
+#[derive(Debug)]
+pub struct Collector(Vec<u8>);
+
+
+impl Handler for Collector {
+    fn write(&mut self, data: &[u8]) -> Result<usize, WriteError> {
+        self.0.extend_from_slice(data);
+        Ok(data.len())
+    }
+}
 
 
 //
