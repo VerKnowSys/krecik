@@ -17,28 +17,17 @@ use crate::*;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHost {
-    /// Domains to check
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub domains: Option<Domains>,
-
-    /// Pages to check
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pages: Option<Pages>,
-
     /// Updated at:
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
-
-    /// Client name:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub client: Option<String>,
-
-    /// Client is active?:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
 
     /// Client data:
     pub data: PongoHostData,
+
+    /// Client name:
+    pub client: Option<String>,
+
+    /// Client is active?:
+    pub active: Option<bool>,
 
     /// Slack Webhook
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,36 +42,38 @@ pub struct PongoHost {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHostData {
-    /// Client name:
-    pub client: Option<String>,
+    /// Host inner object:
+    pub host: PongoHostDetails,
 
-    /// Client application environment:
+    /// Client env:
     #[serde(skip_serializing_if = "Option::is_none")]
     pub env: Option<String>,
 
-    /// Client application ams name:
+    /// Client ams:
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ams: Option<String>,
 
-    /// Client main host name:
-    pub host: PongoHostDetails,
+    /// Domains to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domains: Option<Domains>,
 
-    /// Client report:
-    pub report: PongoReport,
+    /// Pages to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pages: Option<Pages>,
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-/// Remote structure that will be loaded as GenCheck:
-pub struct PongoReport {
-    /// Application modules enabled:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub modules: Option<Vec<String>>,
+// #[derive(Debug, Clone, Serialize, Deserialize)]
+// /// Remote structure that will be loaded as GenCheck:
+// pub struct PongoReport {
+//     /// Application modules enabled:
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub modules: Option<Vec<String>>,
 
-    /// Application processes:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub processes: Option<String>,
-}
+//     /// Application processes:
+//     #[serde(skip_serializing_if = "Option::is_none")]
+//     pub processes: Option<usize>,
+// }
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -97,16 +88,14 @@ pub struct PongoHostDetails {
     pub primary_vhost: Option<String>,
 
     /// List of virtual hosts of client:
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub vhosts: Option<Vec<String>>,
+
+    /// Showroom urls of client:
+    pub showroom_urls: Option<Vec<String>>,
 
     /// Backend SSHD port of client:
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ssh_port: Option<String>,
-
-    /// Showroom urls of client:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub showroom_urls: Option<Vec<String>>,
 }
 
 
@@ -121,7 +110,16 @@ pub struct PongoRemoteMapper {
     pub url: String,
 
     /// Check AMS only for specified subdomain
-    pub only_vhost_contains: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub only_vhost_contains: Option<String>,
+
+    /// Slack Webhook
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alert_webhook: Option<String>,
+
+    /// Slack alert channel
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alert_channel: Option<String>,
 }
 
 
@@ -244,7 +242,9 @@ impl Checks<GenCheck> for PongoHost {
             pages: Some(pongo_checks),
             domains: Some(domain_checks),
 
-            ..GenCheck::default()
+            // pass alert webhook and channel from mapper to the checks
+            alert_webhook: mapper.alert_webhook,
+            alert_channel: mapper.alert_channel,
         })
     }
 
@@ -252,8 +252,8 @@ impl Checks<GenCheck> for PongoHost {
     fn execute(&self) -> History {
         let history = History::new_from(
             [
-                Self::check_pages(self.pages.clone()).stories(),
-                Self::check_domains(self.domains.clone()).stories(),
+                Self::check_pages(self.data.pages.clone()).stories(),
+                Self::check_domains(self.data.domains.clone()).stories(),
             ]
             .concat(),
         );
@@ -298,8 +298,10 @@ impl ToString for PongoRemoteMapper {
 impl Default for PongoRemoteMapper {
     fn default() -> Self {
         PongoRemoteMapper {
-            url: "".to_string(),
-            only_vhost_contains: "".to_string(),
+            url: String::new(),
+            only_vhost_contains: None,
+            alert_webhook: None,
+            alert_channel: None,
         }
     }
 }
