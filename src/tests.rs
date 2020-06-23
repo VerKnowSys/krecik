@@ -1,6 +1,6 @@
-#[allow(unused_imports)]
+#[allow(unused_imports, clippy::unit_arg, clippy::assertions_on_constants)]
 #[cfg(test)]
-mod tests {
+mod all_tests {
 
     // Load all internal modules:
     use curl::easy::{Easy, Easy2, Handler, WriteError};
@@ -39,7 +39,7 @@ mod tests {
     fn test_ssl_domain_expiration() {
         let domain = "google.com";
         let expiration = SslExpiration::from_domain_name(&domain).unwrap();
-        assert!(expiration.is_expired() == false);
+        assert!(!expiration.is_expired());
         assert!(expiration.days() > 300);
     }
 
@@ -67,13 +67,12 @@ mod tests {
     #[test]
     fn test_curl_multi_test() {
         let url1 = "https://www.rust-lang.org/";
-        let url2 = "https://www.centra.com/";
 
         let mut easy1 = Easy2::new(CollectorForTests(Vec::new()));
         easy1.get(true).unwrap_or_default();
         easy1.follow_location(true).unwrap_or_default();
         // easy1.verbose(true).unwrap_or_default();
-        easy1.url("https://www.rust-lang.org/").unwrap_or_default();
+        easy1.url(url1).unwrap_or_default();
         easy1.max_connects(10).unwrap_or_default();
         easy1.max_redirections(10).unwrap_or_default();
 
@@ -310,7 +309,7 @@ mod tests {
     #[test]
     fn test_agent_check() {
         let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
-        let page: &Page = &check.clone().pages.unwrap_or_default()[0];
+        let page: &Page = &check.pages.unwrap_or_default()[0];
         let options = page.options.clone().unwrap_or_default();
         let agent = options.agent;
         assert!(agent.is_some());
@@ -335,7 +334,7 @@ mod tests {
     #[test]
     fn test_parsing_bogus_validators() {
         GenCheck::load("checks/tests/test10.json")
-            .and_then(|check| Ok(assert!(false)))
+            .and_then(|_check| Ok(assert!(false)))
             .unwrap_or_else(|err| {
                 assert!(
                     err.to_string()
@@ -348,7 +347,7 @@ mod tests {
     #[test]
     fn test_parsing_invalid_validator_value_type() {
         GenCheck::load("checks/tests/test11.json")
-            .and_then(|check| Ok(assert!(false)))
+            .and_then(|_check| Ok(assert!(false)))
             .unwrap_or_else(|err| {
                 assert!(err.to_string().contains("invalid type: string"));
             });
@@ -367,7 +366,7 @@ mod tests {
                 });
                 Ok(())
             })
-            .unwrap_or_else(|err| assert!(false));
+            .unwrap_or_else(|_err| assert!(false));
     }
 
     // test POST
