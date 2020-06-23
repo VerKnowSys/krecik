@@ -144,7 +144,11 @@ impl Checks<GenCheck> for PongoHost {
         );
 
         // now use default Pongo structure defined as default for PongoRemoteMapper
-        let pongo_hosts: PongoHosts = serde_json::from_str(&remote_raw).unwrap_or_default();
+        let pongo_hosts: PongoHosts = serde_json::from_str(&remote_raw)
+            .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
+            .unwrap_or_default();
+
+        debug!("Pongo hosts: {:#?}", &pongo_hosts);
         let pongo_checks = pongo_hosts
             .clone()
             .into_par_iter()
