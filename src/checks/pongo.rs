@@ -306,11 +306,50 @@ impl ToString for PongoRemoteMapper {
 /// Implement default for PongoRemoteMapper:
 impl Default for PongoRemoteMapper {
     fn default() -> Self {
-        PongoRemoteMapper {
+        Self {
             url: String::new(),
             only_vhost_contains: None,
             alert_webhook: None,
             alert_channel: None,
+        }
+    }
+}
+
+
+impl Default for PongoHost {
+    fn default() -> Self {
+        Self {
+            data: PongoHostData::default(),
+            client: None,
+            active: None,
+            alert_webhook: None,
+            alert_channel: None,
+            domains: None,
+            pages: None,
+        }
+    }
+}
+
+
+impl Default for PongoHostData {
+    fn default() -> Self {
+        Self {
+            host: None,
+            env: None,
+            ams: None,
+        }
+    }
+}
+
+
+impl Default for PongoHostDetails {
+    fn default() -> Self {
+        Self {
+            ip: None,
+            primary_vhost: None,
+            vhosts: None,
+            showroom_urls: None,
+            ssh_port: None,
         }
     }
 }
