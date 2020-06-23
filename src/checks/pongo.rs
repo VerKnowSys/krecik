@@ -17,9 +17,6 @@ use crate::*;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHost {
-    /// Updated at:
-    pub updated_at: Option<String>,
-
     /// Client data:
     pub data: PongoHostData,
 
@@ -51,7 +48,7 @@ pub struct PongoHost {
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHostData {
     /// Host inner object:
-    pub host: PongoHostDetails,
+    pub host: Option<PongoHostDetails>,
 
     /// Client env:
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,9 +150,9 @@ impl Checks<PongoHost> for PongoHost {
             .clone()
             .into_par_iter()
             .flat_map(|host| {
-                let ams = host.data.ams.unwrap_or_default();
+                let ams = host.clone().data.ams.unwrap_or_default();
                 let active = host.active.unwrap_or_else(|| false);
-                let client = host.client.unwrap_or_default();
+                let client = host.clone().client.unwrap_or_default();
 
                 let pongo_private_token = Regex::new(r"\?token=[A-Za-z0-9_-]*").unwrap();
                 let safe_url = pongo_private_token.replace(&mapper.url, "[[token-masked]]");
@@ -168,8 +165,10 @@ impl Checks<PongoHost> for PongoHost {
                 );
                 [
                     // merge two lists for URLs: "vhosts" and "showrooms":
-                    host.data
+                    host.clone()
+                        .data
                         .host
+                        .unwrap_or_default()
                         .vhosts
                         .and_then(|vhosts| {
                             vhosts
@@ -203,6 +202,7 @@ impl Checks<PongoHost> for PongoHost {
                         .unwrap_or_default(),
                     host.data
                         .host
+                        .unwrap_or_default()
                         .showroom_urls
                         .and_then(|showrooms| {
                             showrooms
@@ -231,6 +231,7 @@ impl Checks<PongoHost> for PongoHost {
             .flat_map(|host| {
                 host.data
                     .host
+                    .unwrap_or_default()
                     .vhosts
                     .and_then(|vhosts| {
                         vhosts
@@ -247,13 +248,14 @@ impl Checks<PongoHost> for PongoHost {
                     .unwrap_or_default()
             })
             .collect();
-        Ok(GenCheck {
+        Ok(PongoHost {
             pages: Some(pongo_checks),
             domains: Some(domain_checks),
 
             // pass alert webhook and channel from mapper to the checks
             alert_webhook: mapper.alert_webhook,
             alert_channel: mapper.alert_channel,
+            ..PongoHost::default()
         })
     }
 
@@ -261,8 +263,8 @@ impl Checks<PongoHost> for PongoHost {
     fn execute(&self) -> History {
         let history = History::new_from(
             [
-                Self::check_pages(self.data.pages.clone()).stories(),
-                Self::check_domains(self.data.domains.clone()).stories(),
+                Self::check_pages(self.pages.clone()).stories(),
+                Self::check_domains(self.domains.clone()).stories(),
             ]
             .concat(),
         );
@@ -274,7 +276,7 @@ impl Checks<PongoHost> for PongoHost {
                     .filter(|story| story.error.is_some())
                     .map(|story| {
                         if let Some(error) = &story.error {
-                            format!("{}, ", error)
+                            format!("{}\n\n", error)
                         } else {
                             String::new()
                         }
