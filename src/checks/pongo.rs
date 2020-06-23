@@ -36,6 +36,14 @@ pub struct PongoHost {
     /// Slack alert channel
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_channel: Option<String>,
+
+    /// Domains to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domains: Option<Domains>,
+
+    /// Pages to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pages: Option<Pages>,
 }
 
 
@@ -52,14 +60,6 @@ pub struct PongoHostData {
     /// Client ams:
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ams: Option<String>,
-
-    /// Domains to check
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub domains: Option<Domains>,
-
-    /// Pages to check
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pages: Option<Pages>,
 }
 
 
@@ -123,8 +123,8 @@ pub struct PongoRemoteMapper {
 }
 
 
-impl Checks<GenCheck> for PongoHost {
-    fn load(remote_file_name: &str) -> Result<GenCheck, Error> {
+impl Checks<PongoHost> for PongoHost {
+    fn load(remote_file_name: &str) -> Result<PongoHost, Error> {
         let mapper: PongoRemoteMapper = read_text_file(&remote_file_name)
             .and_then(|file_contents| {
                 serde_json::from_str(&file_contents)
