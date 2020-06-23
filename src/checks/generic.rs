@@ -57,7 +57,7 @@ impl Checks<GenCheck> for GenCheck {
                     .filter(|story| story.error.is_some())
                     .map(|story| {
                         if let Some(error) = &story.error {
-                            format!("{}, ", error)
+                            format!("{}\n\n", error)
                         } else {
                             String::new()
                         }
