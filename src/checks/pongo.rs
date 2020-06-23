@@ -1,10 +1,10 @@
-use curl::easy::{Easy2, Handler, WriteError};
-use curl::multi::{Easy2Handle, Multi};
+use curl::easy::Easy2;
+
 use rayon::prelude::*;
 use regex::Regex;
-use ssl_expiration::SslExpiration;
+
 use std::io::{Error, ErrorKind};
-use std::time::Duration;
+
 
 use crate::*;
 
@@ -220,7 +220,6 @@ impl Checks<GenCheck> for PongoHost {
             })
             .collect();
         let domain_checks = pongo_hosts
-            .clone()
             .into_par_iter()
             .flat_map(|host| {
                 host.data

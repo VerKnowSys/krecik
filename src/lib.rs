@@ -15,7 +15,7 @@
     unused_qualifications
 )]
 // For development:
-#![allow(dead_code, unused_imports, unused_variables)]
+// #![allow(dead_code, unused_imports, unused_variables)]
 
 
 /// Use Jemalloc as default allocator:
@@ -40,7 +40,7 @@ use crate::checks::domain::*;
 use crate::checks::generic::*;
 use crate::checks::page::*;
 use crate::checks::pongo::*;
-use crate::checks::*;
+
 use crate::configuration::*;
 use crate::products::expected::*;
 use crate::products::history::*;

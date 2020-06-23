@@ -1,8 +1,3 @@
-use failure::Error;
-
-use crate::*;
-
-
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// Describes all supported page expectations
 pub enum PageExpectation {

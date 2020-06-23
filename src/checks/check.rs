@@ -1,4 +1,4 @@
-use curl::easy::{Easy2, Handler, List, WriteError};
+use curl::easy::{Easy2, List};
 use curl::multi::{Easy2Handle, Multi};
 use curl::MultiError;
 use rayon::prelude::*;
@@ -57,10 +57,7 @@ pub trait Checks<T> {
 
     /// Check domains
     fn check_domains(domains: Option<Domains>) -> History {
-        domains
-            .and_then(|domains|
-                Some(
-                    History::new_from(
+        domains.map(|domains| History::new_from(
                         domains
                             .into_par_iter()
                             .flat_map(|defined_check| {
@@ -94,9 +91,7 @@ pub trait Checks<T> {
                                 ).stories()
                             })
                             .collect()
-                        )
-                )
-            )
+                        ))
             .unwrap_or_else(History::empty)
     }
 

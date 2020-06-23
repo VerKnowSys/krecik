@@ -1,9 +1,3 @@
-use chrono::Local;
-use failure::Error;
-
-use crate::*;
-
-
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// Unexpected check result
 pub enum Unexpected {

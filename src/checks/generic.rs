@@ -1,8 +1,5 @@
-use curl::easy::{Easy2, Handler, WriteError};
-use curl::multi::{Easy2Handle, Multi};
-use ssl_expiration::SslExpiration;
 use std::io::{Error, ErrorKind};
-use std::time::Duration;
+
 
 use crate::*;
 
