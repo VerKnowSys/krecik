@@ -176,7 +176,12 @@ impl Checks<GenCheck> for PongoHost {
                                 .par_iter()
                                 .filter(|vhost| {
                                     !vhost.starts_with("*.")
-                                        && vhost.contains(&mapper.only_vhost_contains)
+                                        && vhost.contains(
+                                            &mapper
+                                                .only_vhost_contains
+                                                .clone()
+                                                .unwrap_or_default(),
+                                        )
                                 }) // filter out wildcard domains and pick only these matching value of only_vhost_contains field
                                 .map(|vhost| {
                                     if active {
