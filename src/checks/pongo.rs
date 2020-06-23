@@ -60,39 +60,14 @@ pub struct PongoHostData {
 }
 
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// /// Remote structure that will be loaded as GenCheck:
-// pub struct PongoReport {
-//     /// Application modules enabled:
-//     #[serde(skip_serializing_if = "Option::is_none")]
-//     pub modules: Option<Vec<String>>,
-
-//     /// Application processes:
-//     #[serde(skip_serializing_if = "Option::is_none")]
-//     pub processes: Option<usize>,
-// }
-
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHostDetails {
-    /// Host IPv4:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub ip: Option<String>,
-
-    /// Primary host name:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub primary_vhost: Option<String>,
-
     /// List of virtual hosts of client:
     pub vhosts: Option<Vec<String>>,
 
     /// Showroom urls of client:
     pub showroom_urls: Option<Vec<String>>,
-
-    /// Backend SSHD port of client:
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub ssh_port: Option<String>,
 }
 
 
@@ -347,11 +322,8 @@ impl Default for PongoHostData {
 impl Default for PongoHostDetails {
     fn default() -> Self {
         Self {
-            ip: None,
-            primary_vhost: None,
             vhosts: None,
             showroom_urls: None,
-            ssh_port: None,
         }
     }
 }
