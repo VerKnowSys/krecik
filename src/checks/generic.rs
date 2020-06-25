@@ -51,12 +51,11 @@ impl Checks<GenCheck> for GenCheck {
                 let failures = history
                     .stories()
                     .iter()
-                    .filter(|story| story.error.is_some())
-                    .map(|story| {
+                    .filter_map(|story| {
                         if let Some(error) = &story.error {
-                            format!("{}\n\n", error)
+                            Some(format!("{}\n\n", error))
                         } else {
-                            String::new()
+                            None
                         }
                     })
                     .collect::<String>();
