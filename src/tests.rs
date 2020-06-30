@@ -7,7 +7,7 @@ mod all_tests {
     use curl::multi::{Easy2Handle, Multi};
     use regex::Regex;
 
-    use ssl_expiration::SslExpiration;
+    use ssl_expiration2::SslExpiration;
     use std::io::{Error, ErrorKind};
     use std::time::Duration;
 

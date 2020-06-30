@@ -2,7 +2,7 @@ use curl::easy::{Easy2, List};
 use curl::multi::{Easy2Handle, Multi};
 use curl::MultiError;
 use rayon::prelude::*;
-use ssl_expiration::SslExpiration;
+use ssl_expiration2::SslExpiration;
 use std::io::{Error, ErrorKind};
 use std::time::Duration;
 
@@ -49,8 +49,7 @@ pub trait Checks<T> {
             .unwrap_or_else(|err| {
                 Story::error(Unexpected::InternalProtocolProblem(
                     domain_name.to_string(),
-                    err.to_string() // HACK: XXX: TODO: clean this hack after ssl-expiration crate update. Author was notified via email
-                        .replace(": description() is deprecated; use Display", ""),
+                    err.to_string(),
                 ))
             })
     }
