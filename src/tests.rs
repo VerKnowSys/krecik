@@ -142,7 +142,7 @@ mod all_tests {
         assert!(handler3after.response_code().unwrap_or_default() == 0); // NOTE: 0 since no connection is possible to non existing server
         assert!(handler2after.download_size().unwrap_or_default() > 0f64); // even if connection failed, we sent some bytes
 
-        multi.close().unwrap_or_default();
+        //multi.close().unwrap_or_default();
     }
 
 
