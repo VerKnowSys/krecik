@@ -49,7 +49,8 @@ pub trait Checks<T> {
             .unwrap_or_else(|err| {
                 Story::error(Unexpected::InternalProtocolProblem(
                     domain_name.to_string(),
-                    err.0.to_string(),
+                    err.to_string() // HACK: XXX: TODO: clean this hack after ssl-expiration crate update. Author was notified via email
+                        .replace(": description() is deprecated; use Display", ""),
                 ))
             })
     }
