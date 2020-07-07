@@ -187,6 +187,22 @@ NOTE: early stage, details may change in future!
 
 
 
+# Build requirements for svdOS systems:
+
+For svdOS (custom HardenedBSD x86_64) servers using Sofin:
+
+Install build requirements with:
+
+`s i Openssl Rust Perl Make`
+
+then publish bundles settings to the environment with:
+
+`s env +Openssl +Rust +Perl +Make`
+
+After build bring back dynamic env setup with:
+
+`s env reset`
+
 
 ![krecik-build](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_dyrygent.png?raw=true)
 
