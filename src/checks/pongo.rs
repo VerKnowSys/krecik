@@ -9,6 +9,28 @@ use std::io::{Error, ErrorKind};
 use crate::*;
 
 
+/// Provide pongo page expectations:
+pub fn pongo_page_expectations() -> PageExpectations {
+    vec![
+        PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),
+        PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT),
+        PageExpectation::ValidAddress("https://".to_string()),
+        PageExpectation::ValidContent("SIGN IN".to_string()),
+    ]
+}
+
+
+/// Provide pongo showroom page expectations:
+pub fn showroom_page_expectations() -> PageExpectations {
+    vec![
+        PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),
+        PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT),
+        PageExpectation::ValidAddress("https://".to_string()),
+        PageExpectation::ValidContent("API: 'https://".to_string()),
+    ]
+}
+
+
 //
 // Data structures based on private Centra API, called "Pongo":
 //
@@ -164,7 +186,7 @@ impl Checks<PongoHost> for PongoHost {
                                                 "{}{}/{}",
                                                 CHECK_DEFAULT_PROTOCOL, vhost, ams
                                             ),
-                                            expects: default_page_expectations(),
+                                            expects: pongo_page_expectations(),
                                             options: None,
                                         })
                                     } else {
@@ -186,7 +208,7 @@ impl Checks<PongoHost> for PongoHost {
                                     if active {
                                         Some(Page {
                                             url: vhost.to_string(),
-                                            expects: default_page_expectations(),
+                                            expects: showroom_page_expectations(),
                                             options: None,
                                         })
                                     } else {
