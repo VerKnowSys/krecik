@@ -19,12 +19,24 @@ pub enum Unexpected {
     /// Curl multi handler failure
     #[fail(display = "Curl handler failure: {}.", _0)]
     HandlerFailed(String),
+
+    /// HttpCode (url, code)
+    #[fail(display = "URL: {} unavailable. Details: {}", _0, _1)]
+    OSError(String, String),
+
+    /// Http connection failed
+    #[fail(
+        display = "URL: {} couldn't be reached in time frame of {} seconds.",
+        _0, _1
+    )]
+    HttpConnectionFailed(String, u64),
+
     /// HttpCode (url, code)
     #[fail(
-        display = "URL: {} responded with unexpected error-code: {}. Expected code: {}",
-        _0, _1, _2
+        display = "URL: {} responded with unexpected error: {}. Expected code: {}. Took: {} seconds.",
+        _0, _1, _2, _3
     )]
-    HttpCodeInvalid(String, u32, u32),
+    HttpCodeInvalid(String, u32, u64, u32),
 
     /// Content - expected content not found where expected
     #[fail(display = "URL: {} response lacks expected content: \"{}\"", _0, _1)]

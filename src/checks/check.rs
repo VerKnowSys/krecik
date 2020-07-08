@@ -1,6 +1,6 @@
 use curl::easy::{Easy2, List};
 use curl::multi::{Easy2Handle, Multi};
-use curl::MultiError;
+use curl::{Error as CurlError, MultiError};
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
 use std::io::{Error, ErrorKind};
@@ -376,11 +376,21 @@ pub trait Checks<T> {
             "process_page_handler::result_final_address_story: {}",
             format!("{:?}", result_final_address_story).magenta()
         );
+        let connect_time = result_handler.connect_time().unwrap_or_default();
+        let connect_oserror = match result_handler.os_errno() {
+            Ok(0) => None,
+            Ok(err_code) => Some(Error::from_raw_os_error(err_code)),
+            Err(error) => Some(Error::from_raw_os_error(error.code() as i32)),
+        };
+        debug!("Connect OS error: {:?}", connect_oserror);
+
         let result_handler_story = Self::handle_page_httpcode_expectation(
             &page_check.url,
+            connect_time,
+            connect_oserror,
             result_handler
                 .response_code()
-                .map_err(|err| Error::new(ErrorKind::Other, err.to_string())),
+                .map_err(Self::produce_curl_response_error),
             expected_code,
         );
         debug!(
@@ -598,6 +608,8 @@ pub trait Checks<T> {
     /// Build a Story from a HttpCode PageExpectation
     fn handle_page_httpcode_expectation(
         url: &str,
+        connect_time: Duration,
+        connect_oserror: Option<Error>,
         response_code: Result<u32, Error>,
         expected_code: &PageExpectation,
     ) -> Story {
@@ -608,12 +620,30 @@ pub trait Checks<T> {
                         Story::success(Expected::HttpCode(url.to_string(), the_code))
                     }
 
-                    &PageExpectation::ValidCode(the_code) => {
+                    &PageExpectation::ValidCode(the_code) if responded_code > 0 => {
                         Story::error(Unexpected::HttpCodeInvalid(
                             url.to_string(),
                             responded_code,
+                            connect_time.as_secs(),
                             the_code,
                         ))
+                    }
+
+                    &PageExpectation::ValidCode(_the_code) if responded_code == 0 => {
+                        match connect_oserror {
+                            Some(error) => {
+                                Story::error(Unexpected::OSError(
+                                    url.to_string(),
+                                    error.to_string(),
+                                ))
+                            }
+                            None => {
+                                Story::error(Unexpected::HttpConnectionFailed(
+                                    url.to_string(),
+                                    CHECK_CONNECTION_TIMEOUT,
+                                ))
+                            }
+                        }
                     }
 
                     edge_case => {
