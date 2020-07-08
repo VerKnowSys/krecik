@@ -301,7 +301,9 @@ pub trait Checks<T> {
                     page_check.url.cyan(),
                     err.to_string().red()
                 );
-                return History::empty();
+                return History::new(Story::error(Unexpected::HandlerFailed(
+                    err.description().to_string(),
+                )));
             }
         };
         let handle = a_handler.get_ref();
@@ -359,7 +361,9 @@ pub trait Checks<T> {
                     page_check.url.cyan(),
                     err.to_string().red()
                 );
-                return History::empty();
+                return History::new(Story::error(Unexpected::HandlerFailed(
+                    err.description().to_string(),
+                )));
             }
         };
         let result_final_address = result_handler.effective_url().unwrap_or_default();

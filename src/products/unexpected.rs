@@ -16,6 +16,9 @@ pub enum Unexpected {
     )]
     AddressInvalid(String, String, String),
 
+    /// Curl multi handler failure
+    #[fail(display = "Curl handler failure: {}.", _0)]
+    HandlerFailed(String),
     /// HttpCode (url, code)
     #[fail(
         display = "URL: {} responded with unexpected error-code: {}. Expected code: {}",
