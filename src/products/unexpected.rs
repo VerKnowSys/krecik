@@ -36,7 +36,7 @@ pub enum Unexpected {
         display = "URL: {} responded with unexpected error: {}. Expected code: {}. Took: {} seconds.",
         _0, _1, _2, _3
     )]
-    HttpCodeInvalid(String, u32, u64, u32),
+    HttpCodeInvalid(String, u32, u32, u64),
 
     /// Content - expected content not found where expected
     #[fail(display = "URL: {} response lacks expected content: \"{}\"", _0, _1)]

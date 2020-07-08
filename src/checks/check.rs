@@ -617,15 +617,21 @@ pub trait Checks<T> {
             Ok(responded_code) => {
                 match expected_code {
                     &PageExpectation::ValidCode(the_code) if responded_code == the_code => {
-                        Story::success(Expected::HttpCode(url.to_string(), the_code))
+                        Story::success(Expected::HttpCode(
+                            url.to_string(),
+                            the_code,
+                            connect_time.as_secs(),
+                        ))
                     }
 
-                    &PageExpectation::ValidCode(the_code) if responded_code > 0 => {
+                    &PageExpectation::ValidCode(the_code)
+                        if responded_code > 0 && responded_code != the_code =>
+                    {
                         Story::error(Unexpected::HttpCodeInvalid(
                             url.to_string(),
                             responded_code,
-                            connect_time.as_secs(),
                             the_code,
+                            connect_time.as_secs(),
                         ))
                     }
 
