@@ -401,6 +401,98 @@ pub trait Checks<T> {
     }
 
 
+    /// Converts CurlError to Error
+    fn produce_curl_response_error(err: CurlError) -> Error {
+        let mut reason = "";
+        if err.is_failed_init() {
+            reason = "CURLE_FAILED_INIT"
+        } // Returns whether this error corresponds to CURLE_FAILED_INIT.
+        if err.is_unsupported_protocol() {
+            reason = "CURLE_UNSUPPORTED_PROTOCOL"
+        } // Returns whether this error corresponds to CURLE_UNSUPPORTED_PROTOCOL.
+        if err.is_couldnt_resolve_proxy() {
+            reason = "CURLE_COULDNT_RESOLVE_PROXY"
+        } // Returns whether this error corresponds to CURLE_COULDNT_RESOLVE_PROXY.
+        if err.is_couldnt_resolve_host() {
+            reason = "CURLE_COULDNT_RESOLVE_HOST"
+        } // Returns whether this error corresponds to CURLE_COULDNT_RESOLVE_HOST.
+        if err.is_couldnt_connect() {
+            reason = "CURLE_COULDNT_CONNECT"
+        } // Returns whether this error corresponds to CURLE_COULDNT_CONNECT.
+        if err.is_remote_access_denied() {
+            reason = "CURLE_REMOTE_ACCESS_DENIED"
+        } // whether this error corresponds to CURLE_REMOTE_ACCESS_DENIED.
+        if err.is_partial_file() {
+            reason = "CURLE_PARTIAL_FILE"
+        } // Returns whether this error corresponds to CURLE_PARTIAL_FILE.
+        if err.is_quote_error() {
+            reason = "CURLE_QUOTE_ERROR"
+        } // Returns whether this error corresponds to CURLE_QUOTE_ERROR.
+        if err.is_http_returned_error() {
+            reason = "CURLE_HTTP_RETURNED_ERROR"
+        } // Returns whether this error corresponds to CURLE_HTTP_RETURNED_ERROR.
+        if err.is_read_error() {
+            reason = "CURLE_READ_ERROR"
+        } // Returns whether this error corresponds to CURLE_READ_ERROR.
+        if err.is_write_error() {
+            reason = "CURLE_WRITE_ERROR"
+        } // Returns whether this error corresponds to CURLE_WRITE_ERROR.
+        if err.is_out_of_memory() {
+            reason = "CURLE_OUT_OF_MEMORY"
+        } // Returns whether this error corresponds to CURLE_OUT_OF_MEMORY.
+        if err.is_operation_timedout() {
+            reason = "CURLE_OPERATION_TIMEDOUT"
+        } // Returns whether this error corresponds to CURLE_OPERATION_TIMEDOUT.
+        if err.is_ssl_connect_error() {
+            reason = "CURLE_SSL_CONNECT_ERROR"
+        } // Returns whether this error corresponds to CURLE_SSL_CONNECT_ERROR.
+        if err.is_ssl_certproblem() {
+            reason = "CURLE_SSL_CERTPROBLEM"
+        } // Returns whether this error corresponds to CURLE_SSL_CERTPROBLEM.
+        if err.is_ssl_cipher() {
+            reason = "CURLE_SSL_CIPHER"
+        } // Returns whether this error corresponds to CURLE_SSL_CIPHER.
+        if err.is_ssl_cacert() {
+            reason = "CURLE_SSL_CACERT"
+        } // Returns whether this error corresponds to CURLE_SSL_CACERT.
+        if err.is_ssl_engine_initfailed() {
+            reason = "CURLE_SSL_ENGINE_INITFAILED"
+        } // Returns whether this error corresponds to CURLE_SSL_ENGINE_INITFAILED.
+        if err.is_ssl_issuer_error() {
+            reason = "CURLE_SSL_ISSUER_ERROR"
+        } // Returns whether this error corresponds to CURLE_SSL_ISSUER_ERROR.
+        if err.is_too_many_redirects() {
+            reason = "CURLE_TOO_MANY_REDIRECTS"
+        } // Returns whether this error corresponds to CURLE_TOO_MANY_REDIRECTS.
+        if err.is_peer_failed_verification() {
+            reason = "CURLE_PEER_FAILED_VERIFICATION"
+        } // Returns whether this error corresponds to CURLE_PEER_FAILED_VERIFICATION.
+        if err.is_got_nothing() {
+            reason = "CURLE_GOT_NOTHING"
+        } // Returns whether this error corresponds to CURLE_GOT_NOTHING.
+        if err.is_ssl_engine_notfound() {
+            reason = "CURLE_SSL_ENGINE_NOTFOUND"
+        } // Returns whether this error corresponds to CURLE_SSL_ENGINE_NOTFOUND.
+        if err.is_ssl_engine_setfailed() {
+            reason = "CURLE_SSL_ENGINE_SETFAILED"
+        } // Returns whether this error corresponds to CURLE_SSL_ENGINE_SETFAILED.
+        if err.is_send_error() {
+            reason = "CURLE_SEND_ERROR"
+        } // Returns whether this error corresponds to CURLE_SEND_ERROR.
+        if err.is_recv_error() {
+            reason = "CURLE_RECV_ERROR"
+        } // Returns whether this error corresponds to CURLE_RECV_ERROR.
+        if err.is_http2_stream_error() {
+            reason = "CURLE_HTTP2_STREAM"
+        } // Returns whether this error corresponds to CURLE_HTTP2_STREAM.
+        if err.is_http2_error() {
+            reason = "CURLE_HTTP2"
+        } // Returns whether this error corresponds to CURLE_HTTP2.
+
+        Error::new(ErrorKind::Other, format!("{} ({})", err, reason))
+    }
+
+
     /// Build a Story from a Length PageExpectation
     fn handle_page_content_expectation(
         url: &str,
