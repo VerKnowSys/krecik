@@ -272,7 +272,7 @@ impl Checks<PongoHost> for PongoHost {
                     .iter()
                     .filter_map(|story| {
                         if let Some(error) = &story.error {
-                            Some(format!("{}\n\n", error))
+                            Some(format!("{}\n", error))
                         } else {
                             None
                         }
