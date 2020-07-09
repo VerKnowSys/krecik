@@ -29,7 +29,7 @@ pub enum Unexpected {
         display = "URL: {} couldn't be reached in time frame of {} ms.",
         _0, _1
     )]
-    HttpConnectionFailed(String, u128),
+    HttpConnectionFailed(String, u64),
 
     /// HttpCode (url, code)
     #[fail(
