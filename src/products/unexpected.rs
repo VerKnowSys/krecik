@@ -33,13 +33,13 @@ pub enum Unexpected {
 
     /// HttpCode (url, code)
     #[fail(
-        display = "URL: {} responded with unexpected error: {}. Expected code: {}. Took: {} ms.",
+        display = "URL: {} returned error: {}. Expected code: {}. Took: {} ms.",
         _0, _1, _2, _3
     )]
     HttpCodeInvalid(String, u32, u32, u128),
 
     /// Content - expected content not found where expected
-    #[fail(display = "URL: {} response lacks expected content: \"{}\"", _0, _1)]
+    #[fail(display = "URL: {} lacks expected content: \"{}\"", _0, _1)]
     ContentInvalid(String, String),
 
     /// Failed content length check
