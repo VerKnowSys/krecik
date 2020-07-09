@@ -201,10 +201,20 @@ pub trait Checks<T> {
 
         // Setup Curl configuration based on given options
         match curl_options.method {
-            Some(Method::PUT) | Some(Method::POST) => {
+            Some(Method::PUT) => {
+                debug!("Curl method: {}", "PUT".magenta());
+                let post_data = curl_options.post_data.unwrap_or_default();
+                curl.get(false).unwrap_or_default();
+                curl.post(false).unwrap_or_default();
+                curl.put(true).unwrap_or_default();
+                curl.post_field_size(post_data.len() as u64)
+                    .unwrap_or_default();
+            }
+            Some(Method::POST) => {
                 debug!("Curl method: {}", "POST".magenta());
                 let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();
+                curl.put(false).unwrap_or_default();
                 curl.post(true).unwrap_or_default();
                 curl.post_field_size(post_data.len() as u64)
                     .unwrap_or_default();
