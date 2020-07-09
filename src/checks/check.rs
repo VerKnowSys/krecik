@@ -303,8 +303,14 @@ pub trait Checks<T> {
         );
 
         // take control over curl handler, perform validations, produce stories…
-        let a_handler = match handler {
-            Ok(handle) => handle,
+        let mut a_handler = match handler {
+            Ok(handle) => {
+                debug!("Calling unpause_read()");
+                handle.unpause_read().unwrap_or_default();
+                debug!("Calling unpause_write()");
+                handle.unpause_write().unwrap_or_default();
+                handle
+            }
             Err(err) => {
                 error!(
                     "Curl-handler FAILURE: URL: {}. Error details: {:?}",
@@ -316,11 +322,11 @@ pub trait Checks<T> {
                 )));
             }
         };
-        let handle = a_handler.get_ref();
-        let raw_page_content = String::from_utf8_lossy(&handle.0);
+        let handle = a_handler.get_mut().0.to_owned();
+        let raw_page_content = String::from_utf8(handle).unwrap_or_default();
         debug!(
             "process_page_handler::raw_page_content: {}",
-            format!("{}", raw_page_content).magenta()
+            raw_page_content.magenta()
         );
         let expected_code = Self::find_code_validation(&page_expectations);
         debug!(
