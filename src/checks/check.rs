@@ -620,7 +620,7 @@ pub trait Checks<T> {
                         Story::success(Expected::HttpCode(
                             url.to_string(),
                             the_code,
-                            connect_time.as_secs(),
+                            connect_time.as_millis(),
                         ))
                     }
 
@@ -631,7 +631,7 @@ pub trait Checks<T> {
                             url.to_string(),
                             responded_code,
                             the_code,
-                            connect_time.as_secs(),
+                            connect_time.as_millis(),
                         ))
                     }
 

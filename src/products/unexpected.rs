@@ -26,17 +26,17 @@ pub enum Unexpected {
 
     /// Http connection failed
     #[fail(
-        display = "URL: {} couldn't be reached in time frame of {} seconds.",
+        display = "URL: {} couldn't be reached in time frame of {} ms.",
         _0, _1
     )]
-    HttpConnectionFailed(String, u64),
+    HttpConnectionFailed(String, u128),
 
     /// HttpCode (url, code)
     #[fail(
-        display = "URL: {} responded with unexpected error: {}. Expected code: {}. Took: {} seconds.",
+        display = "URL: {} responded with unexpected error: {}. Expected code: {}. Took: {} ms.",
         _0, _1, _2, _3
     )]
-    HttpCodeInvalid(String, u32, u32, u64),
+    HttpCodeInvalid(String, u32, u32, u128),
 
     /// Content - expected content not found where expected
     #[fail(display = "URL: {} response lacks expected content: \"{}\"", _0, _1)]

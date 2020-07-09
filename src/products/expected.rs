@@ -60,7 +60,7 @@ pub enum Expected {
         display = "URL: {} returns expected error-code: {}. Took: {} seconds.",
         _0, _1, _2
     )]
-    HttpCode(String, u32, u64),
+    HttpCode(String, u32, u128),
 
     /// Check returned expected page contents
     #[fail(display = "URL: {} contains expected literal: \"{}\".", _0, _1)]
