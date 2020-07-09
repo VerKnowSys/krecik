@@ -57,7 +57,7 @@ pub enum Expected {
 
     /// Check returned expected HTTP error code
     #[fail(
-        display = "URL: {} returns expected error-code: {}. Took: {} seconds.",
+        display = "URL: {} returns expected error-code: {}. Took: {} ms.",
         _0, _1, _2
     )]
     HttpCode(String, u32, u128),
