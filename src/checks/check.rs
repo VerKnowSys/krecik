@@ -689,7 +689,7 @@ pub trait Checks<T> {
                         .perform()
                         .unwrap_or_default() > 0 {
                     multi
-                        .wait(&mut [], Duration::from_secs(1))
+                        .wait(&mut [], Duration::from_secs(CHECK_TIMEOUT))
                         .unwrap_or_default();
                 }
 
