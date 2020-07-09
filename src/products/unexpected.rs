@@ -26,7 +26,7 @@ pub enum Unexpected {
 
     /// Http connection failed
     #[fail(
-        display = "URL: {} couldn't be reached in time frame of {} ms.",
+        display = "URL: {} couldn't be reached in time frame of {} seconds.",
         _0, _1
     )]
     HttpConnectionFailed(String, u64),
