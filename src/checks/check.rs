@@ -25,7 +25,7 @@ pub trait Checks<T> {
 
     /// Check SSL certificate expiration using OpenSSL function
     fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
-        SslExpiration::from_domain_name(&domain_name)
+        SslExpiration::from_domain_name_with_timeout(&domain_name, CHECK_TIMEOUT)
             .and_then(|ssl_validator| {
                 match domain_expectation {
                     DomainExpectation::ValidExpiryPeriod(expected_days)
