@@ -40,7 +40,7 @@ mod all_tests {
         let domain = "google.com";
         let expiration = SslExpiration::from_domain_name(&domain).unwrap();
         assert!(!expiration.is_expired());
-        assert!(expiration.days() > 300);
+        assert!(expiration.days() > 10);
     }
 
 
