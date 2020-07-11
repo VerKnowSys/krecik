@@ -14,8 +14,9 @@ pub fn execute_checks_from_file(check_path: &str) -> History {
     );
     GenCheck::load(&check_path)
         .and_then(|check| {
-            debug!("Executing check: {}", format!("{:?}", check).magenta());
-            Ok(check.execute(&check_path))
+            let file_name = file_name_from_path(check_path);
+            debug!("Executing check: {}", file_name.magenta());
+            Ok(check.execute(&file_name))
         })
         .unwrap_or_else(|err| {
             let error = format!(
