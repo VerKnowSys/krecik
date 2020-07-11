@@ -18,6 +18,9 @@ pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
 /// Default listen address and port:
 pub const LISTEN_ADDRESS: &str = "127.0.0.1:60666";
 
+/// Krecik failures state file
+pub const DEFAULT_FAILURES_STATE_FILE: &str = "/tmp/krecik.last.failures";
+
 /// Check timeout in seconds
 pub const CHECK_TIMEOUT: u64 = 60;
 
