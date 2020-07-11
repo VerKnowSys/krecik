@@ -87,7 +87,7 @@ impl Checks<GenCheck> for GenCheck {
                         }
                     });
                     // send notification only for new error that's not present in failure state
-                    if let Some(_) = send_notification {
+                    if send_notification.is_some() {
                         notify_failure(webhook, channel, &failures);
                     }
                 }
