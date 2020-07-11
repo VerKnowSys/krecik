@@ -34,6 +34,7 @@ pub trait Checks<T> {
                     {
                         Ok(Story::error(Unexpected::TLSDomainExpired(
                             domain_name.to_string(),
+                            ssl_validator.days(),
                         )))
                     }
 
