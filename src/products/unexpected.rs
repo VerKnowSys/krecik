@@ -6,8 +6,11 @@ pub enum Unexpected {
     URLConnectionProblem(String, String),
 
     /// Failed to pass page expectation
-    #[fail(display = "Expired TLS/SSL Certificate for domain: {}.", _0)]
-    TLSDomainExpired(String),
+    #[fail(
+        display = "Expired TLS/SSL Certificate for domain: {}, which is valid only for: {} days.",
+        _0, _1
+    )]
+    TLSDomainExpired(String, i32),
 
     /// Failed to get expected Address
     #[fail(
@@ -32,11 +35,8 @@ pub enum Unexpected {
     HttpConnectionFailed(String, u64),
 
     /// HttpCode (url, code)
-    #[fail(
-        display = "URL: {} returned error: {}. Expected code: {}. Took: {} ms.",
-        _0, _1, _2, _3
-    )]
-    HttpCodeInvalid(String, u32, u32, u128),
+    #[fail(display = "URL: {} returned error: {}. Expected code: {}.", _0, _1, _2)]
+    HttpCodeInvalid(String, u32, u32),
 
     /// Content - expected content not found where expected
     #[fail(display = "URL: {} lacks expected content: \"{}\"", _0, _1)]

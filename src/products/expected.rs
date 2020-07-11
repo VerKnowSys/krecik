@@ -56,11 +56,8 @@ pub enum Expected {
     Address(String, String),
 
     /// Check returned expected HTTP error code
-    #[fail(
-        display = "URL: {} returns expected error-code: {}. Took: {} ms.",
-        _0, _1, _2
-    )]
-    HttpCode(String, u32, u128),
+    #[fail(display = "URL: {} returns expected error-code: {}.", _0, _1)]
+    HttpCode(String, u32),
 
     /// Check returned expected page contents
     #[fail(display = "URL: {} contains expected literal: \"{}\".", _0, _1)]

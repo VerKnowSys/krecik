@@ -392,7 +392,6 @@ pub trait Checks<T> {
             "process_page_handler::result_final_address_story: {}",
             format!("{:?}", result_final_address_story).magenta()
         );
-        let connect_time = result_handler.connect_time().unwrap_or_default();
         let connect_oserror = match result_handler.os_errno() {
             Ok(0) => None,
             Ok(err_code) => Some(Error::from_raw_os_error(err_code)),
@@ -402,7 +401,6 @@ pub trait Checks<T> {
 
         let result_handler_story = Self::handle_page_httpcode_expectation(
             &page_check.url,
-            connect_time,
             connect_oserror,
             result_handler
                 .response_code()
@@ -624,7 +622,6 @@ pub trait Checks<T> {
     /// Build a Story from a HttpCode PageExpectation
     fn handle_page_httpcode_expectation(
         url: &str,
-        connect_time: Duration,
         connect_oserror: Option<Error>,
         response_code: Result<u32, Error>,
         expected_code: &PageExpectation,
@@ -633,11 +630,7 @@ pub trait Checks<T> {
             Ok(responded_code) => {
                 match expected_code {
                     &PageExpectation::ValidCode(the_code) if responded_code == the_code => {
-                        Story::success(Expected::HttpCode(
-                            url.to_string(),
-                            the_code,
-                            connect_time.as_millis(),
-                        ))
+                        Story::success(Expected::HttpCode(url.to_string(), the_code))
                     }
 
                     &PageExpectation::ValidCode(the_code)
@@ -647,7 +640,6 @@ pub trait Checks<T> {
                             url.to_string(),
                             responded_code,
                             the_code,
-                            connect_time.as_millis(),
                         ))
                     }
 
