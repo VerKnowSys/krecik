@@ -4,6 +4,7 @@ use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::io::Error;
+use std::path::Path;
 
 use crate::*;
 
@@ -104,4 +105,15 @@ pub fn write_append(file_path: &str, contents: &str) {
             }
         }
     }
+}
+
+
+/// Extracts file name from full path
+pub fn file_name_from_path(path: &str) -> String {
+    let path = Path::new(path);
+    path.file_name()
+        .unwrap_or_default()
+        .to_os_string()
+        .into_string()
+        .unwrap_or_default()
 }

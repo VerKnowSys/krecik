@@ -369,5 +369,12 @@ mod all_tests {
             .unwrap_or_else(|_err| assert!(false));
     }
 
+
+    #[test]
+    fn test_file_from_path() {
+        let path = "/a/file/somewhere/in/a/woods/of/files/is-my-name.txt";
+        assert!(file_name_from_path(path) == "is-my-name.txt");
+    }
+
     // test POST
 }
