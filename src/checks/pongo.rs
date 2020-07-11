@@ -3,7 +3,9 @@ use curl::easy::Easy2;
 use rayon::prelude::*;
 use regex::Regex;
 
+use std::fs;
 use std::io::{Error, ErrorKind};
+use std::path::Path;
 
 
 use crate::*;
@@ -279,8 +281,35 @@ impl Checks<PongoHost> for PongoHost {
                     })
                     .collect::<String>();
 
-                debug!("Executing notification to channel: {}", &channel);
-                notify_failure(webhook, channel, &failures);
+                debug!("FAILURES: {:?}", failures);
+                if failures.is_empty() {
+                    if Path::new(DEFAULT_FAILURES_STATE_FILE).exists() {
+                        debug!(
+                            "No more failures! Removing failures log file and notifying that failures are gone"
+                        );
+                        fs::remove_file(DEFAULT_FAILURES_STATE_FILE).unwrap_or_default();
+                        notify_success(webhook, channel, "All services are UP again.");
+                    } else {
+                        debug!("All services are OK! No notification sent");
+                    }
+                } else {
+                    // there are errors:
+                    let file_entries =
+                        read_text_file(DEFAULT_FAILURES_STATE_FILE).unwrap_or_default();
+
+                    let send_notification = failures.split('\n').find(|fail| {
+                        if !file_entries.contains(fail) {
+                            write_append(DEFAULT_FAILURES_STATE_FILE, &fail.to_string());
+                            true
+                        } else {
+                            false
+                        }
+                    });
+                    // send notification only for new error that's not present in failure state
+                    if let Some(_) = send_notification {
+                        notify_failure(webhook, channel, &failures);
+                    }
+                }
             }
             (..) => {
                 info!("Notifications not configured hence skipped…");
