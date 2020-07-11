@@ -1,6 +1,8 @@
 use glob::glob;
 use slack_hook::{PayloadBuilder, Slack};
 use std::fs;
+use std::fs::OpenOptions;
+use std::io::prelude::*;
 use std::io::Error;
 
 use crate::*;
@@ -25,12 +27,13 @@ pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str) {
 }
 
 
-// pub fn notify_success(webhook: &str, channel: &str, message: &str) {
-//     notify(webhook, channel, message, ":fasterparrot:")
-// }
+/// Sends success notification to Slack
+pub fn notify_success(webhook: &str, channel: &str, message: &str) {
+    notify(webhook, channel, message, ":white_check_mark:")
+}
 
 
-/// Sends failure notification over Slack
+/// Sends failure notification to Slack
 pub fn notify_failure(webhook: &str, channel: &str, message: &str) {
     notify(webhook, channel, message, DEFAULT_SLACK_FAILURE_ICON)
 }
@@ -76,4 +79,29 @@ pub fn list_check_files_from(checks_dir: &str) -> Vec<String> {
 /// Read text file
 pub fn read_text_file(name: &str) -> Result<String, Error> {
     fs::read_to_string(name)
+}
+
+
+/// Write-once-and-atomic to a file
+pub fn write_append(file_path: &str, contents: &str) {
+    // NOTE: since file is written in "write only, all at once" mode, we have to be sure not to write empty buffer
+    if !contents.is_empty() {
+        let mut options = OpenOptions::new();
+        match options.create(true).append(true).open(&file_path) {
+            Ok(mut file) => {
+                file.write_all(contents.as_bytes()).unwrap_or_else(|_| {
+                    panic!("Access denied? File can't be written: {}", &file_path)
+                });
+                debug!("Atomically written data to file: {}", &file_path);
+            }
+
+            Err(err) => {
+                error!(
+                    "Atomic write to: {} has failed! Cause: {}",
+                    &file_path,
+                    err.to_string()
+                )
+            }
+        }
+    }
 }
