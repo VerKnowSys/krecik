@@ -304,13 +304,14 @@ pub trait Checks<T> {
         );
 
         // take control over curl handler, perform validations, produce stories…
-        let mut a_handler = match handler {
+        let a_handler = match handler {
             Ok(handle) => {
-                debug!("Calling unpause_read()");
-                handle.unpause_read().unwrap_or_default();
-                debug!("Calling unpause_write()");
-                handle.unpause_write().unwrap_or_default();
-                handle
+                if handle.get_ref().0.is_empty() {
+                    debug!("Got an empty output from Curl handle!");
+                    handle
+                } else {
+                    handle
+                }
             }
             Err(err) => {
                 error!(
@@ -323,10 +324,11 @@ pub trait Checks<T> {
                 )));
             }
         };
-        let handle = a_handler.get_mut().0.to_owned();
+
+        let handle = a_handler.get_ref().0.to_owned();
         let raw_page_content = String::from_utf8(handle).unwrap_or_default();
         debug!(
-            "process_page_handler::raw_page_content: {}",
+            "process_page_handler::raw_page_content: {:?}",
             raw_page_content.magenta()
         );
         let expected_code = Self::find_code_validation(&page_expectations);
@@ -687,16 +689,14 @@ pub trait Checks<T> {
         pages
             .and_then(|pages| {
                 // collect tuple of page-checks and Curl handler:
-                let process_handlers: Vec<_> // : Vec<(Page, CurlHandler)>
-                    = pages
-                        .iter()
-                        .map(|check| (check, Self::load_handler_for(&check, &multi)))
-                        .collect();
+                // : Vec<(Page, CurlHandler)>
+                let process_handlers: Vec<_> = pages
+                    .iter()
+                    .map(|check| (check, Self::load_handler_for(&check, &multi)))
+                    .collect();
 
                 // perform all checks at once:
-                while multi
-                        .perform()
-                        .unwrap_or_default() > 0 {
+                while multi.perform().unwrap_or_default() > 0 {
                     multi
                         .wait(&mut [], Duration::from_secs(CHECK_TIMEOUT))
                         .unwrap_or_default();
