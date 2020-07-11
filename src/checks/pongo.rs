@@ -50,6 +50,10 @@ pub struct PongoHost {
     /// Client is active?:
     pub active: Option<bool>,
 
+    /// Curl options:
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub options: Option<PageOptions>,
+
     /// Slack Webhook
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_webhook: Option<String>,
@@ -152,6 +156,7 @@ impl Checks<PongoHost> for PongoHost {
                 let ams = host.clone().data.ams.unwrap_or_default();
                 let active = host.active.unwrap_or_else(|| false);
                 let client = host.clone().client.unwrap_or_default();
+                let options = host.clone().options;
 
                 let pongo_private_token = Regex::new(r"\?token=[A-Za-z0-9_-]*").unwrap();
                 let safe_url = pongo_private_token.replace(&mapper.url, "[[token-masked]]");
@@ -189,7 +194,7 @@ impl Checks<PongoHost> for PongoHost {
                                                 CHECK_DEFAULT_PROTOCOL, vhost, ams
                                             ),
                                             expects: pongo_page_expectations(),
-                                            options: None,
+                                            options: options.clone(),
                                         })
                                     } else {
                                         debug!("Skipping not active client: {}", &client);
@@ -349,6 +354,7 @@ impl Default for PongoHost {
     fn default() -> Self {
         Self {
             data: PongoHostData::default(),
+            options: Some(PageOptions::default()),
             client: None,
             active: None,
             alert_webhook: None,
