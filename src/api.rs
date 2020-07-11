@@ -39,17 +39,17 @@ pub fn execute_checks_from_path(check_path: &str) -> History {
         list_check_files_from(&check_path)
             .into_iter()
             .flat_map(|check_resource| {
-                let check = format!("{}/{}", check_path, check_resource);
-                GenCheck::load(&check)
+                let check_file = format!("{}/{}", check_path, check_resource);
+                GenCheck::load(&check_file)
                     .and_then(|check| {
-                        let file_name = file_name_from_path(&check_path);
+                        let file_name = file_name_from_path(&check_file);
                         debug!("Executing check from file: {}", file_name.magenta());
                         Ok(check.execute(&file_name))
                     })
                     .unwrap_or_else(|err| {
                         let error = format!(
                             "Failed to load check from file: {}. Error details: {}",
-                            &check, err
+                            &check_file, err
                         );
                         error!("{}", error.red());
                         History::new(Story::error(Unexpected::CheckParseProblem(error)))
