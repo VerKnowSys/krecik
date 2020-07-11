@@ -1,6 +1,5 @@
-use colored::Colorize;
-
 use crate::*;
+use colored::Colorize;
 
 
 /**
@@ -16,7 +15,7 @@ pub fn execute_checks_from_file(check_path: &str) -> History {
     GenCheck::load(&check_path)
         .and_then(|check| {
             debug!("Executing check: {}", format!("{:?}", check).magenta());
-            Ok(check.execute())
+            Ok(check.execute(&check_path))
         })
         .unwrap_or_else(|err| {
             let error = format!(
@@ -42,9 +41,9 @@ pub fn execute_checks_from_path(check_path: &str) -> History {
                 let check = format!("{}/{}", check_path, check_resource);
                 GenCheck::load(&check)
                     .and_then(|check| {
-                        let debug = format!("{:?}", check);
-                        debug!("Executing check: {}", debug.magenta());
-                        Ok(check.execute())
+                        let file_name = file_name_from_path(&check_path);
+                        debug!("Executing check from file: {}", file_name.magenta());
+                        Ok(check.execute(&file_name))
                     })
                     .unwrap_or_else(|err| {
                         let error = format!(
@@ -75,9 +74,9 @@ pub fn execute_checks_from_remote_resource_defined_in_path(check_path: &str) -> 
                 debug!("Mapper file: {}", mapper);
                 PongoHost::load(&mapper)
                     .and_then(|check| {
-                        let debug = format!("Executing remote check: {:?}", check);
-                        debug!("{}", debug.magenta());
-                        Ok(check.execute())
+                        let file_name = file_name_from_path(&check_file);
+                        debug!("Executing remote check from file: {}", file_name);
+                        Ok(check.execute(&file_name))
                     })
                     .unwrap_or_else(|err| {
                         let error = format!(

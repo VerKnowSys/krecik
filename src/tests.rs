@@ -251,7 +251,7 @@ mod all_tests {
     #[test]
     fn test_page_check_history_length() {
         let check = GenCheck::load("checks/tests/test2.json").unwrap_or_default();
-        let history = check.execute();
+        let history = check.execute("");
         println!("TEST2({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
         let first = history.head();
@@ -263,7 +263,7 @@ mod all_tests {
     #[test]
     fn test_redirect_no_follow() {
         let check = GenCheck::load("checks/tests/test3.json").unwrap_or_default();
-        let history = check.execute();
+        let history = check.execute("");
         println!("TEST3({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
         history.stories().iter().for_each(|story| {
@@ -276,7 +276,7 @@ mod all_tests {
     #[test]
     fn test_gibberish_url_check() {
         let check = GenCheck::load("checks/tests/test4.json").unwrap_or_default();
-        let history = check.execute();
+        let history = check.execute("");
         println!("TEST4({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
         let first = history.head();
@@ -294,7 +294,7 @@ mod all_tests {
         let options = page.options.clone().unwrap_or_default();
         let cookies = options.cookies;
         let headers = options.headers;
-        let history = check.execute();
+        let history = check.execute("");
         println!("TEST5({}): {}", history.length(), history.to_string());
         assert!(history.length() > 3);
         let first = history.head();
@@ -321,7 +321,7 @@ mod all_tests {
     fn test_when_everything_is_a_failure_test9() {
         GenCheck::load("checks/tests/test9.json")
             .unwrap_or_default()
-            .execute()
+            .execute("")
             .stories()
             .iter()
             .for_each(|story| {
@@ -360,7 +360,7 @@ mod all_tests {
             .and_then(|check| {
                 assert!(check.pages.is_some());
                 assert!(check.domains.is_none());
-                check.execute().stories().iter().for_each(|story| {
+                check.execute("").stories().iter().for_each(|story| {
                     assert!(story.success.is_some());
                     assert!(story.error.is_none());
                 });

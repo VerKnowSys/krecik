@@ -20,7 +20,7 @@ pub trait Checks<T> {
 
 
     /// Execute loaded checks
-    fn execute(&self) -> History;
+    fn execute(&self, execution_name: &str) -> History;
 
 
     /// Check SSL certificate expiration using OpenSSL function

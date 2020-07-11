@@ -40,7 +40,7 @@ impl Checks<GenCheck> for GenCheck {
     }
 
 
-    fn execute(&self) -> History {
+    fn execute(&self, execution_name: &str) -> History {
         let history = History::new_from(
             [
                 Self::check_pages(self.pages.clone()).stories(),
@@ -62,25 +62,27 @@ impl Checks<GenCheck> for GenCheck {
                     })
                     .collect::<String>();
 
+                let failures_state_file =
+                    &format!("{}-{}", DEFAULT_FAILURES_STATE_FILE, execution_name);
+                debug!("Failures state file: {}", failures_state_file);
                 debug!("FAILURES: {:?}", failures);
                 if failures.is_empty() {
-                    if Path::new(DEFAULT_FAILURES_STATE_FILE).exists() {
+                    if Path::new(failures_state_file).exists() {
                         debug!(
                             "No more failures! Removing failures log file and notifying that failures are gone"
                         );
-                        fs::remove_file(DEFAULT_FAILURES_STATE_FILE).unwrap_or_default();
+                        fs::remove_file(failures_state_file).unwrap_or_default();
                         notify_success(webhook, channel, "All services are UP again.");
                     } else {
                         debug!("All services are OK! No notification sent");
                     }
                 } else {
                     // there are errors:
-                    let file_entries =
-                        read_text_file(DEFAULT_FAILURES_STATE_FILE).unwrap_or_default();
+                    let file_entries = read_text_file(failures_state_file).unwrap_or_default();
 
                     let send_notification = failures.split('\n').find(|fail| {
                         if !file_entries.contains(fail) {
-                            write_append(DEFAULT_FAILURES_STATE_FILE, &fail.to_string());
+                            write_append(failures_state_file, &fail.to_string());
                             true
                         } else {
                             false
