@@ -72,7 +72,7 @@ impl Checks<GenCheck> for GenCheck {
                             "No more failures! Removing failures log file and notifying that failures are gone"
                         );
                         fs::remove_file(failures_state_file).unwrap_or_default();
-                        notify_success(webhook, channel, "All services are UP again.");
+                        notify_success(webhook, channel, "All services are UP again.\n");
                     } else {
                         debug!("All services are OK! No notification sent");
                     }
