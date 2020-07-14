@@ -111,11 +111,9 @@ pub trait Checks<T> {
     }
 
 
-    /// Find and extract content validation from validations
-    fn find_content_validations(
-        page_expectations: &[PageExpectation],
-    ) -> Vec<PageExpectation> {
-        let expectations: Vec<PageExpectation> = page_expectations
+    /// Find and extract content validations
+    fn find_content_validations(page_expectations: &[PageExpectation]) -> PageExpectations {
+        page_expectations
             .iter()
             .filter(|exp| {
                 match exp {
@@ -124,9 +122,7 @@ pub trait Checks<T> {
                 }
             })
             .cloned()
-            .collect();
-        expectations
-        // .unwrap_or_else(|| &PageExpectation::ValidNoContent)
+            .collect()
     }
 
 
