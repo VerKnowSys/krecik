@@ -1,6 +1,6 @@
 [package]
 name = "krecik"
-version = "0.8.1"
+version = "0.8.2"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 description = "Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL."
 keywords = ["curl", "web", "check", "tls-expire", "openssl"]
@@ -22,7 +22,7 @@ curl = { version = "0.4.30", features = ["http2", "static-curl", "static-ssl"] }
 
 log = "0.4.8"
 fern = { version = "0.6.0", features = ["colored"] }
-colored = "1.9.3"
+colored = "2.0.0"
 
 serde = "1.0.114"
 serde_derive = "1.0.114"
