@@ -128,7 +128,7 @@ impl Checks<PongoHost> for PongoHost {
         let mapper: PongoRemoteMapper = read_text_file(&remote_file_name)
             .and_then(|file_contents| {
                 serde_json::from_str(&file_contents)
-                    .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
+                    .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
             })
             .unwrap_or_default();
 

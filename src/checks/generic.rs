@@ -35,7 +35,7 @@ impl Checks<GenCheck> for GenCheck {
     fn load(name: &str) -> Result<GenCheck, Error> {
         read_text_file(&name).and_then(|file_contents| {
             serde_json::from_str(&*file_contents)
-                .map_err(|err| Error::new(ErrorKind::Other, err.to_string()))
+                .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
         })
     }
 
