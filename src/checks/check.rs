@@ -112,16 +112,21 @@ pub trait Checks<T> {
 
 
     /// Find and extract content validation from validations
-    fn find_content_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
-        page_expectations
-            .par_iter()
-            .find_any(|exp| {
+    fn find_content_validations(
+        page_expectations: &[PageExpectation],
+    ) -> Vec<PageExpectation> {
+        let expectations: Vec<PageExpectation> = page_expectations
+            .iter()
+            .filter(|exp| {
                 match exp {
                     PageExpectation::ValidContent(_) => true,
                     _ => false,
                 }
             })
-            .unwrap_or_else(|| &PageExpectation::ValidNoContent)
+            .cloned()
+            .collect();
+        expectations
+        // .unwrap_or_else(|| &PageExpectation::ValidNoContent)
     }
 
 
@@ -336,10 +341,10 @@ pub trait Checks<T> {
             "process_page_handler::expected_code: {}",
             format!("{}", expected_code).magenta()
         );
-        let expected_content = Self::find_content_validation(&page_expectations);
+        let expected_contents = Self::find_content_validations(&page_expectations);
         debug!(
-            "process_page_handler::expected_content: {}",
-            format!("{}", expected_content).magenta()
+            "process_page_handler::expected_contents: {}",
+            format!("{:?}", expected_contents).magenta()
         );
         let expected_content_length = Self::find_content_length_validation(&page_expectations);
         debug!(
@@ -353,14 +358,14 @@ pub trait Checks<T> {
         );
 
         // Gather Story from expectations
-        let content_story = Self::handle_page_content_expectation(
+        let content_stories = Self::handle_page_content_expectations(
             &page_check.url,
             &raw_page_content,
-            expected_content,
+            &expected_contents,
         );
         debug!(
             "process_page_handler::content_story: {}",
-            format!("{:?}", content_story).magenta()
+            format!("{:?}", content_stories).magenta()
         );
         let content_length_story = Self::handle_page_length_expectation(
             &page_check.url,
@@ -418,7 +423,7 @@ pub trait Checks<T> {
         // Collect the history results
         History::new_from(
             [
-                History::new(content_story).stories(),
+                content_stories,
                 History::new(content_length_story).stories(),
                 History::new(result_handler_story).stories(),
                 History::new(result_final_address_story).stories(),
@@ -521,36 +526,41 @@ pub trait Checks<T> {
 
 
     /// Build a Story from a Length PageExpectation
-    fn handle_page_content_expectation(
+    fn handle_page_content_expectations(
         url: &str,
         raw_page_content: &str,
-        expected_content: &PageExpectation,
-    ) -> Story {
-        match expected_content {
-            &PageExpectation::ValidContent(ref content)
-                if raw_page_content.contains(content) =>
-            {
-                Story::success(Expected::Content(url.to_string(), content.to_string()))
-            }
+        expected_contents: &[PageExpectation],
+    ) -> Stories {
+        expected_contents
+            .par_iter()
+            .map(|expectation| {
+                match expectation {
+                    PageExpectation::ValidContent(ref content)
+                        if raw_page_content.contains(content) =>
+                    {
+                        Story::success(Expected::Content(url.to_string(), content.to_string()))
+                    }
 
-            &PageExpectation::ValidContent(ref content) => {
-                Story::error(Unexpected::ContentInvalid(
-                    url.to_string(),
-                    content.to_string(),
-                ))
-            }
+                    PageExpectation::ValidContent(ref content) => {
+                        Story::error(Unexpected::ContentInvalid(
+                            url.to_string(),
+                            content.to_string(),
+                        ))
+                    }
 
-            &PageExpectation::ValidNoContent => {
-                Story::success(Expected::EmptyContent(url.to_string()))
-            }
+                    PageExpectation::ValidNoContent => {
+                        Story::success(Expected::EmptyContent(url.to_string()))
+                    }
 
-            edge_case => {
-                Story::error(Unexpected::UnmatchedValidationCase(
-                    url.to_string(),
-                    edge_case.to_string(),
-                ))
-            }
-        }
+                    edge_case => {
+                        Story::error(Unexpected::UnmatchedValidationCase(
+                            url.to_string(),
+                            format!("{:?}", edge_case),
+                        ))
+                    }
+                }
+            })
+            .collect::<Stories>()
     }
 
 
