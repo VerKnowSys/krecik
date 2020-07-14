@@ -317,8 +317,14 @@ impl Checks<PongoHost> for PongoHost {
                         }
                     });
                     // send notification only for new error that's not present in failure state
+                    let failures_to_notify = failures
+                        .split('\n')
+                        .filter(|fail| !file_entries.contains(fail))
+                        .map(|fail| format!("{}\n", fail))
+                        .collect::<String>();
+
                     if send_notification.is_some() {
-                        notify_failure(webhook, channel, &failures);
+                        notify_failure(webhook, channel, &failures_to_notify);
                     }
                 }
             }
