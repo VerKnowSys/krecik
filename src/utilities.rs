@@ -1,5 +1,5 @@
 use glob::glob;
-use slack_hook::{PayloadBuilder, Slack};
+use slack_hook::{AttachmentBuilder, PayloadBuilder, Slack};
 use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
@@ -10,14 +10,26 @@ use crate::*;
 
 
 /// Sends generic notification over Slack
-pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str) {
+pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str, fail: bool) {
     Slack::new(webhook)
         .and_then(|slack| {
             PayloadBuilder::new()
-                .text(message)
                 .channel(channel)
                 .username(DEFAULT_SLACK_NAME)
                 .icon_emoji(icon)
+                .attachments(vec![
+                    if fail {
+                        AttachmentBuilder::new(message)
+                            .color(DEFAULT_SLACK_FAILURE_COLOR)
+                            .build()
+                            .unwrap_or_default()
+                    } else {
+                        AttachmentBuilder::new(message)
+                            .color(DEFAULT_SLACK_SUCCESS_COLOR)
+                            .build()
+                            .unwrap_or_default()
+                    },
+                ])
                 .build()
                 .and_then(|payload| {
                     debug!("Sending notification with payload: {:?}", &payload);
@@ -30,13 +42,13 @@ pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str) {
 
 /// Sends success notification to Slack
 pub fn notify_success(webhook: &str, channel: &str, message: &str) {
-    notify(webhook, channel, message, ":white_check_mark:")
+    notify(webhook, channel, message, DEFAULT_SLACK_SUCCESS_ICON, false)
 }
 
 
 /// Sends failure notification to Slack
 pub fn notify_failure(webhook: &str, channel: &str, message: &str) {
-    notify(webhook, channel, message, DEFAULT_SLACK_FAILURE_ICON)
+    notify(webhook, channel, message, DEFAULT_SLACK_FAILURE_ICON, true)
 }
 
 
