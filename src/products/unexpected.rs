@@ -7,7 +7,7 @@ pub enum Unexpected {
 
     /// Failed to pass page expectation
     #[fail(
-        display = "Expired TLS/SSL Certificate for domain: {}, which is valid only for: {} days.",
+        display = "Expired SSL certificate for domain: {}, which is valid only for: {} days.",
         _0, _1
     )]
     TLSDomainExpired(String, i32),
