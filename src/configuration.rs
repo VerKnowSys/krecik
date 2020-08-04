@@ -12,6 +12,15 @@ pub const DEFAULT_SLACK_NAME: &str = "Krecik";
 /// Default Notification failure icon:
 pub const DEFAULT_SLACK_FAILURE_ICON: &str = ":krecik-failure:";
 
+/// Default Notification success icon:
+pub const DEFAULT_SLACK_SUCCESS_ICON: &str = ":white_check_mark:";
+
+/// Default failure notification color:
+pub const DEFAULT_SLACK_FAILURE_COLOR: &str = "#ff1111";
+
+/// Default success notification color:
+pub const DEFAULT_SLACK_SUCCESS_COLOR: &str = "#00ff00";
+
 /// Default stdout:
 pub const DEFAULT_STDOUT_DEV: &str = "/dev/stdout";
 
