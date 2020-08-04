@@ -59,7 +59,7 @@ pub fn produce_list(glob_pattern: &str) -> Vec<String> {
         match entry {
             Ok(path) => {
                 if let Some(element) = path.file_name() {
-                    element.to_str().and_then(|elem| {
+                    element.to_str().map(|elem| {
                         list.push(elem.to_string());
                         Some(elem.to_string())
                     });

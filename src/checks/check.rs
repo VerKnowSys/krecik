@@ -26,24 +26,24 @@ pub trait Checks<T> {
     /// Check SSL certificate expiration using OpenSSL function
     fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
         SslExpiration::from_domain_name_with_timeout(&domain_name, CHECK_TIMEOUT)
-            .and_then(|ssl_validator| {
+            .map(|ssl_validator| {
                 match domain_expectation {
                     DomainExpectation::ValidExpiryPeriod(expected_days)
                         if ssl_validator.days() < expected_days
                             || ssl_validator.is_expired() =>
                     {
-                        Ok(Story::error(Unexpected::TLSDomainExpired(
+                        Story::error(Unexpected::TLSDomainExpired(
                             domain_name.to_string(),
                             ssl_validator.days(),
-                        )))
+                        ))
                     }
 
                     DomainExpectation::ValidExpiryPeriod(expected_days) => {
-                        Ok(Story::success(Expected::TLSCertificateFresh(
+                        Story::success(Expected::TLSCertificateFresh(
                             domain_name.to_string(),
                             ssl_validator.days(),
                             expected_days,
-                        )))
+                        ))
                     }
                 }
             })
@@ -693,7 +693,7 @@ pub trait Checks<T> {
         let mut multi = Multi::new();
         multi.pipelining(true, true).unwrap_or_default();
         pages
-            .and_then(|pages| {
+            .map(|pages| {
                 // collect tuple of page-checks and Curl handler:
                 // : Vec<(Page, CurlHandler)>
                 let process_handlers: Vec<_> = pages
@@ -709,8 +709,7 @@ pub trait Checks<T> {
                 }
 
                 // Collect History of results:
-                Some(
-                     History::new_from(
+                History::new_from(
                         process_handlers
                             .into_iter()
                             .flat_map(|(check, handler)|
@@ -737,7 +736,6 @@ pub trait Checks<T> {
                             )
                             .collect()
                     )
-                )
             })
             .unwrap_or_else(History::empty)
     }

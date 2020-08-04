@@ -13,10 +13,10 @@ pub fn execute_checks_from_file(check_path: &str) -> History {
         &check_path.cyan()
     );
     GenCheck::load(&check_path)
-        .and_then(|check| {
+        .map(|check| {
             let file_name = file_name_from_path(check_path);
             debug!("Executing check: {}", file_name.magenta());
-            Ok(check.execute(&file_name))
+            check.execute(&file_name)
         })
         .unwrap_or_else(|err| {
             let error = format!(
@@ -41,10 +41,10 @@ pub fn execute_checks_from_path(check_path: &str) -> History {
             .flat_map(|check_resource| {
                 let check_file = format!("{}/{}", check_path, check_resource);
                 GenCheck::load(&check_file)
-                    .and_then(|check| {
+                    .map(|check| {
                         let file_name = file_name_from_path(&check_file);
                         debug!("Executing check from file: {}", file_name.magenta());
-                        Ok(check.execute(&file_name))
+                        check.execute(&file_name)
                     })
                     .unwrap_or_else(|err| {
                         let error = format!(
@@ -74,10 +74,10 @@ pub fn execute_checks_from_remote_resource_defined_in_path(check_path: &str) -> 
                 let mapper = format!("{}/{}", check_path, check_file);
                 debug!("Mapper file: {}", mapper);
                 PongoHost::load(&mapper)
-                    .and_then(|check| {
+                    .map(|check| {
                         let file_name = file_name_from_path(&check_file);
                         debug!("Executing remote check from file: {}", file_name);
-                        Ok(check.execute(&file_name))
+                        check.execute(&file_name)
                     })
                     .unwrap_or_else(|err| {
                         let error = format!(

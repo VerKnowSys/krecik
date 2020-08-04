@@ -334,7 +334,7 @@ mod all_tests {
     #[test]
     fn test_parsing_bogus_validators() {
         GenCheck::load("checks/tests/test10.json")
-            .and_then(|_check| Ok(assert!(false)))
+            .map(|_check| assert!(false))
             .unwrap_or_else(|err| {
                 assert!(
                     err.to_string()
@@ -347,7 +347,7 @@ mod all_tests {
     #[test]
     fn test_parsing_invalid_validator_value_type() {
         GenCheck::load("checks/tests/test11.json")
-            .and_then(|_check| Ok(assert!(false)))
+            .map(|_check| assert!(false))
             .unwrap_or_else(|err| {
                 assert!(err.to_string().contains("invalid type: string"));
             });
@@ -357,14 +357,13 @@ mod all_tests {
     #[test]
     fn test_empty_check() {
         GenCheck::load("checks/tests/test12.json")
-            .and_then(|check| {
+            .map(|check| {
                 assert!(check.pages.is_some());
                 assert!(check.domains.is_none());
                 check.execute("").stories().iter().for_each(|story| {
                     assert!(story.success.is_some());
                     assert!(story.error.is_none());
                 });
-                Ok(())
             })
             .unwrap_or_else(|_err| assert!(false));
     }
