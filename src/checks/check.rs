@@ -48,7 +48,7 @@ pub trait Checks<T> {
                 }
             })
             .unwrap_or_else(|err| {
-                Story::error(Unexpected::InternalProtocolProblem(
+                Story::minor(UnexpectedMinor::InternalProtocolProblem(
                     domain_name.to_string(),
                     err.to_string(),
                 ))
@@ -655,7 +655,7 @@ pub trait Checks<T> {
                     &PageExpectation::ValidCode(_the_code) if responded_code == 0 => {
                         match connect_oserror {
                             Some(error) => {
-                                Story::error(Unexpected::OSError(
+                                Story::minor(UnexpectedMinor::OSError(
                                     url.to_string(),
                                     error.to_string(),
                                 ))

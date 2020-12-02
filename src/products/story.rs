@@ -20,6 +20,10 @@ pub struct Story {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub success: Option<Expected>,
 
+    /// Story - minor failure
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub minor: Option<UnexpectedMinor>,
+
     /// Story - keep history of unexpected results (failures)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<Unexpected>,
@@ -33,6 +37,7 @@ impl Story {
             count: 1,
             timestamp: Local::now().to_rfc3339(),
             success: Some(success),
+            minor: None,
             error: None,
         }
     }
@@ -44,7 +49,20 @@ impl Story {
             count: 1,
             timestamp: Local::now().to_rfc3339(),
             success: None,
+            minor: None,
             error: Some(error),
+        }
+    }
+
+
+    /// New minor-failure-story (not notified)
+    pub fn minor(minor: UnexpectedMinor) -> Story {
+        Story {
+            count: 1,
+            timestamp: Local::now().to_rfc3339(),
+            success: None,
+            minor: Some(minor),
+            error: None,
         }
     }
 }
