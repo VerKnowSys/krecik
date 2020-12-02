@@ -253,7 +253,7 @@ mod all_tests {
         let check = GenCheck::load("checks/tests/test2.json").unwrap_or_default();
         let history = check.execute("");
         println!("TEST2({}): {}", history.length(), history.to_string());
-        assert!(history.length() > 3);
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
@@ -265,10 +265,11 @@ mod all_tests {
         let check = GenCheck::load("checks/tests/test3.json").unwrap_or_default();
         let history = check.execute("");
         println!("TEST3({}): {}", history.length(), history.to_string());
-        assert!(history.length() > 3);
+        assert!(history.length() == 3);
         history.stories().iter().for_each(|story| {
             assert!(story.success.is_some());
             assert!(story.error.is_none());
+            assert!(story.minor.is_none());
         });
     }
 
@@ -278,12 +279,13 @@ mod all_tests {
         let check = GenCheck::load("checks/tests/test4.json").unwrap_or_default();
         let history = check.execute("");
         println!("TEST4({}): {}", history.length(), history.to_string());
-        assert!(history.length() > 3);
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
         assert!(first.success.is_some());
         assert!(first.error.is_none());
+        assert!(first.minor.is_none());
     }
 
 
@@ -296,7 +298,7 @@ mod all_tests {
         let headers = options.headers;
         let history = check.execute("");
         println!("TEST5({}): {}", history.length(), history.to_string());
-        assert!(history.length() > 3);
+        assert!(history.length() == 3);
         let first = history.head();
         assert!(headers.is_some());
         assert!(cookies.is_some());
@@ -326,7 +328,7 @@ mod all_tests {
             .iter()
             .for_each(|story| {
                 assert!(story.success.is_none());
-                assert!(story.error.is_some());
+                assert!(story.minor.is_some() || story.error.is_some()); // validation check for undefined domain is minor not error
             });
     }
 
