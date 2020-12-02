@@ -80,6 +80,9 @@ pub trait Checks<T> {
                                                 Story{ success: None, error: Some(error_msg), .. } =>
                                                     error!("Domain TLS-cert validity Story of: FAILURE: {}", error_msg.to_string().red()),
 
+                                                Story{ success: None, error: None, minor: Some(error_msg), .. } =>
+                                                    warn!("Domain TLS-cert validity Story of: MINOR FAILURE: {}", error_msg.to_string().red()),
+
                                                 Story{ success: None, error: None, .. } =>
                                                     warn!("Domain TLS-cert validity Story of: WARNING: {}", "Ambiguous Story that lacks both success and error?!".yellow()),
 
@@ -723,6 +726,9 @@ pub trait Checks<T> {
 
                                             Story{ success: None, error: Some(error_msg), .. } =>
                                                 error!("Web-page Story of: FAILURE: {}", error_msg.to_string().red()),
+
+                                            Story{ success: None, error: None, minor: Some(error_msg), .. } =>
+                                                error!("Web-page Story of: MINOR FAILURE: {}", error_msg.to_string().red()),
 
                                             Story{ success: None, error: None, .. } =>
                                                 warn!("Web-page Story of: WARNING: {}", "Ambiguous Story that lacks both success and error?!".yellow()),
