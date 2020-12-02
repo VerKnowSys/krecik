@@ -1,4 +1,19 @@
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
+/// Unexpected check result that's considered minor - we don't want notifications from those
+pub enum UnexpectedMinor {
+    /// HttpCode (url, code)
+    #[fail(display = "URL: {} unavailable. Details: {}", _0, _1)]
+    OSError(String, String),
+
+    /// Failed internal function
+    #[fail(
+        display = "InternalProtocolProblemFailure on: {}. Details: {}.",
+        _0, _1
+    )]
+    InternalProtocolProblem(String, String),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// Unexpected check result
 pub enum Unexpected {
     /// Failed to pass page expectation
@@ -23,10 +38,6 @@ pub enum Unexpected {
     #[fail(display = "Curl handler failure: {}.", _0)]
     HandlerFailed(String),
 
-    /// HttpCode (url, code)
-    #[fail(display = "URL: {} unavailable. Details: {}", _0, _1)]
-    OSError(String, String),
-
     /// Http connection failed
     #[fail(
         display = "URL: {} couldn't be reached in time frame of {} seconds.",
@@ -48,13 +59,6 @@ pub enum Unexpected {
         _0, _1, _2
     )]
     ContentLengthInvalid(String, usize, usize),
-
-    /// Failed internal function
-    #[fail(
-        display = "InternalProtocolProblemFailure on: {}. Details: {}.",
-        _0, _1
-    )]
-    InternalProtocolProblem(String, String),
 
     /// Check file parse error
     #[fail(
