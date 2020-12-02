@@ -190,7 +190,7 @@ impl Checks<PongoHost> for PongoHost {
                                     if active {
                                         Some(Page {
                                             url: format!(
-                                                "{}{}/{}",
+                                                "{}{}/{}/",
                                                 CHECK_DEFAULT_PROTOCOL, vhost, ams
                                             ),
                                             expects: pongo_page_expectations(),
