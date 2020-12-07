@@ -38,7 +38,7 @@ pub fn showroom_page_expectations() -> PageExpectations {
 //
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHost {
     /// Client data:
@@ -72,7 +72,7 @@ pub struct PongoHost {
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHostData {
     /// Host inner object:
@@ -88,7 +88,7 @@ pub struct PongoHostData {
 }
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Remote structure that will be loaded as GenCheck:
 pub struct PongoHostDetails {
     /// List of virtual hosts of client:
@@ -103,7 +103,7 @@ pub struct PongoHostDetails {
 pub type PongoHosts = Vec<PongoHost>;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Map Remote fields/values mapper structure to GenCheck:
 pub struct PongoRemoteMapper {
     /// Resource URL
@@ -343,55 +343,5 @@ impl ToString for PongoRemoteMapper {
         serde_json::to_string(&self).unwrap_or_else(|_| {
             String::from("{\"status\": \"PongoRemoteMapper serialization failure\"}")
         })
-    }
-}
-
-
-/// Implement default for PongoRemoteMapper:
-impl Default for PongoRemoteMapper {
-    fn default() -> Self {
-        Self {
-            url: String::new(),
-            only_vhost_contains: None,
-            alert_webhook: None,
-            alert_channel: None,
-        }
-    }
-}
-
-
-impl Default for PongoHost {
-    fn default() -> Self {
-        Self {
-            data: PongoHostData::default(),
-            options: Some(PageOptions::default()),
-            client: None,
-            active: None,
-            alert_webhook: None,
-            alert_channel: None,
-            domains: None,
-            pages: None,
-        }
-    }
-}
-
-
-impl Default for PongoHostData {
-    fn default() -> Self {
-        Self {
-            host: None,
-            env: None,
-            ams: None,
-        }
-    }
-}
-
-
-impl Default for PongoHostDetails {
-    fn default() -> Self {
-        Self {
-            vhosts: None,
-            showroom_urls: None,
-        }
     }
 }

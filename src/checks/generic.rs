@@ -10,7 +10,7 @@ use crate::*;
 ///       Decission is justified by lack of JSON comment ability, and other file-specific and sync troubles,
 ///       but also for future editing/ enable/ disable abilities that would be much more complicated with support of several checks per file.
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Generic Check structure:
 pub struct GenCheck {
     /// Domains to check
@@ -109,17 +109,5 @@ impl Checks<GenCheck> for GenCheck {
             }
         };
         history
-    }
-}
-
-
-impl Default for GenCheck {
-    fn default() -> GenCheck {
-        GenCheck {
-            pages: None,
-            domains: None,
-            alert_channel: None,
-            alert_webhook: None,
-        }
     }
 }
