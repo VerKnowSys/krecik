@@ -694,7 +694,8 @@ pub trait Checks<T> {
     /// Check pages
     fn check_pages(pages: Option<Pages>) -> History {
         let mut multi = Multi::new();
-        multi.pipelining(true, true).unwrap_or_default();
+        // http1.1, http2-multiplex
+        multi.pipelining(false, true).unwrap_or_default();
         pages
             .map(|pages| {
                 // collect tuple of page-checks and Curl handler:
