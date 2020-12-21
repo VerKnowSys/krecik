@@ -70,7 +70,7 @@ pub trait Checks<T> {
                                 // Process Domain expectations using parallel iterator (Rayon):
                                 History::new_from(
                                     domain_expectations
-                                        .into_par_iter()
+                                        .into_iter()
                                         .map(|domain_expectation| {
                                             let domain_story = Self::check_ssl_expire(&domain_name, domain_expectation);
                                             match domain_story.clone() {
@@ -719,7 +719,7 @@ pub trait Checks<T> {
                             .flat_map(|(check, handler)|
                                 Self::process_page_handler(&check, handler, &multi)
                                     .stories()
-                                    .into_par_iter()
+                                    .into_iter()
                                     .map(|new_story| {
                                         match new_story.clone() {
                                             Story{ success: Some(success_msg), error: None, .. } =>
