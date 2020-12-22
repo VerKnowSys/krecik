@@ -117,7 +117,7 @@ pub trait Checks<T> {
     /// Find and extract content validations
     fn find_content_validations(page_expectations: &[PageExpectation]) -> PageExpectations {
         page_expectations
-            .iter()
+            .par_iter()
             .filter(|exp| {
                 match exp {
                     PageExpectation::ValidContent(_) => true,
