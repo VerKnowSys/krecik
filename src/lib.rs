@@ -20,7 +20,8 @@
 
 /// Use Jemalloc as default allocator:
 #[global_allocator]
-static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+// static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 
 // Load all useful macros:
