@@ -182,6 +182,12 @@ pub trait Checks<T> {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
         curl.url(&page_check.url).unwrap_or_default();
+        curl.useragent(&format!(
+            "{name}/{version} (+github.com/verknowsys/krecik)",
+            name = DEFAULT_SLACK_NAME,
+            version = env!("CARGO_PKG_VERSION")
+        ))
+        .unwrap_or_default();
         debug!("Curl URL:: {}", format!("{}", &page_check.url.magenta()));
 
         // Load Curl request options from check:
