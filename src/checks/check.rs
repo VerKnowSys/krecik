@@ -1,10 +1,14 @@
-use curl::easy::{Easy2, List};
-use curl::multi::{Easy2Handle, Multi};
-use curl::{Error as CurlError, MultiError};
+use curl::{
+    easy::{Easy2, List},
+    multi::{Easy2Handle, Multi},
+    Error as CurlError, MultiError,
+};
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
-use std::io::{Error, ErrorKind};
-use std::time::Duration;
+use std::{
+    io::{Error, ErrorKind},
+    time::Duration,
+};
 
 use crate::*;
 
@@ -311,7 +315,7 @@ pub trait Checks<T> {
         let a_handler = match handler {
             Ok(handle) => {
                 if handle.get_ref().0.is_empty() {
-                    debug!("Got an empty output from Curl handle!");
+                    warn!("Got an empty output from Curl handle!");
                     handle
                 } else {
                     handle
