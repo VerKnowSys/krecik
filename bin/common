@@ -75,9 +75,19 @@ sanity_checks () {
         failure "Unavailable Perl >= 5.x! (Expected 'perl' in \$PATH!)"
     fi
 
-    if [ ! -x "$(which make)" ]
+    if [ ! -x "$(which gmake)" ]
     then
-        failure "Unavailable utility: Make! (Expected 'make' in \$PATH!)"
+        failure "Unavailable utility: Gmake! (Expected 'gmake' in \$PATH!)"
+    fi
+
+    if [ ! -x "$(which cmake)" ]
+    then
+        failure "Unavailable utility: Cmake! (Expected 'cmake' in \$PATH!)"
+    fi
+
+    if [ ! -x "$(which openssl)" ]
+    then
+        failure "Unavailable utility: OpenSSL/ LibreSSL! (Expected 'openssl' in \$PATH!)"
     fi
 
     if [ ! -x "$(which grep)" ] \
