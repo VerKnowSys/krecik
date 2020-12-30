@@ -15,7 +15,7 @@
     unused_qualifications
 )]
 // For development:
-// #![allow(dead_code, unused_imports, unused_variables)]
+#![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
 
 /// Use Jemalloc as default allocator:
@@ -54,7 +54,7 @@ use curl::easy::{Handler, WriteError};
 
 /// Collects async content from Curl:
 #[derive(Debug)]
-pub struct Collector(Vec<u8>);
+pub struct Collector(pub Vec<u8>);
 
 
 impl Handler for Collector {

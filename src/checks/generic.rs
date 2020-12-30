@@ -1,15 +1,37 @@
+use actix::prelude::*;
 use std::fs;
 use std::io::{Error, ErrorKind};
 use std::path::Path;
 
-
 use crate::*;
 
 
-/// NOTE: Pigeon (previous implementation) supported list of checks per file. TravMole will require each JSON to be separate file.
-///       Decission is justified by lack of JSON comment ability, and other file-specific and sync troubles,
-///       but also for future editing/ enable/ disable abilities that would be much more complicated with support of several checks per file.
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Message)]
+#[rtype(result = "Result<Stories, Stories>")]
+/// Generic Check structure:
+pub struct Check {
+    /// Domains to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domains: Option<Domains>,
 
+    /// Pages to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pages: Option<Pages>,
+
+    /// Slack Webhook
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alert_webhook: Option<String>,
+
+    /// Slack alert channel
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alert_channel: Option<String>,
+}
+
+/// Alias type for list of checks
+pub type CheckList = Vec<Check>;
+
+
+#[deprecated(since = "0.9.0")]
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Generic Check structure:
 pub struct GenCheck {

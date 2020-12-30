@@ -1,3 +1,4 @@
+use actix::prelude::*;
 use chrono::Local;
 
 use crate::*;
@@ -7,8 +8,9 @@ use crate::*;
 pub type Stories = Vec<Story>;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-/// Story holds errornous state
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Message)]
+#[rtype(result = "Story")]
+/// Story holds the story of a check. It can be either: success, error or minor
 pub struct Story {
     /// Story - timestamp
     pub timestamp: String,

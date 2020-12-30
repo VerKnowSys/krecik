@@ -1,10 +1,10 @@
 [package]
 name = "krecik"
-version = "0.8.5"
+version = "0.10.0"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 description = "Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL."
-keywords = ["curl", "web", "check", "tls-expire", "openssl"]
-categories = ["asynchronous", "concurrency"]
+keywords = ["curl", "web", "check", "tls-expire", "openssl", "actix"]
+categories = ["asynchronous", "concurrency", "actors"]
 homepage = "https://github.com/VerKnowSys/krecik"
 license = "MIT"
 edition = "2018"
@@ -16,6 +16,9 @@ name = "krecik"
 path = "src/lib.rs"
 crate-type = ["rlib"]
 
+[[bin]]
+name = "krecik-server"
+path = "src/main.rs"
 
 [dependencies]
 curl = { version = "0.4.34", features = ["http2", "static-curl", "static-ssl"] }
@@ -26,7 +29,7 @@ colored = "2.0.0"
 
 serde = "1.0.118"
 serde_derive = "1.0.118"
-serde_json = "1.0.60"
+serde_json = "1.0.61"
 
 lazy_static = "1.4.0"
 rayon = "1.5.0"
@@ -46,6 +49,10 @@ bencher = "0.1.5"
 mimalloc = { version = "0.1.22", default-features = false }
 
 slack-hook = "0.8.0"
+actix = "0.10.0"
+actix-macros = "0.1.3"
+actix-rt = "1.1.1"
+actix_derive = "0.5.0"
 
 # uuid = { version = "0.7", features = ["v4"] }
 # rand = "0.4"
