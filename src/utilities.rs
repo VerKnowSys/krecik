@@ -52,17 +52,36 @@ pub fn notify_failure(webhook: &str, channel: &str, message: &str) {
 }
 
 
+/// Produce list of absolute paths to all files matching given glob pattern:
+pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
+    let mut list = vec![];
+    for entry in glob(&glob_pattern).unwrap() {
+        match entry {
+            Ok(path) => {
+                match path.to_str() {
+                    Some(element) => list.push(element.to_string()),
+                    None => (),
+                }
+            }
+            Err(err) => {
+                error!("Error: produce_list(): {}", err);
+            }
+        }
+    }
+    debug!("produce_list_absolute(): Elements: {:?}", list);
+    list
+}
+
+
 /// Produce list of dirs/files matching given glob pattern:
 pub fn produce_list(glob_pattern: &str) -> Vec<String> {
     let mut list = vec![];
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
-                if let Some(element) = path.file_name() {
-                    element.to_str().map(|elem| {
-                        list.push(elem.to_string());
-                        Some(elem.to_string())
-                    });
+                match path.file_name().unwrap_or_default().to_str() {
+                    Some(element) => list.push(element.to_string()),
+                    None => (),
                 }
             }
             Err(err) => {
@@ -86,6 +105,14 @@ pub fn list_check_files_from(checks_dir: &str) -> Vec<String> {
     let glob_pattern = format!("{}/*.json", checks_dir);
     debug!("list_check_files(): {}", glob_pattern);
     produce_list(&glob_pattern)
+}
+
+
+/// List all check files from given dir
+pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
+    let glob_pattern = format!("{}/**/*.json", checks_dir);
+    debug!("list_all_checks_from(): {}", glob_pattern);
+    produce_list_absolute(&glob_pattern)
 }
 
 
