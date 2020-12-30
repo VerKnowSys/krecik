@@ -198,7 +198,7 @@ pub trait Checks<T> {
         );
 
         // Setup Curl configuration based on given options
-        if curl_options.follow_redirects.unwrap_or_else(|| true) {
+        if curl_options.follow_redirects.unwrap_or(true) {
             debug!("Enabled following redirects.");
             curl.follow_location(true).unwrap_or_default();
         } else {
@@ -276,7 +276,7 @@ pub trait Checks<T> {
         .unwrap_or_default();
 
         // Verify SSL PEER
-        if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
+        if curl_options.ssl_verify_peer.unwrap_or(true) {
             debug!("Enabled TLS-PEER verification.");
             curl.ssl_verify_peer(true).unwrap_or_default();
         } else {
@@ -285,7 +285,7 @@ pub trait Checks<T> {
         }
 
         // Verify SSL HOST
-        if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
+        if curl_options.ssl_verify_host.unwrap_or(true) {
             debug!("Enabled TLS-HOST verification.");
             curl.ssl_verify_host(true).unwrap_or_default();
         } else {
