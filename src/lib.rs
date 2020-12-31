@@ -84,6 +84,8 @@ pub mod products;
 /// Checks API functions:
 pub mod api;
 
+/// Actors:
+pub mod actors;
 
 //
 // Private modules:

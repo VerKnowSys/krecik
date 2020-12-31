@@ -1,3 +1,5 @@
+use std::io::{Error, ErrorKind};
+
 use crate::*;
 use colored::Colorize;
 
@@ -5,6 +7,22 @@ use colored::Colorize;
 /**
    Public library API for Krecik remote-checks functionality
 **/
+
+/// Return checks from path
+pub fn all_checks() -> Vec<Check> {
+    list_all_checks_from(CHECKS_DIR)
+        .iter()
+        .map(|check_file| {
+            read_text_file(&check_file)
+                .and_then(|file_contents| {
+                    serde_json::from_str(&*file_contents)
+                        .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
+                })
+                .unwrap_or_default()
+        })
+        .collect()
+}
+
 
 /// Execute single check by exact file
 pub fn execute_checks_from_file(check_path: &str) -> History {
