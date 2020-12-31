@@ -97,29 +97,26 @@ async fn main() {
     setup_logger(logger_level).unwrap_or_default();
 
     // Define system actors
-    let curl_multi_checker = SyncArbiter::start(4, || CurlMultiChecker);
-    let curl_multi_checker_pongo = SyncArbiter::start(4, || CurlMultiCheckerPongo);
+    let curl_multi_checker = SyncArbiter::start(2, || CurlMultiChecker);
+    let curl_multi_checker_pongo = SyncArbiter::start(2, || CurlMultiCheckerPongo);
 
     // let results_warden = ResultsWarden::start(1, || )
-
     // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
 
-    match curl_multi_checker
+    let regular_checks = curl_multi_checker
         .send(Checks(all_checks_but_remotes()))
-        .await
-    {
-        Ok(val) => info!("All checks: {:#?}", val),
-        Err(_) => (),
-    };
+        .await;
 
-    match curl_multi_checker_pongo
-        // .send(Checks(all_checks_but_remotes()))
+    let pongo_checks = curl_multi_checker_pongo
         .send(ChecksPongo(all_checks_pongo_remotes()))
-        .await
-    {
-        Ok(val) => info!("All Pongo checks: {:#?}", val),
-        Err(_) => (),
-    };
+        .await;
+
+    let checks = [
+        regular_checks.unwrap().unwrap_or_default(),
+        pongo_checks.unwrap().unwrap_or_default(),
+    ]
+    .concat();
+    info!("OUT: {:#?}", checks);
 
     System::current().stop();
 }
