@@ -31,10 +31,10 @@ pub const LISTEN_ADDRESS: &str = "127.0.0.1:60666";
 pub const DEFAULT_FAILURES_STATE_FILE: &str = "/tmp/krecik.last.failures";
 
 /// Check timeout in seconds
-pub const CHECK_TIMEOUT: u64 = 60;
+pub const CHECK_TIMEOUT: u64 = 30;
 
 /// Check connection timeout in seconds
-pub const CHECK_CONNECTION_TIMEOUT: u64 = 60;
+pub const CHECK_CONNECTION_TIMEOUT: u64 = 45;
 
 /// Check max connect attempts
 pub const CHECK_MAX_CONNECTIONS: u32 = 10;
@@ -56,6 +56,9 @@ pub const CHECK_DEFAULT_CONTENT_EXPECTATION: &str = "body";
 
 /// Checks directory:
 pub const CHECKS_DIR: &str = "checks";
+
+/// Remote checks directory:
+pub const REMOTE_CHECKS_DIR: &str = "remotes";
 
 /// Web-API endpoint
 pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute";
