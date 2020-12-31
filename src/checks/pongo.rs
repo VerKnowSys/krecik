@@ -1,5 +1,6 @@
 use curl::easy::Easy2;
 
+use actix::prelude::*;
 use rayon::prelude::*;
 use regex::Regex;
 
@@ -38,9 +39,13 @@ pub fn showroom_page_expectations() -> PageExpectations {
 //
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+/// List of Pongo checks
+pub type PongoChecks = Vec<PongoCheck>;
+
+
 /// Remote structure that will be loaded as GenCheck:
-pub struct PongoHost {
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct PongoCheck {
     /// Client data:
     pub data: PongoHostData,
 
@@ -99,10 +104,6 @@ pub struct PongoHostDetails {
 }
 
 
-/// PongoHosts collection type
-pub type PongoHosts = Vec<PongoHost>;
-
-
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Map Remote fields/values mapper structure to GenCheck:
 pub struct PongoRemoteMapper {
@@ -123,8 +124,8 @@ pub struct PongoRemoteMapper {
 }
 
 
-impl Checks<PongoHost> for PongoHost {
-    fn load(remote_file_name: &str) -> Result<PongoHost, Error> {
+impl Checks<PongoCheck> for PongoCheck {
+    fn load(remote_file_name: &str) -> Result<PongoCheck, Error> {
         let mapper: PongoRemoteMapper = read_text_file(&remote_file_name)
             .and_then(|file_contents| {
                 serde_json::from_str(&file_contents)
@@ -144,7 +145,7 @@ impl Checks<PongoHost> for PongoHost {
         );
 
         // now use default Pongo structure defined as default for PongoRemoteMapper
-        let pongo_hosts: PongoHosts = serde_json::from_str(&remote_raw)
+        let pongo_hosts: PongoChecks = serde_json::from_str(&remote_raw)
             .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
             .unwrap_or_default();
 
@@ -252,14 +253,14 @@ impl Checks<PongoHost> for PongoHost {
                     .unwrap_or_default()
             })
             .collect();
-        Ok(PongoHost {
+        Ok(PongoCheck {
             pages: Some(pongo_checks),
             domains: Some(domain_checks),
 
             // pass alert webhook and channel from mapper to the checks
             alert_webhook: mapper.alert_webhook,
             alert_channel: mapper.alert_channel,
-            ..PongoHost::default()
+            ..PongoCheck::default()
         })
     }
 

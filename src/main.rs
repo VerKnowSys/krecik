@@ -18,7 +18,10 @@
 #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
 use krecik::{
-    actors::curl_multi_checker::{Checks, CurlMultiChecker},
+    actors::{
+        curl_multi_checker::{Checks, CurlMultiChecker},
+        curl_multi_checker_pongo::{ChecksPongo, CurlMultiCheckerPongo},
+    },
     api::*,
     checks::page::Method,
     configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
@@ -93,12 +96,28 @@ async fn main() {
     };
     setup_logger(logger_level).unwrap_or_default();
 
-    // start sync arbiter with n threads
-    let generic_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
+    // Define system actors
+    let curl_multi_checker = SyncArbiter::start(4, || CurlMultiChecker);
+    let curl_multi_checker_pongo = SyncArbiter::start(4, || CurlMultiCheckerPongo);
+
+    // let results_warden = ResultsWarden::start(1, || )
+
     // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
 
-    match generic_curl_actor.send(Checks(all_checks())).await {
-        Ok(val) => debug!("{:?}", val),
+    match curl_multi_checker
+        .send(Checks(all_checks_but_remotes()))
+        .await
+    {
+        Ok(val) => info!("All checks: {:#?}", val),
+        Err(_) => (),
+    };
+
+    match curl_multi_checker_pongo
+        // .send(Checks(all_checks_but_remotes()))
+        .send(ChecksPongo(all_checks_pongo_remotes()))
+        .await
+    {
+        Ok(val) => info!("All Pongo checks: {:#?}", val),
         Err(_) => (),
     };
 

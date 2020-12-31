@@ -1,6 +1,9 @@
 use crate::{
     api::*,
-    checks::page::Method,
+    checks::{
+        page::Method,
+        pongo::{PongoCheck, PongoChecks},
+    },
     configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
     products::{
         expected::{Expected, PageExpectation, PageExpectations},
@@ -40,21 +43,22 @@ use std::{
     time::Duration,
 };
 
-/// CurlMultiChecker actor for Curl Multi bulk checks
+
+/// CurlMultiCheckerPongo actor for Curl Multi bulk checks
 #[derive(Debug, Copy, Clone)]
-pub struct CurlMultiChecker;
+pub struct CurlMultiCheckerPongo;
 
 
-/// List of Check(s)
+/// Actor message wrapper structure
 #[derive(Message, Debug, Clone)]
 #[rtype(result = "Result<Stories, Stories>")]
-pub struct Checks(pub Vec<Check>);
+pub struct ChecksPongo(pub PongoChecks);
 
 
-impl Handler<Checks> for CurlMultiChecker {
+impl Handler<ChecksPongo> for CurlMultiCheckerPongo {
     type Result = Result<Stories, Stories>;
 
-    fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: ChecksPongo, _ctx: &mut Self::Context) -> Self::Result {
         Ok(msg
             .0
             .iter()
@@ -92,12 +96,12 @@ impl Handler<Checks> for CurlMultiChecker {
 }
 
 
-impl Actor for CurlMultiChecker {
+impl Actor for CurlMultiCheckerPongo {
     type Context = SyncContext<Self>;
 }
 
 
-impl CurlMultiChecker {
+impl CurlMultiCheckerPongo {
     /// Build a Story from a Length PageExpectation
     fn handle_page_length_expectation(
         url: &str,
@@ -586,7 +590,7 @@ impl CurlMultiChecker {
         );
 
         // Setup Curl configuration based on given options
-        if curl_options.follow_redirects.unwrap_or_else(|| true) {
+        if curl_options.follow_redirects.unwrap_or(true) {
             debug!("Enabled following redirects.");
             curl.follow_location(true).unwrap_or_default();
         } else {
@@ -594,7 +598,7 @@ impl CurlMultiChecker {
             curl.follow_location(false).unwrap_or_default();
         }
 
-        if curl_options.verbose.unwrap_or_else(|| false) {
+        if curl_options.verbose.unwrap_or(false) {
             debug!("Enabling Verbose mode.");
             curl.verbose(true).unwrap_or_default();
         } else {
@@ -664,7 +668,7 @@ impl CurlMultiChecker {
         .unwrap_or_default();
 
         // Verify SSL PEER
-        if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
+        if curl_options.ssl_verify_peer.unwrap_or(true) {
             debug!("Enabled TLS-PEER verification.");
             curl.ssl_verify_peer(true).unwrap_or_default();
         } else {
@@ -673,7 +677,7 @@ impl CurlMultiChecker {
         }
 
         // Verify SSL HOST
-        if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
+        if curl_options.ssl_verify_host.unwrap_or(true) {
             debug!("Enabled TLS-HOST verification.");
             curl.ssl_verify_host(true).unwrap_or_default();
         } else {
