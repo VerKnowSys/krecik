@@ -242,7 +242,6 @@ mod all_tests {
         assert!(history.length() > 0);
         assert!(history.length() == 1);
         let first = history.head();
-        assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
         assert!(first.success.is_some());
     }
@@ -255,7 +254,6 @@ mod all_tests {
         println!("TEST2({}): {}", history.length(), history.to_string());
         assert!(history.length() == 3);
         let first = history.head();
-        assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
     }
 
@@ -281,7 +279,6 @@ mod all_tests {
         println!("TEST4({}): {}", history.length(), history.to_string());
         assert!(history.length() == 3);
         let first = history.head();
-        assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
         assert!(first.success.is_some());
         assert!(first.error.is_none());
@@ -303,7 +300,6 @@ mod all_tests {
         assert!(headers.is_some());
         assert!(cookies.is_some());
         assert!(cookies.unwrap_or_default().len() == 3);
-        assert!(first.count == 1);
         assert!(first.timestamp.len() > 10);
     }
 
