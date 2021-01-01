@@ -436,8 +436,10 @@ impl CurlMultiCheckerPongo {
         let a_handler = match handler {
             Ok(handle) => {
                 if handle.get_ref().0.is_empty() {
-                    warn!("Got an empty output from Curl handle!");
-                    handle
+                    let fail =
+                        "Got an empty output from CurlMultiCheckerPongo handle!".to_owned();
+                    debug!("{}", fail);
+                    return vec![Story::error(Unexpected::HandlerFailed(fail.to_string()))];
                 } else {
                     handle
                 }
