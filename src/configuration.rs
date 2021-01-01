@@ -31,10 +31,10 @@ pub const LISTEN_ADDRESS: &str = "127.0.0.1:60666";
 pub const DEFAULT_FAILURES_STATE_FILE: &str = "/tmp/krecik.last.failures";
 
 /// Check timeout in seconds
-pub const CHECK_TIMEOUT: u64 = 30;
+pub const CHECK_TIMEOUT: u64 = 10;
 
 /// Check connection timeout in seconds
-pub const CHECK_CONNECTION_TIMEOUT: u64 = 45;
+pub const CHECK_CONNECTION_TIMEOUT: u64 = 15;
 
 /// Check max connect attempts
 pub const CHECK_MAX_CONNECTIONS: u32 = 10;
