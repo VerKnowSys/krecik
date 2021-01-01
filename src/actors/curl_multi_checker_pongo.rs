@@ -61,7 +61,33 @@ impl Handler<Checks> for CurlMultiCheckerPongo {
     type Result = Result<Stories, Stories>;
 
     fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
-        Ok(msg
+        let stories_from_domains = msg
+            .clone()
+            .0
+            .into_par_iter()
+            .flat_map(|check| {
+                check
+                    .domains
+                    .par_iter()
+                    .flat_map(move |domains| {
+                        domains
+                            .par_iter()
+                            .flat_map(|domain| {
+                                domain
+                                    .expects
+                                    .par_iter()
+                                    .map(|expectation| {
+                                        Self::check_ssl_expire(&domain.name, *expectation)
+                                    })
+                                    .collect::<Stories>()
+                            })
+                            .collect::<Stories>()
+                    })
+                    .collect::<Stories>()
+            })
+            .collect::<Stories>();
+
+        let stories_from_pages = msg
             .0
             .iter()
             .flat_map(|check| {
@@ -93,7 +119,8 @@ impl Handler<Checks> for CurlMultiCheckerPongo {
                         .collect::<Stories>()
                 })
             })
-            .collect())
+            .collect::<Stories>();
+        Ok([stories_from_domains, stories_from_pages].concat())
     }
 }
 

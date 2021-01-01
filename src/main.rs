@@ -22,16 +22,23 @@ use krecik::{
         curl_multi_checker::{Checks, CurlMultiChecker},
         curl_multi_checker_pongo::Checks as ChecksPongo,
         curl_multi_checker_pongo::CurlMultiCheckerPongo,
-        domain_expiry_checker::Checks as DomainChecks,
+        domain_expiry_checker::Checks as ChecksDomains,
         domain_expiry_checker::DomainExpiryChecker,
     },
     api::*,
-    checks::{domain::Domains, page::Method, pongo::get_pongo_hosts},
-    configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
+    checks::{
+        domain::Domains,
+        page::Method,
+        pongo::{
+            collect_pongo_domains, collect_pongo_hosts, get_pongo_hosts, read_pongo_mapper,
+        },
+    },
+    configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE, REMOTE_CHECKS_DIR},
     products::{
         expected::{Expected, PageExpectation, PageExpectations},
         unexpected::{Unexpected, UnexpectedMinor},
     },
+    utilities::list_all_checks_from,
 };
 use krecik::{checks::generic::*, configuration::CHECK_TIMEOUT};
 use krecik::{
@@ -102,29 +109,30 @@ async fn main() {
     // Define system actors
     let curl_multi_checker = SyncArbiter::start(4, || CurlMultiChecker);
     let curl_multi_checker_pongo = SyncArbiter::start(4, || CurlMultiCheckerPongo);
-    let domain_expiry_checker = SyncArbiter::start(4, || DomainExpiryChecker);
+    // let domain_expiry_checker = SyncArbiter::start(4, || DomainExpiryChecker);
 
     // let results_warden = ResultsWarden::start(1, || )
     // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
 
-    // TODO: split remotes, load mappers manually and ONCE
-
     let pongo_checks = curl_multi_checker_pongo
-        .send(ChecksPongo(all_checks_pongo_remote_pages()))
+        .send(ChecksPongo(all_checks_pongo_merged()))
         .await;
 
-    let domain_checks = domain_expiry_checker
-        .send(DomainChecks(all_checks_pongo_remote_domains()))
-        .await;
+    // let pongo_checks = curl_multi_checker_pongo
+    //     .send(ChecksPongo(all_checks_pongo_remote_pages()))
+    //     .await;
+
+    // let domain_checks = domain_expiry_checker
+    //     .send(ChecksDomains(all_checks_pongo_remote_domains()))
+    //     .await;
 
     let regular_checks = curl_multi_checker
         .send(Checks(all_checks_but_remotes()))
         .await;
 
     let stories = [
-        domain_checks.unwrap().unwrap_or_default(),
-        regular_checks.unwrap().unwrap_or_default(),
         pongo_checks.unwrap().unwrap_or_default(),
+        regular_checks.unwrap().unwrap_or_default(),
     ]
     .concat();
     // debug!(

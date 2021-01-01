@@ -31,6 +31,35 @@ pub fn all_checks_but_remotes() -> Vec<Check> {
 }
 
 
+/// Return remote domain+pages checks via mapper
+pub fn all_checks_pongo_merged() -> Vec<Check> {
+    list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
+        .into_iter()
+        .map(|pongo_mapper| {
+            let mapper = read_pongo_mapper(&pongo_mapper);
+            let domain_checks = get_pongo_hosts(&mapper.url)
+                .into_par_iter()
+                .flat_map(|check| collect_pongo_domains(&check, &mapper))
+                .collect();
+            let pongo_checks = get_pongo_hosts(&mapper.url)
+                .into_par_iter()
+                .flat_map(|check| collect_pongo_hosts(&check, &mapper))
+                .collect();
+
+            Check {
+                pages: Some(pongo_checks),
+                domains: Some(domain_checks),
+
+                // pass alert webhook and channel from mapper to the checks
+                alert_webhook: mapper.alert_webhook,
+                alert_channel: mapper.alert_channel,
+                ..Check::default()
+            }
+        })
+        .collect()
+}
+
+
 /// Return remote domain checks via mapper
 pub fn all_checks_pongo_remote_domains() -> Vec<Check> {
     list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))

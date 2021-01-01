@@ -3,7 +3,7 @@ use crate::{
     checks::page::Method,
     configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
     products::{
-        expected::{Expected, PageExpectation, PageExpectations},
+        expected::{DomainExpectation, Expected, PageExpectation, PageExpectations},
         unexpected::{Unexpected, UnexpectedMinor},
     },
 };
@@ -43,6 +43,38 @@ use std::{
 
 /// Trait implementing all helper functions for Curl-driven checks
 pub trait GenericCurlChecker {
+    /// Check SSL certificate expiration using OpenSSL function
+    fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
+        SslExpiration::from_domain_name_with_timeout(&domain_name, CHECK_TIMEOUT)
+            .map(|ssl_validator| {
+                match domain_expectation {
+                    DomainExpectation::ValidExpiryPeriod(expected_days)
+                        if ssl_validator.days() < expected_days
+                            || ssl_validator.is_expired() =>
+                    {
+                        Story::error(Unexpected::TLSDomainExpired(
+                            domain_name.to_string(),
+                            ssl_validator.days(),
+                        ))
+                    }
+
+                    DomainExpectation::ValidExpiryPeriod(expected_days) => {
+                        Story::success(Expected::TLSCertificateFresh(
+                            domain_name.to_string(),
+                            ssl_validator.days(),
+                            expected_days,
+                        ))
+                    }
+                }
+            })
+            .unwrap_or_else(|err| {
+                Story::minor(UnexpectedMinor::InternalProtocolProblem(
+                    domain_name.to_string(),
+                    err.to_string(),
+                ))
+            })
+    }
+
     /// Build a Story from a Length PageExpectation
     fn handle_page_length_expectation(
         url: &str,
