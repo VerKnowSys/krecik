@@ -52,13 +52,13 @@ pub struct CurlMultiCheckerPongo;
 /// Actor message wrapper structure
 #[derive(Message, Debug, Clone)]
 #[rtype(result = "Result<Stories, Stories>")]
-pub struct ChecksPongo(pub PongoChecks);
+pub struct Checks(pub Vec<Check>);
 
 
-impl Handler<ChecksPongo> for CurlMultiCheckerPongo {
+impl Handler<Checks> for CurlMultiCheckerPongo {
     type Result = Result<Stories, Stories>;
 
-    fn handle(&mut self, msg: ChecksPongo, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
         Ok(msg
             .0
             .iter()

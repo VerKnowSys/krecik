@@ -32,8 +32,8 @@ pub fn all_checks_but_remotes() -> Vec<Check> {
 }
 
 
-/// Return remote checks via mapper
-pub fn all_checks_pongo_remotes() -> PongoChecks {
+/// Return remote domain checks via mapper
+pub fn all_checks_pongo_remote_domains() -> Vec<Check> {
     list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
         .into_par_iter()
         .map(|pongo_mapper| {
@@ -47,7 +47,68 @@ pub fn all_checks_pongo_remotes() -> PongoChecks {
             let mut easy = Easy2::new(Collector(Vec::new()));
             easy.get(true).unwrap_or_default();
             easy.url(&mapper.url).unwrap_or_default();
-            easy.perform().expect("Nothing fetched from remote");
+            easy.perform().unwrap_or_default();
+            // .expect(&format!("Expected something from remote: {}", pongo_mapper));
+            let contents = easy.get_ref();
+            let remote_raw = String::from_utf8_lossy(&contents.0);
+
+            // now use default Pongo structure defined as default for PongoRemoteMapper
+            let pongo_hosts: PongoChecks = serde_json::from_str(&remote_raw)
+                .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
+                .unwrap_or_default();
+
+            let domain_checks = pongo_hosts
+                .into_par_iter()
+                .flat_map(|host| {
+                    host.data
+                        .host
+                        .unwrap_or_default()
+                        .vhosts
+                        .and_then(|vhosts| {
+                            vhosts
+                                .par_iter()
+                                .filter(|vhost| !vhost.starts_with("*.")) // filter out wildcard domains
+                                .map(|vhost| {
+                                    Some(Domain {
+                                        name: vhost.to_string(),
+                                        expects: default_domain_expectations(),
+                                    })
+                                })
+                                .collect::<Option<Domains>>()
+                        })
+                        .unwrap_or_default()
+                })
+                .collect();
+            Check {
+                domains: Some(domain_checks),
+
+                // pass alert webhook and channel from mapper to the checks
+                alert_webhook: mapper.alert_webhook,
+                alert_channel: mapper.alert_channel,
+                ..Check::default()
+            }
+        })
+        .collect()
+}
+
+
+/// Return remote page checks via mapper
+pub fn all_checks_pongo_remote_pages() -> Vec<Check> {
+    list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
+        .into_par_iter()
+        .map(|pongo_mapper| {
+            let mapper: PongoRemoteMapper = read_text_file(&pongo_mapper)
+                .and_then(|file_contents| {
+                    serde_json::from_str(&file_contents)
+                        .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
+                })
+                .unwrap_or_default();
+
+            let mut easy = Easy2::new(Collector(Vec::new()));
+            easy.get(true).unwrap_or_default();
+            easy.url(&mapper.url).unwrap_or_default();
+            easy.perform().unwrap_or_default();
+            // .expect(&format!("Expected something from remote: {}", pongo_mapper));
             let contents = easy.get_ref();
             let remote_raw = String::from_utf8_lossy(&contents.0);
 
@@ -132,36 +193,15 @@ pub fn all_checks_pongo_remotes() -> PongoChecks {
                     .concat()
                 })
                 .collect();
-            let domain_checks = pongo_hosts
-                .into_par_iter()
-                .flat_map(|host| {
-                    host.data
-                        .host
-                        .unwrap_or_default()
-                        .vhosts
-                        .and_then(|vhosts| {
-                            vhosts
-                                .par_iter()
-                                .filter(|vhost| !vhost.starts_with("*.")) // filter out wildcard domains
-                                .map(|vhost| {
-                                    Some(Domain {
-                                        name: vhost.to_string(),
-                                        expects: default_domain_expectations(),
-                                    })
-                                })
-                                .collect::<Option<Domains>>()
-                        })
-                        .unwrap_or_default()
-                })
-                .collect();
-            PongoCheck {
+
+            Check {
                 pages: Some(pongo_checks),
-                domains: Some(domain_checks),
+                // domains: Some(domain_checks),
 
                 // pass alert webhook and channel from mapper to the checks
                 alert_webhook: mapper.alert_webhook,
                 alert_channel: mapper.alert_channel,
-                ..PongoCheck::default()
+                ..Check::default()
             }
         })
         .collect()

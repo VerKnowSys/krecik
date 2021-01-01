@@ -20,10 +20,13 @@
 use krecik::{
     actors::{
         curl_multi_checker::{Checks, CurlMultiChecker},
-        curl_multi_checker_pongo::{ChecksPongo, CurlMultiCheckerPongo},
+        curl_multi_checker_pongo::Checks as ChecksPongo,
+        curl_multi_checker_pongo::CurlMultiCheckerPongo,
+        domain_expiry_checker::Checks as DomainChecks,
+        domain_expiry_checker::DomainExpiryChecker,
     },
     api::*,
-    checks::page::Method,
+    checks::{domain::Domains, page::Method},
     configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
     products::{
         expected::{Expected, PageExpectation, PageExpectations},
@@ -97,26 +100,34 @@ async fn main() {
     setup_logger(logger_level).unwrap_or_default();
 
     // Define system actors
-    let curl_multi_checker = SyncArbiter::start(2, || CurlMultiChecker);
-    let curl_multi_checker_pongo = SyncArbiter::start(2, || CurlMultiCheckerPongo);
+    let curl_multi_checker = SyncArbiter::start(4, || CurlMultiChecker);
+    let curl_multi_checker_pongo = SyncArbiter::start(4, || CurlMultiCheckerPongo);
+    let domain_expiry_checker = SyncArbiter::start(4, || DomainExpiryChecker);
 
     // let results_warden = ResultsWarden::start(1, || )
     // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
+    info!("{:#?}", domain_expiry_checker);
+
+    let domain_checks = domain_expiry_checker
+        .send(DomainChecks(all_checks_pongo_remote_domains()))
+        .await;
 
     let regular_checks = curl_multi_checker
         .send(Checks(all_checks_but_remotes()))
         .await;
 
     let pongo_checks = curl_multi_checker_pongo
-        .send(ChecksPongo(all_checks_pongo_remotes()))
+        .send(ChecksPongo(all_checks_pongo_remote_pages()))
         .await;
 
-    let checks = [
+    let stories = [
+        domain_checks.unwrap().unwrap_or_default(),
         regular_checks.unwrap().unwrap_or_default(),
         pongo_checks.unwrap().unwrap_or_default(),
     ]
     .concat();
-    info!("OUT: {:#?}. Total checks: {}", checks, checks.len());
+    debug!("Stories: {:#?}", stories);
+    info!("Result stories count: {}", stories.len());
 
     System::current().stop();
 }
