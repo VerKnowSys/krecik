@@ -1,7 +1,6 @@
 use crate::checks::pongo::*;
 use crate::*;
 use colored::Colorize;
-use curl::easy::Easy2;
 use rayon::prelude::*;
 use regex::Regex;
 use std::io::{Error, ErrorKind};
@@ -37,27 +36,8 @@ pub fn all_checks_pongo_remote_domains() -> Vec<Check> {
     list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
         .into_par_iter()
         .map(|pongo_mapper| {
-            let mapper: PongoRemoteMapper = read_text_file(&pongo_mapper)
-                .and_then(|file_contents| {
-                    serde_json::from_str(&file_contents)
-                        .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
-                })
-                .unwrap_or_default();
-
-            let mut easy = Easy2::new(Collector(Vec::new()));
-            easy.get(true).unwrap_or_default();
-            easy.url(&mapper.url).unwrap_or_default();
-            easy.perform().unwrap_or_default();
-            // .expect(&format!("Expected something from remote: {}", pongo_mapper));
-            let contents = easy.get_ref();
-            let remote_raw = String::from_utf8_lossy(&contents.0);
-
-            // now use default Pongo structure defined as default for PongoRemoteMapper
-            let pongo_hosts: PongoChecks = serde_json::from_str(&remote_raw)
-                .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
-                .unwrap_or_default();
-
-            let domain_checks = pongo_hosts
+            let mapper = read_pongo_mapper(&pongo_mapper);
+            let domain_checks = get_pongo_hosts(&mapper.url)
                 .into_par_iter()
                 .flat_map(|host| {
                     host.data
@@ -97,28 +77,8 @@ pub fn all_checks_pongo_remote_pages() -> Vec<Check> {
     list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
         .into_par_iter()
         .map(|pongo_mapper| {
-            let mapper: PongoRemoteMapper = read_text_file(&pongo_mapper)
-                .and_then(|file_contents| {
-                    serde_json::from_str(&file_contents)
-                        .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
-                })
-                .unwrap_or_default();
-
-            let mut easy = Easy2::new(Collector(Vec::new()));
-            easy.get(true).unwrap_or_default();
-            easy.url(&mapper.url).unwrap_or_default();
-            easy.perform().unwrap_or_default();
-            // .expect(&format!("Expected something from remote: {}", pongo_mapper));
-            let contents = easy.get_ref();
-            let remote_raw = String::from_utf8_lossy(&contents.0);
-
-            // now use default Pongo structure defined as default for PongoRemoteMapper
-            let pongo_hosts: PongoChecks = serde_json::from_str(&remote_raw)
-                .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
-                .unwrap_or_default();
-
-            debug!("Pongo hosts: {:#?}", &pongo_hosts);
-            let pongo_checks = pongo_hosts
+            let mapper = read_pongo_mapper(&pongo_mapper);
+            let pongo_checks = get_pongo_hosts(&mapper.url)
                 .clone()
                 .into_par_iter()
                 .flat_map(|host| {

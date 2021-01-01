@@ -12,6 +12,32 @@ use std::path::Path;
 use crate::*;
 
 
+/// Read Pongo mapper object
+pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
+    read_text_file(&pongo_mapper)
+        .and_then(|file_contents| {
+            serde_json::from_str(&file_contents)
+                .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
+        })
+        .unwrap_or_default()
+}
+
+
+/// Pongo remote read utility
+pub fn get_pongo_hosts(url: &str) -> PongoChecks {
+    use curl::easy::Easy2;
+    let mut easy = Easy2::new(Collector(Vec::new()));
+    easy.get(true).unwrap_or_default();
+    easy.url(&url).unwrap_or_default();
+    easy.perform().unwrap_or_default();
+    let contents = easy.get_ref();
+    let remote_raw = String::from_utf8_lossy(&contents.0);
+    serde_json::from_str(&remote_raw)
+        .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
+        .unwrap_or_default()
+}
+
+
 /// Provide pongo page expectations:
 pub fn pongo_page_expectations() -> PageExpectations {
     vec![

@@ -60,6 +60,9 @@ pub const CHECKS_DIR: &str = "checks";
 /// Remote checks directory:
 pub const REMOTE_CHECKS_DIR: &str = "remotes";
 
+/// Tests directory:
+pub const TESTS_DIR: &str = "tests";
+
 /// Web-API endpoint
 pub const CHECK_API_EXECUTE_REQUEST_PATH: &str = "/check/execute";
 
