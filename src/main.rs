@@ -116,7 +116,7 @@ async fn main() {
         pongo_checks.unwrap().unwrap_or_default(),
     ]
     .concat();
-    info!("OUT: {:#?}", checks);
+    info!("OUT: {:#?}. Total checks: {}", checks, checks.len());
 
     System::current().stop();
 }
