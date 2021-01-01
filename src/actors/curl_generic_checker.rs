@@ -41,6 +41,7 @@ use std::{
 };
 
 
+/// Trait implementing all helper functions for Curl-driven checks
 pub trait GenericCurlChecker {
     /// Build a Story from a Length PageExpectation
     fn handle_page_length_expectation(

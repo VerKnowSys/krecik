@@ -16,7 +16,7 @@ pub fn all_checks_but_remotes() -> Vec<Check> {
     list_all_checks_from(CHECKS_DIR)
         .par_iter()
         .filter_map(|check_path| {
-            if !check_path.contains(REMOTE_CHECKS_DIR) {
+            if !check_path.contains(REMOTE_CHECKS_DIR) && !check_path.contains(TESTS_DIR) {
                 read_text_file(&check_path)
                     .and_then(|file_contents| {
                         serde_json::from_str(&*file_contents).map_err(|err| {
