@@ -12,6 +12,137 @@ use std::path::Path;
 use crate::*;
 
 
+/// Read domain checks from pongo mapper
+pub fn get_domain_checks(pongo_mapper: String) -> Check {
+    let mapper = read_pongo_mapper(&pongo_mapper);
+    let domain_checks = get_pongo_hosts(&mapper.url)
+        .into_par_iter()
+        .flat_map(|check| collect_pongo_domains(&check, &mapper))
+        .collect();
+    Check {
+        domains: Some(domain_checks),
+
+        // pass alert webhook and channel from mapper to the checks
+        alert_webhook: mapper.alert_webhook,
+        alert_channel: mapper.alert_channel,
+        ..Check::default()
+    }
+}
+
+
+/// Read page checks from pongo mapper
+pub fn get_page_checks(pongo_mapper: String) -> Check {
+    let mapper = read_pongo_mapper(&pongo_mapper);
+    let pongo_checks = get_pongo_hosts(&mapper.url)
+        .into_par_iter()
+        .flat_map(|check| collect_pongo_hosts(&check, &mapper))
+        .collect();
+
+    Check {
+        pages: Some(pongo_checks),
+
+        // pass alert webhook and channel from mapper to the checks
+        alert_webhook: mapper.alert_webhook,
+        alert_channel: mapper.alert_channel,
+        ..Check::default()
+    }
+}
+
+
+/// Collect pongo domain check by host
+pub fn collect_pongo_domains(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Vec<Domain> {
+    check
+        .data
+        .host
+        .clone()
+        .unwrap_or_default()
+        .vhosts
+        .and_then(|vhosts| {
+            vhosts
+                .par_iter()
+                .filter(|vhost| !vhost.starts_with("*.")) // filter out wildcard domains
+                .map(|vhost| {
+                    Some(Domain {
+                        name: vhost.to_string(),
+                        expects: default_domain_expectations(),
+                    })
+                })
+                .collect::<Option<Domains>>()
+        })
+        .unwrap_or_default()
+}
+
+
+/// Collect pongo page checks by host
+pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Vec<Page> {
+    let ams = check.clone().data.ams.unwrap_or_default();
+    let active = check.active.unwrap_or(false);
+    let client = check.clone().client.unwrap_or_default();
+    let options = check.clone().options;
+
+    let pongo_private_token = Regex::new(r"\?token=[A-Za-z0-9_-]*").unwrap();
+    let safe_url = pongo_private_token.replace(&mapper.url, "[[token-masked]]");
+    [
+        // merge two lists for URLs: "vhosts" and "showrooms":
+        check
+            .clone()
+            .data
+            .host
+            .unwrap_or_default()
+            .vhosts
+            .and_then(|vhosts| {
+                vhosts
+                    .par_iter()
+                    .filter(|vhost| {
+                        !vhost.starts_with("*.")
+                            && vhost.contains(
+                                &mapper.only_vhost_contains.clone().unwrap_or_default(),
+                            )
+                    }) // filter out wildcard domains and pick only these matching value of only_vhost_contains field
+                    .map(|vhost| {
+                        if active {
+                            Some(Page {
+                                url: format!("{}{}/{}/", CHECK_DEFAULT_PROTOCOL, vhost, ams),
+                                expects: pongo_page_expectations(),
+                                options: options.clone(),
+                            })
+                        } else {
+                            debug!("Skipping not active client: {}", &client);
+                            None
+                        }
+                    })
+                    .collect::<Option<Pages>>()
+            })
+            .unwrap_or_default(),
+        check
+            .data
+            .clone()
+            .host
+            .unwrap_or_default()
+            .showroom_urls
+            .and_then(|showrooms| {
+                showrooms
+                    .par_iter()
+                    .map(|vhost| {
+                        if active {
+                            Some(Page {
+                                url: vhost.to_string(),
+                                expects: showroom_page_expectations(),
+                                options: None,
+                            })
+                        } else {
+                            debug!("Skipping not active client: {}", &client);
+                            None
+                        }
+                    })
+                    .collect::<Option<Pages>>()
+            })
+            .unwrap_or_default(),
+    ]
+    .concat()
+}
+
+
 /// Read Pongo mapper object
 pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
     read_text_file(&pongo_mapper)
@@ -33,7 +164,12 @@ pub fn get_pongo_hosts(url: &str) -> PongoChecks {
     let contents = easy.get_ref();
     let remote_raw = String::from_utf8_lossy(&contents.0);
     serde_json::from_str(&remote_raw)
-        .map_err(|err| error!("Failed to parse Pongo input: {:#?}", err))
+        .map_err(|err| {
+            error!(
+                "Failed to parse Pongo input: {:#?}. Caused by: {:?}",
+                remote_raw, err
+            )
+        })
         .unwrap_or_default()
 }
 

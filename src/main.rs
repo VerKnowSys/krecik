@@ -26,7 +26,7 @@ use krecik::{
         domain_expiry_checker::DomainExpiryChecker,
     },
     api::*,
-    checks::{domain::Domains, page::Method},
+    checks::{domain::Domains, page::Method, pongo::get_pongo_hosts},
     configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
     products::{
         expected::{Expected, PageExpectation, PageExpectations},
@@ -106,7 +106,12 @@ async fn main() {
 
     // let results_warden = ResultsWarden::start(1, || )
     // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
-    info!("{:#?}", domain_expiry_checker);
+
+    // TODO: split remotes, load mappers manually and ONCE
+
+    let pongo_checks = curl_multi_checker_pongo
+        .send(ChecksPongo(all_checks_pongo_remote_pages()))
+        .await;
 
     let domain_checks = domain_expiry_checker
         .send(DomainChecks(all_checks_pongo_remote_domains()))
@@ -116,17 +121,26 @@ async fn main() {
         .send(Checks(all_checks_but_remotes()))
         .await;
 
-    let pongo_checks = curl_multi_checker_pongo
-        .send(ChecksPongo(all_checks_pongo_remote_pages()))
-        .await;
-
     let stories = [
         domain_checks.unwrap().unwrap_or_default(),
         regular_checks.unwrap().unwrap_or_default(),
         pongo_checks.unwrap().unwrap_or_default(),
     ]
     .concat();
-    debug!("Stories: {:#?}", stories);
+    // debug!(
+    //     "Stories JSON: [{}]",
+    //     stories
+    //         .iter()
+    //         .map(|story| story.to_string())
+    //         .collect::<String>()
+    // );
+    utilities::write_append(
+        "/tmp/out.json",
+        &stories
+            .iter()
+            .map(|story| story.to_string())
+            .collect::<String>(),
+    );
     info!("Result stories count: {}", stories.len());
 
     System::current().stop();
