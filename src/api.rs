@@ -14,7 +14,7 @@ use std::io::{Error, ErrorKind};
 /// Return checks from path, excluding remotes
 pub fn all_checks_but_remotes() -> Vec<Check> {
     list_all_checks_from(CHECKS_DIR)
-        .iter()
+        .par_iter()
         .filter_map(|check_path| {
             if !check_path.contains(REMOTE_CHECKS_DIR) {
                 read_text_file(&check_path)
@@ -35,7 +35,7 @@ pub fn all_checks_but_remotes() -> Vec<Check> {
 /// Return remote checks via mapper
 pub fn all_checks_pongo_remotes() -> PongoChecks {
     list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
-        .into_iter()
+        .into_par_iter()
         .map(|pongo_mapper| {
             let mapper: PongoRemoteMapper = read_text_file(&pongo_mapper)
                 .and_then(|file_contents| {
