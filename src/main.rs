@@ -135,20 +135,14 @@ async fn main() {
         regular_checks.unwrap().unwrap_or_default(),
     ]
     .concat();
-    // debug!(
-    //     "Stories JSON: [{}]",
-    //     stories
-    //         .iter()
-    //         .map(|story| story.to_string())
-    //         .collect::<String>()
-    // );
-    utilities::write_append(
-        "/tmp/out.json",
-        &stories
-            .iter()
-            .map(|story| story.to_string())
-            .collect::<String>(),
-    );
+
+    let stories_listof_json = stories
+        .iter()
+        .map(|story| story.to_string())
+        .collect::<Vec<String>>()
+        .join(",");
+
+    utilities::write_append("/tmp/out.json", &format!("[{}]", stories_listof_json));
     info!("Result stories count: {}", stories.len());
 
     System::current().stop();
