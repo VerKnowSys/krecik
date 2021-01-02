@@ -1,41 +1,29 @@
 use crate::{
-    api::*,
-    checks::page::Method,
-    configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE},
+    checks::{
+        check::*,
+        page::{Method, Page},
+    },
+    configuration::{
+        CHECK_CONNECTION_TIMEOUT, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE, CHECK_MAX_CONNECTIONS,
+        CHECK_MAX_REDIRECTIONS, CHECK_TIMEOUT, DEFAULT_SLACK_NAME,
+    },
     products::{
         expected::{DomainExpectation, Expected, PageExpectation, PageExpectations},
+        story::*,
         unexpected::{Unexpected, UnexpectedMinor},
     },
-};
-use crate::{checks::generic::*, configuration::CHECK_TIMEOUT};
-use crate::{
-    checks::{check::*, page::Page},
-    configuration::DEFAULT_SLACK_NAME,
-};
-use crate::{configuration::CHECK_CONNECTION_TIMEOUT, products::story::*};
-use crate::{
-    configuration::{CHECK_MAX_CONNECTIONS, CHECK_MAX_REDIRECTIONS},
     Collector,
 };
-
-// use crate::*;
-use actix::prelude::*;
-use chrono::*;
 use colored::Colorize;
-use fern::InitError;
-use log::*;
-use std::fs;
-use std::{env, env::var, path::Path};
-
-// use curl::easy::{Handler, WriteError};
 use curl::{
     easy::{Easy2, List},
-    multi::{Easy2Handle, Multi},
-    Error as CurlError, MultiError,
+    multi::Multi,
+    Error as CurlError,
 };
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
 use std::{
+    env,
     io::{Error, ErrorKind},
     time::Duration,
 };

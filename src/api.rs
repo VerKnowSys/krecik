@@ -1,8 +1,6 @@
-use crate::checks::pongo::*;
-use crate::*;
+use crate::{checks::pongo::*, *};
 use colored::Colorize;
 use rayon::prelude::*;
-use regex::Regex;
 use std::io::{Error, ErrorKind};
 
 

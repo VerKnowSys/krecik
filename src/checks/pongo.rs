@@ -1,15 +1,12 @@
+use crate::*;
 use curl::easy::Easy2;
-
-use actix::prelude::*;
 use rayon::prelude::*;
 use regex::Regex;
-
-use std::fs;
-use std::io::{Error, ErrorKind};
-use std::path::Path;
-
-
-use crate::*;
+use std::{
+    fs,
+    io::{Error, ErrorKind},
+    path::Path,
+};
 
 
 /// Read domain checks from pongo mapper
@@ -156,7 +153,6 @@ pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
 
 /// Pongo remote read utility
 pub fn get_pongo_hosts(url: &str) -> PongoChecks {
-    use curl::easy::Easy2;
     let mut easy = Easy2::new(Collector(Vec::new()));
     easy.get(true).unwrap_or_default();
     easy.url(&url).unwrap_or_default();

@@ -1,52 +1,15 @@
 use crate::{
-    api::*,
-    checks::{
-        domain::{default_domain_expectations, Domains},
-        page::Method,
-        pongo::{PongoCheck, PongoChecks},
-    },
-    configuration::{
-        CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE, CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY,
-    },
+    checks::generic::*,
+    configuration::CHECK_TIMEOUT,
     products::{
-        expected::{
-            DomainExpectation, DomainExpectations, Expected, PageExpectation, PageExpectations,
-        },
+        expected::{DomainExpectation, Expected},
+        story::*,
         unexpected::{Unexpected, UnexpectedMinor},
     },
 };
-use crate::{checks::generic::*, configuration::CHECK_TIMEOUT};
-use crate::{
-    checks::{check::*, page::Page},
-    configuration::DEFAULT_SLACK_NAME,
-};
-use crate::{configuration::CHECK_CONNECTION_TIMEOUT, products::story::*};
-use crate::{
-    configuration::{CHECK_MAX_CONNECTIONS, CHECK_MAX_REDIRECTIONS},
-    Collector,
-};
-
-// use crate::*;
 use actix::prelude::*;
-use chrono::*;
-use colored::Colorize;
-use fern::InitError;
-use log::*;
-use std::fs;
-use std::{env, env::var, path::Path};
-
-// use curl::easy::{Handler, WriteError};
-use curl::{
-    easy::{Easy2, List},
-    multi::{Easy2Handle, Multi},
-    Error as CurlError, MultiError,
-};
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
-use std::{
-    io::{Error, ErrorKind},
-    time::Duration,
-};
 
 
 /// DomainExpiryChecker actor for TLS certificatea expiration check
