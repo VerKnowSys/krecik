@@ -27,27 +27,25 @@ use krecik::{
     },
     api::*,
     checks::{
+        check::*,
         domain::Domains,
-        page::Method,
+        generic::*,
+        page::{Method, Page},
         pongo::{
             collect_pongo_domains, collect_pongo_hosts, get_pongo_hosts, read_pongo_mapper,
         },
     },
-    configuration::{CHECKS_DIR, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE, REMOTE_CHECKS_DIR},
+    configuration::{
+        CHECKS_DIR, CHECK_CONNECTION_TIMEOUT, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
+        CHECK_MAX_CONNECTIONS, CHECK_MAX_REDIRECTIONS, CHECK_TIMEOUT, DEFAULT_SLACK_NAME,
+        REMOTE_CHECKS_DIR,
+    },
     products::{
         expected::{Expected, PageExpectation, PageExpectations},
+        story::*,
         unexpected::{Unexpected, UnexpectedMinor},
     },
     utilities::list_all_checks_from,
-};
-use krecik::{checks::generic::*, configuration::CHECK_TIMEOUT};
-use krecik::{
-    checks::{check::*, page::Page},
-    configuration::DEFAULT_SLACK_NAME,
-};
-use krecik::{configuration::CHECK_CONNECTION_TIMEOUT, products::story::*};
-use krecik::{
-    configuration::{CHECK_MAX_CONNECTIONS, CHECK_MAX_REDIRECTIONS},
     *,
 };
 
