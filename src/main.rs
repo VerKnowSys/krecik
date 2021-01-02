@@ -17,6 +17,20 @@
 // For development:
 #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
+use actix::prelude::*;
+use actix_macros::main as actix_main;
+
+#[macro_use]
+extern crate fern;
+
+use chrono::*;
+use colored::Colorize;
+use curl::{
+    easy::{Easy2, List},
+    multi::{Easy2Handle, Multi},
+    Error as CurlError, MultiError,
+};
+use fern::InitError;
 use krecik::{
     actors::{
         curl_multi_checker::{Checks, CurlMultiChecker},
@@ -48,32 +62,14 @@ use krecik::{
     utilities::list_all_checks_from,
     *,
 };
-
-// use actix_derive::*;
-use actix::prelude::*;
-use actix_macros::main as actix_main;
-
-#[macro_use]
-extern crate fern;
-
-use chrono::*;
-use colored::Colorize;
-use fern::InitError;
-use krecik::api::*;
 use log::*;
-use std::fs;
-use std::{env, env::var, path::Path};
-
-
-use curl::{
-    easy::{Easy2, List},
-    multi::{Easy2Handle, Multi},
-    Error as CurlError, MultiError,
-};
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
 use std::{
+    env::{self, var},
+    fs,
     io::{Error, ErrorKind},
+    path::Path,
     time::Duration,
 };
 
