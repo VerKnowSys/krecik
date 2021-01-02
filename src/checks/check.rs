@@ -108,13 +108,10 @@ pub trait Checks<T> {
     fn find_code_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
-                match exp {
-                    PageExpectation::ValidCode(_) => true,
-                    _ => false,
-                }
-            })
-            .unwrap_or_else(|| &PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE))
+            .find_any(|exp| matches!(exp, PageExpectation::ValidCode(_)))
+            .unwrap_or(&PageExpectation::ValidCode(
+                CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
+            ))
     }
 
 
@@ -122,12 +119,7 @@ pub trait Checks<T> {
     fn find_content_validations(page_expectations: &[PageExpectation]) -> PageExpectations {
         page_expectations
             .par_iter()
-            .filter(|exp| {
-                match exp {
-                    PageExpectation::ValidContent(_) => true,
-                    _ => false,
-                }
-            })
+            .filter(|exp| matches!(exp, PageExpectation::ValidContent(_)))
             .cloned()
             .collect()
     }
@@ -139,13 +131,8 @@ pub trait Checks<T> {
     ) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
-                match exp {
-                    PageExpectation::ValidLength(_) => true,
-                    _ => false,
-                }
-            })
-            .unwrap_or_else(|| &PageExpectation::ValidNoLength)
+            .find_any(|exp| matches!(exp, PageExpectation::ValidLength(_)))
+            .unwrap_or(&PageExpectation::ValidNoLength)
     }
 
 
@@ -153,13 +140,8 @@ pub trait Checks<T> {
     fn find_address_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
-            .find_any(|exp| {
-                match exp {
-                    PageExpectation::ValidAddress(_) => true,
-                    _ => false,
-                }
-            })
-            .unwrap_or_else(|| &PageExpectation::ValidNoAddress)
+            .find_any(|exp| matches!(exp, PageExpectation::ValidAddress(_)))
+            .unwrap_or(&PageExpectation::ValidNoAddress)
     }
 
 
