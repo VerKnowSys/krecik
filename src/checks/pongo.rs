@@ -76,9 +76,6 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
     let active = check.active.unwrap_or(false);
     let client = check.clone().client.unwrap_or_default();
     let options = check.clone().options;
-
-    let pongo_private_token = Regex::new(r"\?token=[A-Za-z0-9_-]*").unwrap();
-    let safe_url = pongo_private_token.replace(&mapper.url, "[[token-masked]]");
     [
         // merge two lists for URLs: "vhosts" and "showrooms":
         check

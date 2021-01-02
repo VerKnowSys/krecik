@@ -118,14 +118,6 @@ async fn main() {
         .send(ChecksPongo(all_checks_pongo_merged()))
         .await;
 
-    // let pongo_checks = curl_multi_checker_pongo
-    //     .send(ChecksPongo(all_checks_pongo_remote_pages()))
-    //     .await;
-
-    // let domain_checks = domain_expiry_checker
-    //     .send(ChecksDomains(all_checks_pongo_remote_domains()))
-    //     .await;
-
     let regular_checks = curl_multi_checker
         .send(Checks(all_checks_but_remotes()))
         .await;

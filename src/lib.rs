@@ -20,10 +20,9 @@
 // #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
 
-/// Use Jemalloc as default allocator:
+/// Use MiMalloc as default allocator:
 #[global_allocator]
 static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
-// static GLOBAL: jemallocator::Jemalloc = jemallocator::Jemalloc;
 
 
 // Load all useful macros:
