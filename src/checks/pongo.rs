@@ -310,7 +310,7 @@ impl Checks<PongoCheck> for PongoCheck {
             .into_par_iter()
             .flat_map(|host| {
                 let ams = host.clone().data.ams.unwrap_or_default();
-                let active = host.active.unwrap_or_else(|| false);
+                let active = host.active.unwrap_or(false);
                 let client = host.clone().client.unwrap_or_default();
                 let options = host.clone().options;
 

@@ -73,10 +73,9 @@ impl Handler<Checks> for CurlMultiChecker {
                     // Collect History of results:
                     process_handlers
                         .into_iter()
-                        .map(|(check, handler)| {
+                        .flat_map(|(check, handler)| {
                             Self::process_page_handler(&check, handler, &multi)
                         })
-                        .flat_map(|e| e.clone())
                         .collect::<Stories>()
                 })
             })

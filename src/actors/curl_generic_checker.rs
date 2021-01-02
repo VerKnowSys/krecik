@@ -139,7 +139,7 @@ pub trait GenericCurlChecker {
                     _ => false,
                 }
             })
-            .unwrap_or_else(|| &PageExpectation::ValidNoLength)
+            .unwrap_or(&PageExpectation::ValidNoLength)
     }
 
 
@@ -153,7 +153,7 @@ pub trait GenericCurlChecker {
                     _ => false,
                 }
             })
-            .unwrap_or_else(|| &PageExpectation::ValidNoAddress)
+            .unwrap_or(&PageExpectation::ValidNoAddress)
     }
 
 
@@ -399,7 +399,7 @@ pub trait GenericCurlChecker {
                 if handle.get_ref().0.is_empty() {
                     let fail = "Got an empty output from CurlMultiChecker handle!".to_owned();
                     debug!("{}", fail);
-                    return vec![Story::error(Unexpected::HandlerFailed(fail.to_string()))];
+                    return vec![Story::error(Unexpected::HandlerFailed(fail))];
                 } else {
                     handle
                 }
@@ -552,7 +552,7 @@ pub trait GenericCurlChecker {
         );
 
         // Setup Curl configuration based on given options
-        if curl_options.follow_redirects.unwrap_or_else(|| true) {
+        if curl_options.follow_redirects.unwrap_or(true) {
             debug!("Enabled following redirects.");
             curl.follow_location(true).unwrap_or_default();
         } else {
@@ -560,7 +560,7 @@ pub trait GenericCurlChecker {
             curl.follow_location(false).unwrap_or_default();
         }
 
-        if curl_options.verbose.unwrap_or_else(|| false) {
+        if curl_options.verbose.unwrap_or(false) {
             debug!("Enabling Verbose mode.");
             curl.verbose(true).unwrap_or_default();
         } else {
@@ -621,16 +621,16 @@ pub trait GenericCurlChecker {
         curl.connect_timeout(Duration::from_secs(
             curl_options
                 .connection_timeout
-                .unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT),
+                .unwrap_or(CHECK_CONNECTION_TIMEOUT),
         ))
         .unwrap_or_default();
         curl.timeout(Duration::from_secs(
-            curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT),
+            curl_options.timeout.unwrap_or(CHECK_TIMEOUT),
         ))
         .unwrap_or_default();
 
         // Verify SSL PEER
-        if curl_options.ssl_verify_peer.unwrap_or_else(|| true) {
+        if curl_options.ssl_verify_peer.unwrap_or(true) {
             debug!("Enabled TLS-PEER verification.");
             curl.ssl_verify_peer(true).unwrap_or_default();
         } else {
@@ -639,7 +639,7 @@ pub trait GenericCurlChecker {
         }
 
         // Verify SSL HOST
-        if curl_options.ssl_verify_host.unwrap_or_else(|| true) {
+        if curl_options.ssl_verify_host.unwrap_or(true) {
             debug!("Enabled TLS-HOST verification.");
             curl.ssl_verify_host(true).unwrap_or_default();
         } else {

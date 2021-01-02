@@ -206,7 +206,7 @@ pub trait Checks<T> {
             curl.follow_location(false).unwrap_or_default();
         }
 
-        if curl_options.verbose.unwrap_or_else(|| false) {
+        if curl_options.verbose.unwrap_or(false) {
             debug!("Enabling Verbose mode.");
             curl.verbose(true).unwrap_or_default();
         } else {
@@ -267,11 +267,11 @@ pub trait Checks<T> {
         curl.connect_timeout(Duration::from_secs(
             curl_options
                 .connection_timeout
-                .unwrap_or_else(|| CHECK_CONNECTION_TIMEOUT),
+                .unwrap_or(CHECK_CONNECTION_TIMEOUT),
         ))
         .unwrap_or_default();
         curl.timeout(Duration::from_secs(
-            curl_options.timeout.unwrap_or_else(|| CHECK_TIMEOUT),
+            curl_options.timeout.unwrap_or(CHECK_TIMEOUT),
         ))
         .unwrap_or_default();
 
