@@ -17,7 +17,7 @@ pub fn get_domain_checks(pongo_mapper: String) -> Check {
     let mapper = read_pongo_mapper(&pongo_mapper);
     let domain_checks = get_pongo_hosts(&mapper.url)
         .into_par_iter()
-        .flat_map(|check| collect_pongo_domains(&check, &mapper))
+        .flat_map(|check| collect_pongo_domains(&check))
         .collect();
     Check {
         domains: Some(domain_checks),
@@ -50,7 +50,7 @@ pub fn get_page_checks(pongo_mapper: String) -> Check {
 
 
 /// Collect pongo domain check by host
-pub fn collect_pongo_domains(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Vec<Domain> {
+pub fn collect_pongo_domains(check: &PongoCheck) -> Vec<Domain> {
     check
         .data
         .host
