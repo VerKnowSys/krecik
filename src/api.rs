@@ -51,7 +51,6 @@ pub fn all_checks_pongo_merged() -> Vec<Check> {
                 // pass alert webhook and channel from mapper to the checks
                 alert_webhook: mapper.alert_webhook,
                 alert_channel: mapper.alert_channel,
-                ..Check::default()
             }
         })
         .collect()

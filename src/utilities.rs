@@ -58,9 +58,8 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
-                match path.to_str() {
-                    Some(element) => list.push(element.to_string()),
-                    None => (),
+                if let Some(element) = path.to_str() {
+                    list.push(element.to_string())
                 }
             }
             Err(err) => {
@@ -79,9 +78,8 @@ pub fn produce_list(glob_pattern: &str) -> Vec<String> {
     for entry in glob(&glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
-                match path.file_name().unwrap_or_default().to_str() {
-                    Some(element) => list.push(element.to_string()),
-                    None => (),
+                if let Some(element) = path.file_name().unwrap_or_default().to_str() {
+                    list.push(element.to_string())
                 }
             }
             Err(err) => {
