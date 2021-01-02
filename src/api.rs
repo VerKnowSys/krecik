@@ -77,6 +77,7 @@ pub fn all_checks_pongo_remote_pages() -> Vec<Check> {
 
 
 /// Execute single check by exact file
+#[deprecated(since = "0.9.0")]
 pub fn execute_checks_from_file(check_path: &str) -> History {
     debug!(
         "Loading single check from file under path: {}",
@@ -100,6 +101,7 @@ pub fn execute_checks_from_file(check_path: &str) -> History {
 
 
 /// Execute all file checks from path
+#[deprecated(since = "0.9.0")]
 pub fn execute_checks_from_path(check_path: &str) -> History {
     debug!(
         "Loading all checks from local path: {}/*.json",
@@ -132,6 +134,7 @@ pub fn execute_checks_from_path(check_path: &str) -> History {
 
 
 /// Remote PongoCheck check request
+#[deprecated(since = "0.9.0")]
 pub fn execute_checks_from_remote_resource_defined_in_path(check_path: &str) -> History {
     debug!(
         "Loading checks from remote resources defined under path: {}",
