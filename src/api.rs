@@ -35,11 +35,13 @@ pub fn all_checks_pongo_merged() -> Vec<Check> {
         .into_iter()
         .map(|pongo_mapper| {
             let mapper = read_pongo_mapper(&pongo_mapper);
-            let domain_checks = get_pongo_hosts(&mapper.url)
+            let all_pongo_checks = get_pongo_checks(&mapper.url);
+            let domain_checks = all_pongo_checks
+                .clone()
                 .into_par_iter()
                 .flat_map(|check| collect_pongo_domains(&check))
                 .collect();
-            let pongo_checks = get_pongo_hosts(&mapper.url)
+            let pongo_checks = all_pongo_checks
                 .into_par_iter()
                 .flat_map(|check| collect_pongo_hosts(&check, &mapper))
                 .collect();

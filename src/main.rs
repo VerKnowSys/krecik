@@ -46,7 +46,7 @@ use krecik::{
         generic::*,
         page::{Method, Page},
         pongo::{
-            collect_pongo_domains, collect_pongo_hosts, get_pongo_hosts, read_pongo_mapper,
+            collect_pongo_domains, collect_pongo_hosts, get_pongo_checks, read_pongo_mapper,
         },
     },
     configuration::{

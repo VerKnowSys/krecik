@@ -12,7 +12,7 @@ use std::{
 /// Read domain checks from pongo mapper
 pub fn get_domain_checks(pongo_mapper: String) -> Check {
     let mapper = read_pongo_mapper(&pongo_mapper);
-    let domain_checks = get_pongo_hosts(&mapper.url)
+    let domain_checks = get_pongo_checks(&mapper.url)
         .into_par_iter()
         .flat_map(|check| collect_pongo_domains(&check))
         .collect();
@@ -30,7 +30,7 @@ pub fn get_domain_checks(pongo_mapper: String) -> Check {
 /// Read page checks from pongo mapper
 pub fn get_page_checks(pongo_mapper: String) -> Check {
     let mapper = read_pongo_mapper(&pongo_mapper);
-    let pongo_checks = get_pongo_hosts(&mapper.url)
+    let pongo_checks = get_pongo_checks(&mapper.url)
         .into_par_iter()
         .flat_map(|check| collect_pongo_hosts(&check, &mapper))
         .collect();
@@ -148,8 +148,8 @@ pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
 }
 
 
-/// Pongo remote read utility
-pub fn get_pongo_hosts(url: &str) -> PongoChecks {
+/// Read checks from Pongo remote
+pub fn get_pongo_checks(url: &str) -> PongoChecks {
     let mut easy = Easy2::new(Collector(Vec::new()));
     easy.get(true).unwrap_or_default();
     easy.url(&url).unwrap_or_default();
