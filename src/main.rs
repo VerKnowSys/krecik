@@ -107,6 +107,7 @@ async fn main() {
 
     // let results_warden = ResultsWarden::start(1, || )
     // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
+    let start = Local::now();
 
     let pongo_checks = curl_multi_checker_pongo
         .send(ChecksPongo(all_checks_pongo_merged()))
@@ -128,8 +129,16 @@ async fn main() {
         .collect::<Vec<String>>()
         .join(",");
 
+    let end = Local::now();
+    let diff = end - start;
+
     utilities::write_append("/tmp/out.json", &format!("[{}]", stories_listof_json));
-    info!("Result stories count: {}", stories.len());
+    info!(
+        "Process took: {}s. Result stories count: {}. ({} sps)",
+        diff.num_seconds(),
+        stories.len(),
+        stories.len() / diff.num_seconds() as usize
+    );
 
     System::current().stop();
 }
