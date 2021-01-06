@@ -17,12 +17,11 @@
 // For development:
 #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
-use actix::prelude::*;
-use actix_macros::main as actix_main;
 
 #[macro_use]
 extern crate fern;
 
+use actix::prelude::*;
 use chrono::*;
 use colored::Colorize;
 use curl::{
@@ -92,7 +91,7 @@ fn setup_logger(level: LevelFilter) -> Result<(), InitError> {
 }
 
 
-#[actix_main]
+#[actix_macros::main]
 async fn main() {
     let logger_level = match var("DEBUG") {
         Ok(value) => LevelFilter::Debug,
