@@ -1,0 +1,21 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"folder_exclude_patterns": [".cargo", "logs", "target"],
+			"file_exclude_patterns": ["*.lock", "*.sublime-workspace"]
+		}
+	],
+	"debugger_configurations":
+	[
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Launch",
+			"program": "${workspaceFolder}/target/debug/krecik-server",
+			"args": [],
+			"cwd": "${workspaceFolder}"
+		}
+	],
+}

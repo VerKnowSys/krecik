@@ -10,3 +10,4 @@ web/views/*
 logs/*
 .*
 ./checks
+*.sublime-workspace
