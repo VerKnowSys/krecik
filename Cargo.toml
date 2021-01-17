@@ -3,7 +3,7 @@ name = "krecik"
 version = "0.10.0"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 description = "Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL."
-keywords = ["curl", "web", "check", "tls-expire", "openssl", "actix"]
+keywords = ["curl", "web", "check", "tls-expire", "tls", "mesalink", "actix"]
 categories = ["asynchronous", "concurrency", "actors"]
 homepage = "https://github.com/VerKnowSys/krecik"
 license = "MIT"
@@ -21,7 +21,7 @@ name = "krecik-server"
 path = "src/main.rs"
 
 [dependencies]
-curl = { version = "0.4.34", features = ["http2", "static-curl", "static-ssl"] }
+curl = { version = "0.4.34", features = ["http2", "static-curl", "mesalink"] }
 
 log = "0.4.13"
 fern = { version = "0.6.0", features = ["colored"] }
