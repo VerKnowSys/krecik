@@ -27,8 +27,8 @@ log = "0.4.13"
 fern = { version = "0.6.0", features = ["colored"] }
 colored = "2.0.0"
 
-serde = "1.0.119"
-serde_derive = "1.0.119"
+serde = "1.0.120"
+serde_derive = "1.0.120"
 serde_json = "1.0.61"
 
 # lazy_static = "1.4.0"
@@ -44,7 +44,7 @@ domain = "0.5.3"
 abstract-ns = "0.4.3"
 ns-std-threaded = "0.3.0"
 
-bencher = "0.1.5"
+#bencher = "0.1.5"
 #jemallocator = "0.3.2"
 mimalloc = { version = "0.1.22", default-features = false }
 
