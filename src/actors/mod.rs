@@ -14,3 +14,6 @@ pub mod domain_expiry_checker;
 
 /// store history of checks on disk
 pub mod history_teacher;
+
+/// read last history states and send Slack notifications if necessary
+pub mod results_warden;
