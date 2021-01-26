@@ -37,6 +37,8 @@ use krecik::{
         curl_multi_checker_pongo::CurlMultiCheckerPongo,
         domain_expiry_checker::Checks as ChecksDomains,
         domain_expiry_checker::DomainExpiryChecker,
+        history_teacher::{HistoryTeacher, Results},
+        results_warden::{ResultsWarden, ValidateResults},
     },
     api::*,
     checks::{
@@ -69,6 +71,7 @@ use std::{
     fs,
     io::{Error, ErrorKind},
     path::Path,
+    thread,
     time::Duration,
 };
 
@@ -78,7 +81,7 @@ fn setup_logger(level: LevelFilter) -> Result<(), InitError> {
         .format(|out, message, record| {
             out.finish(format_args!(
                 "{}[{}][{}] {}",
-                chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
                 record.target(),
                 record.level(),
                 message
@@ -102,42 +105,59 @@ async fn main() {
     // Define system actors
     let curl_multi_checker = SyncArbiter::start(4, || CurlMultiChecker);
     let curl_multi_checker_pongo = SyncArbiter::start(4, || CurlMultiCheckerPongo);
-    // let domain_expiry_checker = SyncArbiter::start(4, || DomainExpiryChecker);
+    let history_teacher = SyncArbiter::start(4, || HistoryTeacher);
+    let results_warden = SyncArbiter::start(1, || ResultsWarden);
 
-    // let results_warden = ResultsWarden::start(1, || )
-    // let pongo_curl_actor = SyncArbiter::start(4, || CurlMultiChecker);
-    let start = Local::now();
+    ctrlc::set_handler(|| {
+        println!("\n\nKrecik server was interrupted!");
+        std::process::exit(0);
+    })
+    .expect("Error setting Ctrl-C handler");
 
-    let pongo_checks = curl_multi_checker_pongo
-        .send(ChecksPongo(all_checks_pongo_merged()))
-        .await;
+    loop {
+        // TODO: let config = KrecikConfiguration{…}; => reload configuration every loop iteration
+        let start = Local::now();
 
-    let regular_checks = curl_multi_checker
-        .send(Checks(all_checks_but_remotes()))
-        .await;
+        let pongo_checks = curl_multi_checker_pongo
+            .send(ChecksPongo(all_checks_pongo_merged()))
+            .await;
 
-    let stories = [
-        pongo_checks.unwrap().unwrap_or_default(),
-        regular_checks.unwrap().unwrap_or_default(),
-    ]
-    .concat();
+        let regular_checks = curl_multi_checker
+            .send(Checks(all_checks_but_remotes()))
+            .await;
 
-    let stories_listof_json = stories
-        .iter()
-        .map(|story| story.to_string())
-        .collect::<Vec<String>>()
-        .join(",");
+        let stories = [
+            pongo_checks.unwrap().unwrap_or_default(),
+            regular_checks.unwrap().unwrap_or_default(),
+        ]
+        .concat();
 
-    let end = Local::now();
-    let diff = end - start;
+        let end = Local::now();
+        let diff = end - start;
 
-    utilities::write_append("/tmp/out.json", &format!("[{}]", stories_listof_json));
-    info!(
-        "Process took: {}s. Result stories count: {}. ({} sps)",
-        diff.num_seconds(),
-        stories.len(),
-        stories.len() / diff.num_seconds() as usize
-    );
+        info!(
+            "Remote checks took: {}s. Result stories count: {}.",
+            diff.num_seconds(),
+            stories.len(),
+        );
 
-    System::current().stop();
+        debug!("Sending results to HistoryTeacher…");
+        history_teacher
+            .send(Results(stories))
+            .await
+            .unwrap()
+            .unwrap_or_default();
+
+        debug!("Starting results validation…");
+        match results_warden.send(ValidateResults).await.unwrap() {
+            Ok(()) => {
+                // only if no issues were found, we can do a pause between tests
+                debug!("No issues detected, pausing before next check…");
+                thread::sleep(Duration::from_millis(30_000));
+            }
+            Err(()) => {
+                debug!("Errors were detected, starting next check immediately…");
+            }
+        }
+    }
 }
