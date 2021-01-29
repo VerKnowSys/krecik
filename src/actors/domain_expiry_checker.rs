@@ -32,6 +32,7 @@ impl Handler<Checks> for DomainExpiryChecker {
     type Result = Result<Stories, Stories>;
 
     fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
+        let notifier = None; // TODO: read notifires from config
         Ok(msg
             .0
             .into_par_iter()
@@ -39,7 +40,7 @@ impl Handler<Checks> for DomainExpiryChecker {
                 check
                     .domains
                     .par_iter()
-                    .flat_map(move |domains| {
+                    .flat_map(|domains| {
                         domains
                             .par_iter()
                             .flat_map(|domain| {
@@ -47,7 +48,11 @@ impl Handler<Checks> for DomainExpiryChecker {
                                     .expects
                                     .par_iter()
                                     .map(|expectation| {
-                                        Self::check_ssl_expire(&domain.name, *expectation)
+                                        Self::check_ssl_expire(
+                                            &domain.name,
+                                            *expectation,
+                                            notifier.clone(),
+                                        )
                                     })
                                     .collect::<Stories>()
                             })
@@ -62,7 +67,11 @@ impl Handler<Checks> for DomainExpiryChecker {
 
 impl DomainExpiryChecker {
     /// Check SSL certificate expiration using OpenSSL function
-    fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
+    fn check_ssl_expire(
+        domain_name: &str,
+        domain_expectation: DomainExpectation,
+        notifier: Option<String>,
+    ) -> Story {
         SslExpiration::from_domain_name_with_timeout(&domain_name, CHECK_TIMEOUT)
             .map(|ssl_validator| {
                 match domain_expectation {
@@ -70,18 +79,24 @@ impl DomainExpiryChecker {
                         if ssl_validator.days() < expected_days
                             || ssl_validator.is_expired() =>
                     {
-                        Story::error(Unexpected::TLSDomainExpired(
-                            domain_name.to_string(),
-                            ssl_validator.days(),
-                        ))
+                        Story::error(
+                            Unexpected::TLSDomainExpired(
+                                domain_name.to_string(),
+                                ssl_validator.days(),
+                            ),
+                            notifier,
+                        )
                     }
 
                     DomainExpectation::ValidExpiryPeriod(expected_days) => {
-                        Story::success(Expected::TLSCertificateFresh(
-                            domain_name.to_string(),
-                            ssl_validator.days(),
-                            expected_days,
-                        ))
+                        Story::success(
+                            Expected::TLSCertificateFresh(
+                                domain_name.to_string(),
+                                ssl_validator.days(),
+                                expected_days,
+                            ),
+                            notifier,
+                        )
                     }
                 }
             })

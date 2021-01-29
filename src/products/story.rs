@@ -26,28 +26,34 @@ pub struct Story {
     /// Story - keep history of unexpected results (failures)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<Unexpected>,
+
+    /// Notifier to use if notification action is necessary
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notifier: Option<String>,
 }
 
 
 impl Story {
     /// New success-story
-    pub fn success(success: Expected) -> Story {
+    pub fn success(success: Expected, notifier: Option<String>) -> Story {
         Story {
             timestamp: Local::now().to_rfc3339(),
             success: Some(success),
             minor: None,
             error: None,
+            notifier,
         }
     }
 
 
     /// New error-story
-    pub fn error(error: Unexpected) -> Story {
+    pub fn error(error: Unexpected, notifier: Option<String>) -> Story {
         Story {
             timestamp: Local::now().to_rfc3339(),
             success: None,
             minor: None,
             error: Some(error),
+            notifier,
         }
     }
 
@@ -59,6 +65,7 @@ impl Story {
             success: None,
             minor: Some(minor),
             error: None,
+            notifier: None,
         }
     }
 }

@@ -147,6 +147,7 @@ async fn main() {
             .await
             .unwrap()
             .unwrap_or_default();
+        // TODO: HistoryTeacher should send VadlidateResults message after it's done to eliminate possible race condition when stories weren't saved yet and ResultsWarden is already on validation process.
 
         debug!("Starting results validation…");
         match results_warden.send(ValidateResults).await.unwrap() {

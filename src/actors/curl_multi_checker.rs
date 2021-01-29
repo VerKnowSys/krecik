@@ -2,7 +2,6 @@ use super::curl_generic_checker::GenericCurlChecker;
 use crate::{checks::generic::*, configuration::CHECK_TIMEOUT, products::story::*};
 use actix::prelude::*;
 use curl::multi::Multi;
-use log::*;
 use rayon::prelude::*;
 use std::time::Duration;
 
@@ -22,6 +21,8 @@ impl Handler<Checks> for CurlMultiChecker {
     type Result = Result<Stories, Stories>;
 
     fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
+        // TODO: read notifiers from configuration:
+        let notifier = None;
         let stories_from_domains = msg
             .clone()
             .0
@@ -30,7 +31,7 @@ impl Handler<Checks> for CurlMultiChecker {
                 check
                     .domains
                     .par_iter()
-                    .flat_map(move |domains| {
+                    .flat_map(|domains| {
                         domains
                             .par_iter()
                             .flat_map(|domain| {
@@ -38,7 +39,11 @@ impl Handler<Checks> for CurlMultiChecker {
                                     .expects
                                     .par_iter()
                                     .map(|expectation| {
-                                        Self::check_ssl_expire(&domain.name, *expectation)
+                                        Self::check_ssl_expire(
+                                            &domain.name,
+                                            *expectation,
+                                            notifier.clone(),
+                                        )
                                     })
                                     .collect::<Stories>()
                             })
@@ -52,9 +57,8 @@ impl Handler<Checks> for CurlMultiChecker {
             .0
             .iter()
             .flat_map(|check| {
-                check.pages.iter().flat_map(move |pages| {
+                check.pages.iter().flat_map(|pages| {
                     let mut multi = Multi::new();
-                    debug!("Starting new check: {:#?}", check);
                     multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex
 
                     // collect tuple of page-checks and Curl handler:
@@ -74,7 +78,12 @@ impl Handler<Checks> for CurlMultiChecker {
                     process_handlers
                         .into_iter()
                         .flat_map(|(check, handler)| {
-                            Self::process_page_handler(&check, handler, &multi)
+                            Self::process_page_handler(
+                                &check,
+                                handler,
+                                &multi,
+                                notifier.clone(),
+                            )
                         })
                         .collect::<Stories>()
                 })

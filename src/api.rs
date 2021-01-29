@@ -1,5 +1,4 @@
 use crate::{checks::pongo::*, *};
-use colored::Colorize;
 use rayon::prelude::*;
 use std::io::{Error, ErrorKind};
 
@@ -49,9 +48,7 @@ pub fn all_checks_pongo_merged() -> Vec<Check> {
             Check {
                 pages: Some(pongo_checks),
                 domains: Some(domain_checks),
-
-                // pass alert webhook from mapper to the checks
-                alert_webhook: mapper.alert_webhook,
+                notifier: mapper.notifier,
             }
         })
         .collect()
@@ -73,95 +70,4 @@ pub fn all_checks_pongo_remote_pages() -> Vec<Check> {
         .into_par_iter()
         .map(get_page_checks)
         .collect()
-}
-
-
-/// Execute single check by exact file
-#[deprecated(since = "0.9.0")]
-pub fn execute_checks_from_file(check_path: &str) -> History {
-    debug!(
-        "Loading single check from file under path: {}",
-        &check_path.cyan()
-    );
-    GenCheck::load(&check_path)
-        .map(|check| {
-            let file_name = file_name_from_path(check_path);
-            debug!("Executing check: {}", file_name.magenta());
-            check.execute(&file_name)
-        })
-        .unwrap_or_else(|err| {
-            let error = format!(
-                "Failed to load check from file: {}. Error details: {}",
-                &check_path, err
-            );
-            error!("{}", error.red());
-            History::new(Story::error(Unexpected::CheckParseProblem(error)))
-        })
-}
-
-
-/// Execute all file checks from path
-#[deprecated(since = "0.9.0")]
-pub fn execute_checks_from_path(check_path: &str) -> History {
-    debug!(
-        "Loading all checks from local path: {}/*.json",
-        &check_path.cyan()
-    );
-    History::new_from(
-        list_check_files_from(&check_path)
-            .into_iter()
-            .flat_map(|check_resource| {
-                let check_file = format!("{}/{}", check_path, check_resource);
-                GenCheck::load(&check_file)
-                    .map(|check| {
-                        let file_name = file_name_from_path(&check_file);
-                        debug!("Executing check from file: {}", file_name.magenta());
-                        check.execute(&file_name)
-                    })
-                    .unwrap_or_else(|err| {
-                        let error = format!(
-                            "Failed to load check from file: {}. Error details: {}",
-                            &check_file, err
-                        );
-                        error!("{}", error.red());
-                        History::new(Story::error(Unexpected::CheckParseProblem(error)))
-                    })
-                    .stories()
-            })
-            .collect(),
-    )
-}
-
-
-/// Remote PongoCheck check request
-#[deprecated(since = "0.9.0")]
-pub fn execute_checks_from_remote_resource_defined_in_path(check_path: &str) -> History {
-    debug!(
-        "Loading checks from remote resources defined under path: {}",
-        &check_path.cyan()
-    );
-    History::new_from(
-        list_check_files_from(&check_path)
-            .into_iter()
-            .flat_map(|check_file| {
-                let mapper = format!("{}/{}", check_path, check_file);
-                debug!("Mapper file: {}", mapper);
-                PongoCheck::load(&mapper)
-                    .map(|check| {
-                        let file_name = file_name_from_path(&check_file);
-                        debug!("Executing remote check from file: {}", file_name);
-                        check.execute(&file_name)
-                    })
-                    .unwrap_or_else(|err| {
-                        let error = format!(
-                            "Failed to load remote check from file: {}. Error details: {}",
-                            &mapper, err
-                        );
-                        error!("{}", error.red());
-                        History::new(Story::error(Unexpected::CheckParseProblem(error)))
-                    })
-                    .stories()
-            })
-            .collect(),
-    )
 }

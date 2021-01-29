@@ -37,19 +37,15 @@ pub extern crate failure;
 pub extern crate serde_derive;
 
 
-use crate::checks::check::*;
-use crate::checks::domain::*;
-use crate::checks::generic::*;
-use crate::checks::page::*;
-use crate::checks::pongo::*;
-
-use crate::configuration::*;
-use crate::products::expected::*;
-use crate::products::history::*;
-use crate::products::story::*;
-use crate::products::unexpected::*;
-use crate::utilities::*;
-use colored::Colorize;
+pub use crate::checks::generic::*;
+pub use crate::checks::page::*;
+pub use crate::checks::pongo::*;
+pub use crate::configuration::*;
+pub use crate::products::expected::*;
+pub use crate::products::history::*;
+pub use crate::products::story::*;
+pub use crate::products::unexpected::*;
+pub use crate::utilities::*;
 use curl::easy::{Handler, WriteError};
 
 

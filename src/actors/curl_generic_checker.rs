@@ -32,7 +32,11 @@ use std::{
 /// Trait implementing all helper functions for Curl-driven checks
 pub trait GenericCurlChecker {
     /// Check SSL certificate expiration using OpenSSL function
-    fn check_ssl_expire(domain_name: &str, domain_expectation: DomainExpectation) -> Story {
+    fn check_ssl_expire(
+        domain_name: &str,
+        domain_expectation: DomainExpectation,
+        notifier: Option<String>,
+    ) -> Story {
         SslExpiration::from_domain_name_with_timeout(&domain_name, CHECK_TIMEOUT)
             .map(|ssl_validator| {
                 match domain_expectation {
@@ -40,18 +44,24 @@ pub trait GenericCurlChecker {
                         if ssl_validator.days() < expected_days
                             || ssl_validator.is_expired() =>
                     {
-                        Story::error(Unexpected::TLSDomainExpired(
-                            domain_name.to_string(),
-                            ssl_validator.days(),
-                        ))
+                        Story::error(
+                            Unexpected::TLSDomainExpired(
+                                domain_name.to_string(),
+                                ssl_validator.days(),
+                            ),
+                            notifier.clone(),
+                        )
                     }
 
                     DomainExpectation::ValidExpiryPeriod(expected_days) => {
-                        Story::success(Expected::TLSCertificateFresh(
-                            domain_name.to_string(),
-                            ssl_validator.days(),
-                            expected_days,
-                        ))
+                        Story::success(
+                            Expected::TLSCertificateFresh(
+                                domain_name.to_string(),
+                                ssl_validator.days(),
+                                expected_days,
+                            ),
+                            notifier,
+                        )
                     }
                 }
             })
@@ -68,31 +78,41 @@ pub trait GenericCurlChecker {
         url: &str,
         raw_page_content: &str,
         expected_content_length: &PageExpectation,
+        notifier: Option<String>,
     ) -> Story {
         match expected_content_length {
             &PageExpectation::ValidLength(ref requested_length)
                 if raw_page_content.len() >= *requested_length =>
             {
-                Story::success(Expected::ContentLength(url.to_string(), *requested_length))
+                Story::success(
+                    Expected::ContentLength(url.to_string(), *requested_length),
+                    notifier,
+                )
             }
 
             &PageExpectation::ValidLength(ref requested_length) => {
-                Story::error(Unexpected::ContentLengthInvalid(
-                    url.to_string(),
-                    raw_page_content.len(),
-                    *requested_length,
-                ))
+                Story::error(
+                    Unexpected::ContentLengthInvalid(
+                        url.to_string(),
+                        raw_page_content.len(),
+                        *requested_length,
+                    ),
+                    notifier,
+                )
             }
 
             &PageExpectation::ValidNoLength => {
-                Story::success(Expected::NoContentLength(url.to_string()))
+                Story::success(Expected::NoContentLength(url.to_string()), notifier)
             }
 
             edge_case => {
-                Story::error(Unexpected::UnmatchedValidationCase(
-                    url.to_string(),
-                    edge_case.to_string(),
-                ))
+                Story::error(
+                    Unexpected::UnmatchedValidationCase(
+                        url.to_string(),
+                        edge_case.to_string(),
+                    ),
+                    notifier,
+                )
             }
         }
     }
@@ -236,6 +256,7 @@ pub trait GenericCurlChecker {
         url: &str,
         raw_page_content: &str,
         expected_contents: &[PageExpectation],
+        notifier: Option<String>,
     ) -> Stories {
         expected_contents
             .par_iter()
@@ -244,25 +265,34 @@ pub trait GenericCurlChecker {
                     PageExpectation::ValidContent(ref content)
                         if raw_page_content.contains(content) =>
                     {
-                        Story::success(Expected::Content(url.to_string(), content.to_string()))
+                        Story::success(
+                            Expected::Content(url.to_string(), content.to_string()),
+                            notifier.clone(),
+                        )
                     }
 
                     PageExpectation::ValidContent(ref content) => {
-                        Story::error(Unexpected::ContentInvalid(
-                            url.to_string(),
-                            content.to_string(),
-                        ))
+                        Story::error(
+                            Unexpected::ContentInvalid(url.to_string(), content.to_string()),
+                            notifier.clone(),
+                        )
                     }
 
                     PageExpectation::ValidNoContent => {
-                        Story::success(Expected::EmptyContent(url.to_string()))
+                        Story::success(
+                            Expected::EmptyContent(url.to_string()),
+                            notifier.clone(),
+                        )
                     }
 
                     edge_case => {
-                        Story::error(Unexpected::UnmatchedValidationCase(
-                            url.to_string(),
-                            format!("{:?}", edge_case),
-                        ))
+                        Story::error(
+                            Unexpected::UnmatchedValidationCase(
+                                url.to_string(),
+                                format!("{:?}", edge_case),
+                            ),
+                            notifier.clone(),
+                        )
                     }
                 }
             })
@@ -275,29 +305,42 @@ pub trait GenericCurlChecker {
         url: &str,
         address: &str,
         expected_address: &PageExpectation,
+        notifier: Option<String>,
     ) -> Story {
         match expected_address {
             &PageExpectation::ValidAddress(ref an_address) if address.contains(an_address) => {
-                Story::success(Expected::Address(url.to_string(), address.to_string()))
+                Story::success(
+                    Expected::Address(url.to_string(), address.to_string()),
+                    notifier,
+                )
             }
 
             &PageExpectation::ValidAddress(ref an_address) => {
-                Story::error(Unexpected::AddressInvalid(
-                    url.to_string(),
-                    address.to_string(),
-                    an_address.to_string(),
-                ))
+                Story::error(
+                    Unexpected::AddressInvalid(
+                        url.to_string(),
+                        address.to_string(),
+                        an_address.to_string(),
+                    ),
+                    notifier,
+                )
             }
 
             &PageExpectation::ValidNoAddress => {
-                Story::success(Expected::Address(url.to_string(), url.to_string()))
+                Story::success(
+                    Expected::Address(url.to_string(), url.to_string()),
+                    notifier,
+                )
             }
 
             edge_case => {
-                Story::error(Unexpected::UnmatchedValidationCase(
-                    url.to_string(),
-                    edge_case.to_string(),
-                ))
+                Story::error(
+                    Unexpected::UnmatchedValidationCase(
+                        url.to_string(),
+                        edge_case.to_string(),
+                    ),
+                    notifier,
+                )
             }
         }
     }
@@ -309,22 +352,26 @@ pub trait GenericCurlChecker {
         connect_oserror: Option<Error>,
         response_code: Result<u32, Error>,
         expected_code: &PageExpectation,
+        notifier: Option<String>,
     ) -> Story {
         match response_code {
             Ok(responded_code) => {
                 match expected_code {
                     &PageExpectation::ValidCode(the_code) if responded_code == the_code => {
-                        Story::success(Expected::HttpCode(url.to_string(), the_code))
+                        Story::success(Expected::HttpCode(url.to_string(), the_code), notifier)
                     }
 
                     &PageExpectation::ValidCode(the_code)
                         if responded_code > 0 && responded_code != the_code =>
                     {
-                        Story::error(Unexpected::HttpCodeInvalid(
-                            url.to_string(),
-                            responded_code,
-                            the_code,
-                        ))
+                        Story::error(
+                            Unexpected::HttpCodeInvalid(
+                                url.to_string(),
+                                responded_code,
+                                the_code,
+                            ),
+                            notifier,
+                        )
                     }
 
                     &PageExpectation::ValidCode(_the_code) if responded_code == 0 => {
@@ -336,28 +383,34 @@ pub trait GenericCurlChecker {
                                 ))
                             }
                             None => {
-                                Story::error(Unexpected::HttpConnectionFailed(
-                                    url.to_string(),
-                                    CHECK_CONNECTION_TIMEOUT,
-                                ))
+                                Story::error(
+                                    Unexpected::HttpConnectionFailed(
+                                        url.to_string(),
+                                        CHECK_CONNECTION_TIMEOUT,
+                                    ),
+                                    notifier,
+                                )
                             }
                         }
                     }
 
                     edge_case => {
-                        Story::error(Unexpected::UnmatchedValidationCase(
-                            url.to_string(),
-                            edge_case.to_string(),
-                        ))
+                        Story::error(
+                            Unexpected::UnmatchedValidationCase(
+                                url.to_string(),
+                                edge_case.to_string(),
+                            ),
+                            notifier,
+                        )
                     }
                 }
             }
 
             Err(err) => {
-                Story::error(Unexpected::URLConnectionProblem(
-                    url.to_string(),
-                    err.to_string(),
-                ))
+                Story::error(
+                    Unexpected::URLConnectionProblem(url.to_string(), err.to_string()),
+                    notifier,
+                )
             }
         }
     }
@@ -368,6 +421,7 @@ pub trait GenericCurlChecker {
         page_check: &Page,
         handler: CurlHandler,
         multi: &Multi,
+        notifier: Option<String>,
     ) -> Stories {
         let page_expectations = page_check.clone().expects;
         debug!(
@@ -381,7 +435,7 @@ pub trait GenericCurlChecker {
                 if handle.get_ref().0.is_empty() {
                     let fail = "Got an empty output from CurlMultiChecker handle!".to_owned();
                     debug!("{}", fail);
-                    return vec![Story::error(Unexpected::HandlerFailed(fail))];
+                    return vec![Story::error(Unexpected::HandlerFailed(fail), notifier)];
                 } else {
                     handle
                 }
@@ -392,9 +446,10 @@ pub trait GenericCurlChecker {
                     page_check.url.cyan(),
                     err.to_string().red()
                 );
-                return vec![Story::error(Unexpected::HandlerFailed(
-                    err.description().to_string(),
-                ))];
+                return vec![Story::error(
+                    Unexpected::HandlerFailed(err.description().to_string()),
+                    notifier,
+                )];
             }
         };
 
@@ -430,6 +485,7 @@ pub trait GenericCurlChecker {
             &page_check.url,
             &raw_page_content,
             &expected_contents,
+            notifier.clone(),
         );
         debug!(
             "process_page_handler::content_story: {}",
@@ -439,6 +495,7 @@ pub trait GenericCurlChecker {
             &page_check.url,
             &raw_page_content,
             expected_content_length,
+            notifier.clone(),
         )];
         debug!(
             "process_page_handler::content_length_story: {}",
@@ -453,9 +510,10 @@ pub trait GenericCurlChecker {
                     page_check.url.cyan(),
                     err.to_string().red()
                 );
-                return vec![Story::error(Unexpected::HandlerFailed(
-                    err.description().to_string(),
-                ))];
+                return vec![Story::error(
+                    Unexpected::HandlerFailed(err.description().to_string()),
+                    notifier,
+                )];
             }
         };
         let result_final_address = result_handler.effective_url().unwrap_or_default();
@@ -463,6 +521,7 @@ pub trait GenericCurlChecker {
             &page_check.url,
             &result_final_address.unwrap_or_default(),
             expected_final_address,
+            notifier.clone(),
         )];
         debug!(
             "process_page_handler::result_final_address_story: {}",
@@ -482,6 +541,7 @@ pub trait GenericCurlChecker {
                 .response_code()
                 .map_err(Self::produce_curl_response_error),
             expected_code,
+            notifier,
         )];
         debug!(
             "process_page_handler::handle_page_httpcode_expectation: {}",
