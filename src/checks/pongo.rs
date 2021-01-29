@@ -4,14 +4,12 @@ use crate::{
     configuration::*,
     products::expected::{PageExpectation, PageExpectations},
     utilities::read_text_file,
-    Collector,
+    *,
 };
 
 use curl::easy::Easy2;
 use rayon::prelude::*;
 use std::io::{Error, ErrorKind};
-
-use super::generic::Check;
 
 
 /// Read domain checks from pongo mapper

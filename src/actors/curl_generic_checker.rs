@@ -1,8 +1,5 @@
 use crate::{
-    checks::{
-        check::*,
-        page::{Method, Page},
-    },
+    checks::page::{Method, Page},
     configuration::{
         CHECK_CONNECTION_TIMEOUT, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE, CHECK_MAX_CONNECTIONS,
         CHECK_MAX_REDIRECTIONS, CHECK_TIMEOUT, DEFAULT_SLACK_NAME,
@@ -12,7 +9,7 @@ use crate::{
         story::*,
         unexpected::{Unexpected, UnexpectedMinor},
     },
-    Collector,
+    *,
 };
 use colored::Colorize;
 use curl::{

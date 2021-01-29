@@ -1,5 +1,5 @@
 use super::curl_generic_checker::GenericCurlChecker;
-use crate::{checks::generic::*, configuration::CHECK_TIMEOUT, products::story::*};
+use crate::{checks::check::*, configuration::CHECK_TIMEOUT, products::story::*};
 use actix::prelude::*;
 use curl::multi::Multi;
 use rayon::prelude::*;

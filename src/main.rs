@@ -44,7 +44,6 @@ use krecik::{
     checks::{
         check::*,
         domain::Domains,
-        generic::*,
         page::{Method, Page},
         pongo::{
             collect_pongo_domains, collect_pongo_hosts, get_pongo_checks, read_pongo_mapper,

@@ -11,8 +11,8 @@ mod all_tests {
     use std::io::{Error, ErrorKind};
     use std::time::Duration;
 
+    use crate::checks::check::*;
     use crate::checks::domain::*;
-    use crate::checks::generic::*;
     use crate::checks::page::*;
     use crate::checks::pongo::*;
     use crate::checks::*;

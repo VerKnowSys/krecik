@@ -1,6 +1,23 @@
-use crate::*;
-use curl::{multi::Easy2Handle, MultiError};
+use crate::{
+    checks::{domain::*, page::*},
+    products::story::*,
+};
+use actix::prelude::*;
 
 
-/// Type alias for long type name:
-pub type CurlHandler = Result<Easy2Handle<Collector>, MultiError>;
+#[derive(Debug, Clone, Serialize, Deserialize, Default, Message)]
+#[rtype(result = "Result<Stories, Stories>")]
+/// Generic Check structure:
+pub struct Check {
+    /// Domains to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domains: Option<Domains>,
+
+    /// Pages to check
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pages: Option<Pages>,
+
+    /// Slack notifier id - taken from config
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notifier: Option<String>,
+}

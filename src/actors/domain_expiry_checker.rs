@@ -1,5 +1,5 @@
 use crate::{
-    checks::generic::*,
+    checks::check::*,
     configuration::CHECK_TIMEOUT,
     products::{
         expected::{DomainExpectation, Expected},
