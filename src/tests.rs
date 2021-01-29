@@ -218,7 +218,6 @@ mod all_tests {
                 options: Some(PageOptions::default()),
             }]),
             alert_webhook: None,
-            alert_channel: None,
         };
         let output = serde_json::to_string(&check).unwrap_or_default();
         println!("Output: {}", output);

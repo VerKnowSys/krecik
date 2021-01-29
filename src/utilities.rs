@@ -10,11 +10,10 @@ use crate::*;
 
 
 /// Sends generic notification over Slack
-pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str, fail: bool) {
+pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
     Slack::new(webhook)
         .and_then(|slack| {
             PayloadBuilder::new()
-                .channel(channel)
                 .username(DEFAULT_SLACK_NAME)
                 .icon_emoji(icon)
                 .attachments(vec![
@@ -41,14 +40,14 @@ pub fn notify(webhook: &str, channel: &str, message: &str, icon: &str, fail: boo
 
 
 /// Sends success notification to Slack
-pub fn notify_success(webhook: &str, channel: &str, message: &str) {
-    notify(webhook, channel, message, DEFAULT_SLACK_SUCCESS_ICON, false)
+pub fn notify_success(webhook: &str, message: &str) {
+    notify(webhook, message, DEFAULT_SLACK_SUCCESS_ICON, false)
 }
 
 
 /// Sends failure notification to Slack
-pub fn notify_failure(webhook: &str, channel: &str, message: &str) {
-    notify(webhook, channel, message, DEFAULT_SLACK_FAILURE_ICON, true)
+pub fn notify_failure(webhook: &str, message: &str) {
+    notify(webhook, message, DEFAULT_SLACK_FAILURE_ICON, true)
 }
 
 

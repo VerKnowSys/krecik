@@ -102,8 +102,8 @@ impl Handler<ValidateResults> for ResultsWarden {
                 && !previous_stories_errors.is_empty()
                 && !old_previous_stories_errors.is_empty()
             {
-                // TODO: create configuration with HashMap of webhooks per channel?
-                // notify_success(webhook, channel, &format!("All services are UP again!\n"));
+                // TODO: create configuration with HashMap of webhooks?
+                // notify_success(webhook, &format!("All services are UP again!\n"));
             }
             // TODO: send failure notification when last_stories_errors and previous_stories_errors and old_previous_stories_errors contain same error
         }

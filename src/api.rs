@@ -50,9 +50,8 @@ pub fn all_checks_pongo_merged() -> Vec<Check> {
                 pages: Some(pongo_checks),
                 domains: Some(domain_checks),
 
-                // pass alert webhook and channel from mapper to the checks
+                // pass alert webhook from mapper to the checks
                 alert_webhook: mapper.alert_webhook,
-                alert_channel: mapper.alert_channel,
             }
         })
         .collect()

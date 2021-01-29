@@ -21,10 +21,6 @@ pub struct Check {
     /// Slack Webhook
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_webhook: Option<String>,
-
-    /// Slack alert channel
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub alert_channel: Option<String>,
 }
 
 /// Alias type for list of checks
@@ -46,10 +42,6 @@ pub struct GenCheck {
     /// Slack Webhook
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_webhook: Option<String>,
-
-    /// Slack alert channel
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub alert_channel: Option<String>,
 }
 
 
@@ -70,8 +62,8 @@ impl Checks<GenCheck> for GenCheck {
             ]
             .concat(),
         );
-        match (&self.alert_webhook, &self.alert_channel) {
-            (Some(webhook), Some(channel)) => {
+        match &self.alert_webhook {
+            Some(webhook) => {
                 let failures = history
                     .stories()
                     .iter()
@@ -96,7 +88,6 @@ impl Checks<GenCheck> for GenCheck {
                         fs::remove_file(failures_state_file).unwrap_or_default();
                         notify_success(
                             webhook,
-                            channel,
                             &format!("All services are UP again ({}).\n", &execution_name),
                         );
                     } else {
@@ -122,12 +113,12 @@ impl Checks<GenCheck> for GenCheck {
                         .collect::<String>();
 
                     if send_notification.is_some() {
-                        notify_failure(webhook, channel, &failures_to_notify);
+                        notify_failure(webhook, &failures_to_notify);
                     }
                 }
             }
-            (..) => {
-                info!("Notifications not configured hence skipped…");
+            None => {
+                warn!("Notifications not configured!");
             }
         };
         history

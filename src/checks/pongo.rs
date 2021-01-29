@@ -21,7 +21,6 @@ pub fn get_domain_checks(pongo_mapper: String) -> Check {
 
         // pass alert webhook and channel from mapper to the checks
         alert_webhook: mapper.alert_webhook,
-        alert_channel: mapper.alert_channel,
         ..Check::default()
     }
 }
@@ -40,7 +39,6 @@ pub fn get_page_checks(pongo_mapper: String) -> Check {
 
         // pass alert webhook and channel from mapper to the checks
         alert_webhook: mapper.alert_webhook,
-        alert_channel: mapper.alert_channel,
         ..Check::default()
     }
 }
@@ -218,10 +216,6 @@ pub struct PongoCheck {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_webhook: Option<String>,
 
-    /// Slack alert channel
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub alert_channel: Option<String>,
-
     /// Domains to check
     #[serde(skip_serializing_if = "Option::is_none")]
     pub domains: Option<Domains>,
@@ -272,10 +266,6 @@ pub struct PongoRemoteMapper {
     /// Slack Webhook
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alert_webhook: Option<String>,
-
-    /// Slack alert channel
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub alert_channel: Option<String>,
 }
 
 
@@ -414,7 +404,6 @@ impl Checks<PongoCheck> for PongoCheck {
 
             // pass alert webhook and channel from mapper to the checks
             alert_webhook: mapper.alert_webhook,
-            alert_channel: mapper.alert_channel,
             ..PongoCheck::default()
         })
     }
@@ -428,8 +417,8 @@ impl Checks<PongoCheck> for PongoCheck {
             ]
             .concat(),
         );
-        match (&self.alert_webhook, &self.alert_channel) {
-            (Some(webhook), Some(channel)) => {
+        match &self.alert_webhook {
+            Some(webhook) => {
                 let failures = history
                     .stories()
                     .iter()
@@ -454,7 +443,6 @@ impl Checks<PongoCheck> for PongoCheck {
                         fs::remove_file(failures_state_file).unwrap_or_default();
                         notify_success(
                             webhook,
-                            channel,
                             &format!("All services are UP again ({}).\n", &execution_name),
                         );
                     } else {
@@ -480,11 +468,11 @@ impl Checks<PongoCheck> for PongoCheck {
                         .collect::<String>();
 
                     if send_notification.is_some() {
-                        notify_failure(webhook, channel, &failures_to_notify);
+                        notify_failure(webhook, &failures_to_notify);
                     }
                 }
             }
-            (..) => {
+            None => {
                 info!("Notifications not configured hence skipped…");
             }
         };
