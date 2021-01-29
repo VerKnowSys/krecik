@@ -42,7 +42,7 @@ impl Handler<ValidateResults> for ResultsWarden {
         debug!("Last stories file name: {}", &files_list[0]);
         let last_stories: Vec<Story> =
             serde_json::from_str(&read_text_file(&files_list[0]).unwrap_or_default())
-                .unwrap_or(vec![]);
+                .unwrap_or_default();
         if last_stories.is_empty() {
             warn!("Last stories seems to be incomplete? Skipping it until next time.");
             return Err(());
@@ -77,7 +77,7 @@ impl Handler<ValidateResults> for ResultsWarden {
 
             let previous_stories: Vec<Story> =
                 serde_json::from_str(&read_text_file(&files_list[1]).unwrap_or_default())
-                    .unwrap_or(vec![]);
+                    .unwrap_or_default();
             let previous_stories_errors = previous_stories
                 .iter()
                 .filter(|entry| entry.error.is_some())
@@ -86,7 +86,7 @@ impl Handler<ValidateResults> for ResultsWarden {
 
             let old_previous_stories: Vec<Story> =
                 serde_json::from_str(&read_text_file(&files_list[2]).unwrap_or_default())
-                    .unwrap_or(vec![]);
+                    .unwrap_or_default();
             let old_previous_stories_errors = old_previous_stories
                 .iter()
                 .filter(|entry| entry.error.is_some())
