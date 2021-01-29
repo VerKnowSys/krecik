@@ -43,6 +43,10 @@ impl Handler<ValidateResults> for ResultsWarden {
         let last_stories: Vec<Story> =
             serde_json::from_str(&read_text_file(&files_list[0]).unwrap_or_default())
                 .unwrap_or(vec![]);
+        if last_stories.is_empty() {
+            warn!("Last stories seems to be incomplete? Skipping it until next time.");
+            return Err(());
+        }
         let last_stories_errors = last_stories
             .iter()
             .filter(|entry| entry.error.is_some())
@@ -93,8 +97,14 @@ impl Handler<ValidateResults> for ResultsWarden {
             info!("[1]: {:?}", previous_stories_errors);
             info!("[2]: {:?}", old_previous_stories_errors);
 
-            // TODO: add notification logic:
-            // TODO: send success notification when previous_stories_errors or old_previous_stories_errors contain errors, and last_stories_errors is ok
+            // send success notification when previous_stories_errors or old_previous_stories_errors contain errors, and last_stories_errors is empty
+            if last_stories_errors.is_empty()
+                && !previous_stories_errors.is_empty()
+                && !old_previous_stories_errors.is_empty()
+            {
+                // TODO: create configuration with HashMap of webhooks per channel?
+                // notify_success(webhook, channel, &format!("All services are UP again!\n"));
+            }
             // TODO: send failure notification when last_stories_errors and previous_stories_errors and old_previous_stories_errors contain same error
         }
 
