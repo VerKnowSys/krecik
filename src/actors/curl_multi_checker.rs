@@ -21,13 +21,12 @@ impl Handler<Checks> for CurlMultiChecker {
     type Result = Result<Stories, Stories>;
 
     fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
-        // TODO: read notifiers from configuration:
-        let notifier = None;
         let stories_from_domains = msg
             .clone()
             .0
             .into_par_iter()
             .flat_map(|check| {
+                let notifier = check.notifier;
                 check
                     .domains
                     .par_iter()
@@ -57,7 +56,8 @@ impl Handler<Checks> for CurlMultiChecker {
             .0
             .iter()
             .flat_map(|check| {
-                check.pages.iter().flat_map(|pages| {
+                let notifier = check.clone().notifier;
+                check.pages.iter().flat_map(move |pages| {
                     let mut multi = Multi::new();
                     multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex
 
@@ -77,9 +77,9 @@ impl Handler<Checks> for CurlMultiChecker {
                     // Collect History of results:
                     process_handlers
                         .into_iter()
-                        .flat_map(|(check, handler)| {
+                        .flat_map(|(page, handler)| {
                             Self::process_page_handler(
-                                &check,
+                                &page,
                                 handler,
                                 &multi,
                                 notifier.clone(),

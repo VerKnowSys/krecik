@@ -32,11 +32,11 @@ impl Handler<Checks> for DomainExpiryChecker {
     type Result = Result<Stories, Stories>;
 
     fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
-        let notifier = None; // TODO: read notifires from config
         Ok(msg
             .0
             .into_par_iter()
             .flat_map(|check| {
+                let notifier = check.notifier;
                 check
                     .domains
                     .par_iter()
