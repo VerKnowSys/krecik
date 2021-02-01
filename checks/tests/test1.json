@@ -52,6 +52,5 @@
             ]
         }
     ],
-    "alert_webhook": null,
-    "alert_channel": null
+    "slack_webhook": null
 }

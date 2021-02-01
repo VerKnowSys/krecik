@@ -211,7 +211,7 @@ pub struct PongoCheck {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<PageOptions>,
 
-    /// Slack notifier id
+    /// Notifier id
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notifier: Option<String>,
 
@@ -262,7 +262,7 @@ pub struct PongoRemoteMapper {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub only_vhost_contains: Option<String>,
 
-    /// Slack notifier id
+    /// Notifier id
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notifier: Option<String>,
 }
