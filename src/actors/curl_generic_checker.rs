@@ -575,16 +575,28 @@ pub trait GenericCurlChecker {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
         curl.url(&page_check.url).unwrap_or_default();
-        curl.useragent(&format!(
-            "{name}/{version} (+github.com/verknowsys/krecik)",
-            name = DEFAULT_SLACK_NAME,
-            version = env!("CARGO_PKG_VERSION")
-        ))
-        .unwrap_or_default();
         debug!("Curl URL:: {}", format!("{}", &page_check.url.magenta()));
 
         // Load Curl request options from check:
         let curl_options = page_check.clone().options.unwrap_or_default();
+
+        // Set agent
+        match curl_options.agent.clone() {
+            Some(new_agent) => {
+                debug!("Setting useragent: {}", format!("{}", &new_agent.magenta()));
+                curl.useragent(&new_agent).unwrap_or_default()
+            }
+            None => {
+                debug!("Setting Krecik default useragent");
+                curl.useragent(&format!(
+                    "{name}/{version} (+github.com/verknowsys/krecik)",
+                    name = DEFAULT_SLACK_NAME,
+                    version = env!("CARGO_PKG_VERSION")
+                ))
+                .unwrap_or_default();
+            }
+        }
+
         debug!(
             "Curl options: {}",
             format!("{}", curl_options.to_string().magenta())
@@ -643,17 +655,6 @@ pub trait GenericCurlChecker {
         for cookie in curl_options.cookies.unwrap_or_default() {
             debug!("Setting cookie: {}", format!("{}", cookie.magenta()));
             curl.cookie(&cookie).unwrap_or_default();
-        }
-
-        // Set agent
-        match curl_options.agent {
-            Some(new_agent) => {
-                debug!("Setting useragent: {}", format!("{}", &new_agent.magenta()));
-                curl.useragent(&new_agent).unwrap_or_default()
-            }
-            None => {
-                debug!("Empty useragent");
-            }
         }
 
         // Set connection and request timeout with default fallback to 30s for each
