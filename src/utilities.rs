@@ -7,6 +7,16 @@ use std::io::Error;
 use std::path::Path;
 
 use crate::*;
+use std::cmp::Eq;
+use std::collections::HashSet;
+use std::hash::Hash;
+
+
+/// Helper to remove duplicates from vector
+pub fn remove_duplicates(elements: &mut Vec<String>) {
+    let list: HashSet<_> = elements.drain(..).collect();
+    elements.extend(list.into_iter());
+}
 
 
 /// Sends generic notification over Slack
