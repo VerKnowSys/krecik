@@ -430,8 +430,8 @@ pub trait GenericCurlChecker {
         let a_handler = match handler {
             Ok(handle) => {
                 if handle.get_ref().0.is_empty() {
-                    let fail = "Got an empty output from CurlMultiChecker handle!".to_owned();
-                    debug!("{}", fail);
+                    let fail = format!("Site is down: {}", page_check.url);
+                    error!("{}", fail);
                     return vec![Story::error(Unexpected::HandlerFailed(fail), notifier)];
                 } else {
                     handle
@@ -439,7 +439,7 @@ pub trait GenericCurlChecker {
             }
             Err(err) => {
                 error!(
-                    "Curl-handler FAILURE: URL: {}. Error details: {:?}",
+                    "Couldn't connect to: {}. Error details: {:?}",
                     page_check.url.cyan(),
                     err.to_string().red()
                 );
@@ -503,7 +503,7 @@ pub trait GenericCurlChecker {
             Ok(res_handler) => res_handler,
             Err(err) => {
                 error!(
-                    "Curl-result-handler FAILURE: URL: {}. Error details: {:?}",
+                    "Couldn't get URL: {}. Error details: {:?}",
                     page_check.url.cyan(),
                     err.to_string().red()
                 );
