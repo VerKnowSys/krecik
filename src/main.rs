@@ -142,22 +142,12 @@ async fn main() {
 
         debug!("Sending results to HistoryTeacher…");
         history_teacher
-            .send(Results(stories))
+            .send(Results(
+                stories,
+                results_warden.clone(),
+                notificator.clone(),
+            ))
             .await
-            .unwrap()
             .unwrap_or_default();
-        // TODO: HistoryTeacher should send VadlidateResults message after it's done to eliminate possible race condition when stories weren't saved yet and ResultsWarden is already on validation process.
-
-        debug!("Starting results validation…");
-        match results_warden.send(ValidateResults).await.unwrap() {
-            Ok(()) => {
-                // only if no issues were found, we can do a pause between tests
-                debug!("No issues detected, pausing before next check…");
-                thread::sleep(Duration::from_millis(30_000));
-            }
-            Err(()) => {
-                debug!("Errors were detected, starting next check immediately…");
-            }
-        }
     }
 }
