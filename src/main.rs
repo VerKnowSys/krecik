@@ -101,32 +101,40 @@ async fn main() {
     };
     setup_logger(logger_level).unwrap_or_default();
 
-    // Define system actors
-    let curl_multi_checker = SyncArbiter::start(4, || CurlMultiChecker);
-    let curl_multi_checker_pongo = SyncArbiter::start(4, || CurlMultiCheckerPongo);
-    let history_teacher = SyncArbiter::start(4, || HistoryTeacher);
-    let results_warden = SyncArbiter::start(1, || ResultsWarden);
-
     ctrlc::set_handler(|| {
         println!("\n\nKrecik server was interrupted!");
         std::process::exit(0);
     })
     .expect("Error setting Ctrl-C handler");
 
+    let num = num_cpus::get();
+    info!(
+        "Starting Krecik-server with {} threads per check-actor.",
+        num
+    );
+
+    // Define system actors
+    let curl_multi_checker = SyncArbiter::start(num, || CurlMultiChecker);
+    let curl_multi_checker_pongo = SyncArbiter::start(num, || CurlMultiCheckerPongo);
+    let history_teacher = SyncArbiter::start(num, || HistoryTeacher);
+    let results_warden = SyncArbiter::start(num, || ResultsWarden);
+    let notificator = SyncArbiter::start(num, || Notificator);
+
     loop {
+        debug!("New execution iteration…");
+
         // TODO: let config = KrecikConfiguration{…}; => reload configuration every loop iteration
         let start = Local::now();
 
-        let pongo_checks = curl_multi_checker_pongo
+        let pongo_checks = &curl_multi_checker_pongo
             .send(ChecksPongo(all_checks_pongo_merged()))
             .await;
 
         let regular_checks = curl_multi_checker
             .send(Checks(all_checks_but_remotes()))
             .await;
-
         let stories = [
-            pongo_checks.unwrap().unwrap_or_default(),
+            pongo_checks.clone().unwrap().unwrap_or_default(),
             regular_checks.unwrap().unwrap_or_default(),
         ]
         .concat();
