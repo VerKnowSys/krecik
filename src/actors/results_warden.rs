@@ -1,10 +1,11 @@
-use actix::prelude::*;
-use std::fs;
-
 use crate::{
     products::story::Story,
     utilities::{produce_list_absolute, read_text_file},
+    Notificator, Notify,
 };
+use actix::prelude::*;
+use colored::Colorize;
+use std::{fs, thread, time::Duration};
 
 
 /// ResultsWarden actor will check stories result and send alert notification if necessary
@@ -13,19 +14,19 @@ pub struct ResultsWarden;
 
 
 /// Validates results history
-#[derive(Message, Debug, Clone, Copy)]
+#[derive(Message, Debug, Clone)]
 #[rtype(result = "Result<(), ()>")]
-pub struct ValidateResults;
+pub struct ValidateResults(pub Addr<Notificator>);
 
 
-const STORIES_TO_VALIDATE_COUNT: usize = 3;
+const STORIES_TO_VALIDATE_COUNT: usize = 4;
 const STORIES_TO_KEEP_COUNT: usize = 60 * 12; // keep half a day of stories
 
 
 impl Handler<ValidateResults> for ResultsWarden {
     type Result = Result<(), ()>;
 
-    fn handle(&mut self, _msg: ValidateResults, _ctx: &mut Self::Context) -> Self::Result {
+    fn handle(&mut self, val: ValidateResults, _ctx: &mut Self::Context) -> Self::Result {
         info!("ResultsWarden validates results…");
         let stories_glob = "/tmp/krecik-history-*.json";
         let files_list = produce_list_absolute(&stories_glob)
@@ -43,10 +44,10 @@ impl Handler<ValidateResults> for ResultsWarden {
         let last_stories: Vec<Story> =
             serde_json::from_str(&read_text_file(&files_list[0]).unwrap_or_default())
                 .unwrap_or_default();
-        if last_stories.is_empty() {
-            warn!("Last stories seems to be incomplete? Skipping it until next time.");
-            return Err(());
-        }
+        // if last_stories.is_empty() {
+        //     warn!("Last stories seems to be incomplete? Skipping it until next time.");
+        //     return Err(());
+        // }
         let last_stories_errors = last_stories
             .iter()
             .filter(|entry| entry.error.is_some())
@@ -93,19 +94,45 @@ impl Handler<ValidateResults> for ResultsWarden {
                 .cloned()
                 .collect::<Vec<Story>>();
 
-            info!("[0]: {:?}", last_stories_errors);
-            info!("[1]: {:?}", previous_stories_errors);
-            info!("[2]: {:?}", old_previous_stories_errors);
+            let oldest_previous_stories: Vec<Story> =
+                serde_json::from_str(&read_text_file(&files_list[3]).unwrap_or_default())
+                    .unwrap_or_default();
+            let oldest_previous_stories_errors = old_previous_stories
+                .iter()
+                .filter(|entry| entry.error.is_some())
+                .cloned()
+                .collect::<Vec<Story>>();
+
+            debug!("Error stories:");
+            debug!("[0]: {:?}", last_stories_errors);
+            debug!("[1]: {:?}", previous_stories_errors);
+            debug!("[2]: {:?}", old_previous_stories_errors);
+            debug!("[3]: {:?}", oldest_previous_stories_errors);
+
+            let notifier = val.0;
 
             // send success notification when previous_stories_errors or old_previous_stories_errors contain errors, and last_stories_errors is empty
             if last_stories_errors.is_empty()
                 && !previous_stories_errors.is_empty()
                 && !old_previous_stories_errors.is_empty()
+                && !oldest_previous_stories_errors.is_empty()
             {
-                // TODO: create configuration with HashMap of webhooks?
-                // notify_success(webhook, &format!("All services are UP again!\n"));
+                notifier.do_send(Notify(vec![])); // empty vector means all is ok
             }
-            // TODO: send failure notification when last_stories_errors and previous_stories_errors and old_previous_stories_errors contain same error
+
+            if !last_stories_errors.is_empty()
+                && !previous_stories_errors.is_empty()
+                && !old_previous_stories_errors.is_empty()
+            {
+                notifier.do_send(Notify(
+                    [
+                        last_stories_errors.clone(),
+                        previous_stories_errors,
+                        old_previous_stories_errors,
+                    ]
+                    .concat(),
+                ));
+            }
         }
 
         // if an error is detected in last stories, run next check without a pause in-between:
@@ -113,7 +140,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             info!("No errors in last stories!");
             Ok(())
         } else {
-            error!("There were errors in last stories!");
+            error!("{}", format!("There were errors in last stories!").red());
             Err(())
         }
     }

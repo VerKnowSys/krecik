@@ -1,6 +1,8 @@
-use crate::{products::story::Story, utilities};
+use std::time::Duration;
+
+use crate::{actors::results_warden::*, products::story::Story, utilities, Notificator};
 use actix::prelude::*;
-use chrono::*;
+use chrono::Local;
 
 
 /// HistoryTeacher actor stores check results to a json file
@@ -10,12 +12,16 @@ pub struct HistoryTeacher;
 
 /// List of result stories
 #[derive(Message, Debug, Clone)]
-#[rtype(result = "Result<(), ()>")]
-pub struct Results(pub Vec<Story>);
+#[rtype(result = "()")]
+pub struct Results(
+    pub Vec<Story>,
+    pub Addr<ResultsWarden>,
+    pub Addr<Notificator>,
+);
 
 
 impl Handler<Results> for HistoryTeacher {
-    type Result = Result<(), ()>;
+    type Result = ();
 
     fn handle(&mut self, history: Results, _ctx: &mut Self::Context) -> Self::Result {
         let stories_listof_json = history
@@ -29,7 +35,8 @@ impl Handler<Results> for HistoryTeacher {
         let stories_output = format!("/tmp/krecik-history-{}.json", timestamp);
         info!("Storing check result stories to file: {}", stories_output);
         utilities::write_append(&stories_output, &history_json);
-        Ok(())
+        // then send message to ResultsWarden to validate results after stories were saved to a file
+        history.1.do_send(ValidateResults(history.2));
     }
 }
 
