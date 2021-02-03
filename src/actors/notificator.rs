@@ -35,7 +35,12 @@ impl Handler<Notify> for Notificator {
                 .collect::<Vec<String>>();
             sorted_strings.sort_by(|a, b| a.partial_cmp(b).unwrap());
             utilities::remove_duplicates(&mut sorted_strings);
-            sorted_strings.join("")
+            if sorted_strings.len() > 1 {
+                debug!("Detected distinct errors. No notification to avoid spam.");
+                String::new()
+            } else {
+                sorted_strings.join("")
+            }
         };
         let last_notifications_file = "/tmp/krecik-last-failures";
         let last_notifications =
@@ -45,7 +50,9 @@ impl Handler<Notify> for Notificator {
             notification_contents, last_notifications,
         );
         if last_notifications == notification_contents {
-            debug!("Notification already sent! Skipping.");
+            info!("Notification already sent! Skipping.");
+        } else if notification_contents.is_empty() {
+            info!("Notification skipped since there are more than one failure detected.");
         } else {
             fs::remove_file(&last_notifications_file).unwrap_or_default();
             utilities::write_append(&last_notifications_file, &notification_contents);
