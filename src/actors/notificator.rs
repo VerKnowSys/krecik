@@ -18,10 +18,9 @@ impl Handler<Notify> for Notificator {
     type Result = ();
 
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
-        let ok_message = "All services are UP again!".to_string();
-        let notification_contents = if stories.0.is_empty() {
-            (ok_message, true)
-        } else {
+        // TODO: read ok_message from confiruation:
+        let ok_message = "All services are UP.".to_string();
+        let notification_contents = {
             let mut sorted_strings = stories
                 .0
                 .iter()
