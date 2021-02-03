@@ -44,10 +44,12 @@ impl Handler<ValidateResults> for ResultsWarden {
         let last_stories: Vec<Story> =
             serde_json::from_str(&read_text_file(&files_list[0]).unwrap_or_default())
                 .unwrap_or_default();
-        // if last_stories.is_empty() {
-        //     warn!("Last stories seems to be incomplete? Skipping it until next time.");
-        //     return Err(());
-        // }
+        if last_stories.is_empty() {
+            warn!(
+                "{}", "Last stories seems to be incomplete? Skipping validation until next iteration.".yellow()
+            );
+            return Err(());
+        }
         let last_stories_errors = last_stories
             .iter()
             .filter(|entry| entry.error.is_some())
