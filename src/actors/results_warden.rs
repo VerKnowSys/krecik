@@ -97,7 +97,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             let oldest_previous_stories: Vec<Story> =
                 serde_json::from_str(&read_text_file(&files_list[3]).unwrap_or_default())
                     .unwrap_or_default();
-            let oldest_previous_stories_errors = old_previous_stories
+            let oldest_previous_stories_errors = oldest_previous_stories
                 .iter()
                 .filter(|entry| entry.error.is_some())
                 .cloned()
