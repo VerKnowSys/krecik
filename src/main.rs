@@ -30,7 +30,7 @@ use curl::{
 };
 use fern::{
     colors::{Color, ColoredLevelConfig},
-    InitError,
+    Dispatch, InitError,
 };
 use krecik::{
     actors::{
@@ -77,14 +77,16 @@ use std::{
 };
 
 
-fn setup_logger(level: LevelFilter) -> Result<(), InitError> {
+fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
+    // TODO: read log_file value from configuration:
+    let log_file = "krecik.log";
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
         .info(Color::White)
         .debug(Color::Magenta)
         .trace(Color::Cyan);
-    fern::Dispatch::new()
+    Dispatch::new()
         .format(move |out, message, record| {
             out.finish(format_args!(
                 "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
@@ -100,8 +102,8 @@ fn setup_logger(level: LevelFilter) -> Result<(), InitError> {
         })
         .level(level)
         .chain(std::io::stdout())
-        .apply()?;
-    Ok(())
+        .chain(fern::DateBased::new(format!("{}.", log_file), "%Y-%m-%d"))
+        .apply()
 }
 
 
@@ -127,7 +129,8 @@ async fn main() {
 
     let num = num_cpus::get();
     info!(
-        "Starting Krecik-server with {} threads per check-actor.",
+        "Starting Krecik-server v{} with {} threads per check-actor.",
+        env!("CARGO_PKG_VERSION"),
         num
     );
 
