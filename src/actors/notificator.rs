@@ -25,16 +25,8 @@ impl Handler<Notify> for Notificator {
         let notification_contents = if stories.0 == vec![] {
             "All services are UP again!".to_string()
         } else {
-            let mut sorted = stories.0;
-            sorted.sort_by(|a, b| {
-                a.error
-                    .clone()
-                    .unwrap()
-                    .to_string()
-                    .partial_cmp(&b.error.clone().unwrap().to_string())
-                    .unwrap()
-            });
-            let mut sorted_strings = sorted
+            let mut sorted_strings = stories
+                .0
                 .iter()
                 .map(|elem| {
                     if let Some(error) = elem.error.clone() {
@@ -43,7 +35,8 @@ impl Handler<Notify> for Notificator {
                         "\n".to_string()
                     }
                 })
-                .collect();
+                .collect::<Vec<String>>();
+            sorted_strings.sort_by(|a, b| a.partial_cmp(b).unwrap());
             utilities::remove_duplicates(&mut sorted_strings);
             sorted_strings.join("")
         };
