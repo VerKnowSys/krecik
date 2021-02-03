@@ -22,7 +22,7 @@ impl Handler<Notify> for Notificator {
     type Result = ();
 
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
-        let notification_contents = if stories.0 == vec![] {
+        let notification_contents = if stories.0.is_empty() {
             "All services are UP again!".to_string()
         } else {
             let mut sorted_strings = stories
