@@ -78,8 +78,9 @@ use std::{
 
 
 fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
-    // TODO: read log_file value from configuration:
-    let log_file = "krecik.log";
+    let log_file = Config::load()
+        .log_file
+        .unwrap_or(String::from("krecik.log"));
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
@@ -144,7 +145,6 @@ async fn main() {
     loop {
         debug!("New execution iteration…");
 
-        // TODO: let config = KrecikConfiguration{…}; => reload configuration every loop iteration
         let start = Local::now();
 
         let pongo_checks = &curl_multi_checker_pongo

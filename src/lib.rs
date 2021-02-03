@@ -41,6 +41,7 @@ pub use crate::actors::notificator::*;
 pub use crate::checks::check::*;
 pub use crate::checks::page::*;
 pub use crate::checks::pongo::*;
+pub use crate::config::*;
 pub use crate::configuration::*;
 pub use crate::products::expected::*;
 pub use crate::products::history::*;
@@ -69,6 +70,9 @@ impl Handler for Collector {
 
 /// Configuration defaults:
 pub mod configuration;
+
+/// Dynamic config:
+pub mod config;
 
 /// Utilities and helpers:
 pub mod utilities;
