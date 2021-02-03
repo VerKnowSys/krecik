@@ -135,12 +135,12 @@ impl Handler<ValidateResults> for ResultsWarden {
             }
         }
 
-        // if an error is detected in last stories, run next check without a pause in-between:
+        // TODO: if an error is detected in last stories, run next check without a pause in-between:
         if last_stories_errors.is_empty() {
-            info!("No errors in last stories!");
+            debug!("No errors in last stories!");
             Ok(())
         } else {
-            error!("{}", "There were errors in last stories!".red());
+            debug!("{}", "There were errors in last stories!".magenta());
             Err(())
         }
     }
