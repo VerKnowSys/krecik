@@ -20,6 +20,9 @@ impl Handler<Notify> for Notificator {
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
         // TODO: read ok_message from confiruation:
         let ok_message = "All services are UP.".to_string();
+        let ok_message = Config::load()
+            .ok_message
+            .unwrap_or(String::from("All services are UP."));
         let notification_contents = {
             let mut sorted_strings = stories
                 .0
