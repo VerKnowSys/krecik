@@ -11,7 +11,6 @@ use crate::{
     },
     *,
 };
-use colored::Colorize;
 use curl::{
     easy::{Easy2, List},
     multi::Multi,
@@ -423,7 +422,7 @@ pub trait GenericCurlChecker {
         let page_expectations = page_check.clone().expects;
         debug!(
             "process_page_handler::page_expectations: {}",
-            format!("{:?}", page_expectations).magenta()
+            format!("{:?}", page_expectations)
         );
 
         // take control over curl handler, perform validations, produce stories…
@@ -440,8 +439,8 @@ pub trait GenericCurlChecker {
             Err(err) => {
                 error!(
                     "Couldn't connect to: {}. Error details: {:?}",
-                    page_check.url.cyan(),
-                    err.to_string().red()
+                    page_check.url,
+                    err.to_string()
                 );
                 return vec![Story::error(
                     Unexpected::HandlerFailed(err.description().to_string()),
@@ -452,29 +451,29 @@ pub trait GenericCurlChecker {
 
         let handle = a_handler.get_ref().0.to_owned();
         let raw_page_content = String::from_utf8(handle).unwrap_or_default();
-        debug!(
+        trace!(
             "process_page_handler::raw_page_content: {:?}",
-            raw_page_content.magenta()
+            raw_page_content
         );
         let expected_code = Self::find_code_validation(&page_expectations);
-        debug!(
+        trace!(
             "process_page_handler::expected_code: {}",
-            format!("{}", expected_code).magenta()
+            format!("{}", expected_code)
         );
         let expected_contents = Self::find_content_validations(&page_expectations);
-        debug!(
+        trace!(
             "process_page_handler::expected_contents: {}",
-            format!("{:?}", expected_contents).magenta()
+            format!("{:?}", expected_contents)
         );
         let expected_content_length = Self::find_content_length_validation(&page_expectations);
-        debug!(
+        trace!(
             "process_page_handler::expected_content_length: {}",
-            format!("{}", expected_content_length).magenta()
+            format!("{}", expected_content_length)
         );
         let expected_final_address = Self::find_address_validation(&page_expectations);
-        debug!(
+        trace!(
             "process_page_handler::expected_final_address: {}",
-            format!("{}", expected_final_address).magenta()
+            format!("{}", expected_final_address)
         );
 
         // Gather Story from expectations
@@ -484,9 +483,9 @@ pub trait GenericCurlChecker {
             &expected_contents,
             notifier.clone(),
         );
-        debug!(
+        trace!(
             "process_page_handler::content_story: {}",
-            format!("{:?}", content_stories).magenta()
+            format!("{:?}", content_stories)
         );
         let content_length_story = vec![Self::handle_page_length_expectation(
             &page_check.url,
@@ -496,7 +495,7 @@ pub trait GenericCurlChecker {
         )];
         debug!(
             "process_page_handler::content_length_story: {}",
-            format!("{:?}", content_length_story).magenta()
+            format!("{:?}", content_length_story)
         );
 
         let mut result_handler = match multi.remove2(a_handler) {
@@ -504,8 +503,8 @@ pub trait GenericCurlChecker {
             Err(err) => {
                 error!(
                     "Couldn't get URL: {}. Error details: {:?}",
-                    page_check.url.cyan(),
-                    err.to_string().red()
+                    page_check.url,
+                    err.to_string()
                 );
                 return vec![Story::error(
                     Unexpected::HandlerFailed(err.description().to_string()),
@@ -522,7 +521,7 @@ pub trait GenericCurlChecker {
         )];
         debug!(
             "process_page_handler::result_final_address_story: {}",
-            format!("{:?}", result_final_address_story).magenta()
+            format!("{:?}", result_final_address_story)
         );
         let connect_oserror = match result_handler.os_errno() {
             Ok(0) => None,
@@ -542,7 +541,7 @@ pub trait GenericCurlChecker {
         )];
         debug!(
             "process_page_handler::handle_page_httpcode_expectation: {}",
-            format!("{:?}", result_handler_story).magenta()
+            format!("{:?}", result_handler_story)
         );
 
         // Collect the history results
@@ -563,7 +562,7 @@ pub trait GenericCurlChecker {
         //         list.append("Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==").unwrap();
         let mut list = List::new();
         for header in headers.unwrap_or_default() {
-            debug!("Setting Curl header: {}", header.magenta());
+            debug!("Setting Curl header: {}", header);
             list.append(&header.to_owned()).unwrap_or_default();
         }
         list
@@ -575,7 +574,7 @@ pub trait GenericCurlChecker {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
         curl.url(&page_check.url).unwrap_or_default();
-        debug!("Curl URL:: {}", format!("{}", &page_check.url.magenta()));
+        debug!("Curl URL: {}", format!("{}", &page_check.url));
 
         // Load Curl request options from check:
         let curl_options = page_check.clone().options.unwrap_or_default();
@@ -583,11 +582,11 @@ pub trait GenericCurlChecker {
         // Set agent
         match curl_options.agent.clone() {
             Some(new_agent) => {
-                debug!("Setting useragent: {}", format!("{}", &new_agent.magenta()));
+                trace!("Setting useragent: {}", format!("{}", &new_agent));
                 curl.useragent(&new_agent).unwrap_or_default()
             }
             None => {
-                debug!("Setting Krecik default useragent");
+                trace!("Setting Krecik default useragent");
                 curl.useragent(&format!(
                     "{name}/{version} (+github.com/verknowsys/krecik)",
                     name = DEFAULT_SLACK_NAME,
@@ -597,32 +596,29 @@ pub trait GenericCurlChecker {
             }
         }
 
-        debug!(
-            "Curl options: {}",
-            format!("{}", curl_options.to_string().magenta())
-        );
+        debug!("Curl options: {}", format!("{}", curl_options.to_string()));
 
         // Setup Curl configuration based on given options
         if curl_options.follow_redirects.unwrap_or(true) {
-            debug!("Enabled following redirects.");
+            trace!("Enabled following redirects.");
             curl.follow_location(true).unwrap_or_default();
         } else {
-            debug!("Disabled following redirects.");
+            trace!("Disabled following redirects.");
             curl.follow_location(false).unwrap_or_default();
         }
 
         if curl_options.verbose.unwrap_or(false) {
-            debug!("Enabling Verbose mode.");
+            trace!("Enabling Verbose mode.");
             curl.verbose(true).unwrap_or_default();
         } else {
-            debug!("Disabling Verbose mode.");
+            trace!("Disabling Verbose mode.");
             curl.verbose(false).unwrap_or_default();
         }
 
         // Setup Curl configuration based on given options
         match curl_options.method {
             Some(Method::PUT) => {
-                debug!("Curl method: {}", "PUT".magenta());
+                trace!("Curl method: {}", "PUT");
                 let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();
                 curl.post(false).unwrap_or_default();
@@ -631,7 +627,7 @@ pub trait GenericCurlChecker {
                     .unwrap_or_default();
             }
             Some(Method::POST) => {
-                debug!("Curl method: {}", "POST".magenta());
+                trace!("Curl method: {}", "POST");
                 let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();
                 curl.put(false).unwrap_or_default();
@@ -642,7 +638,7 @@ pub trait GenericCurlChecker {
 
             // fallbacks to GET
             Some(_) | None => {
-                debug!("Curl method: {}", "GET".magenta());
+                trace!("Curl method: {}", "GET");
                 curl.put(false).unwrap_or_default();
                 curl.post(false).unwrap_or_default();
                 curl.get(true).unwrap_or_default();
@@ -653,7 +649,7 @@ pub trait GenericCurlChecker {
         curl.http_headers(Self::list_of_headers(curl_options.headers))
             .unwrap_or_default();
         for cookie in curl_options.cookies.unwrap_or_default() {
-            debug!("Setting cookie: {}", format!("{}", cookie.magenta()));
+            trace!("Setting cookie: {}", format!("{}", cookie));
             curl.cookie(&cookie).unwrap_or_default();
         }
 
@@ -671,19 +667,19 @@ pub trait GenericCurlChecker {
 
         // Verify SSL PEER
         if curl_options.ssl_verify_peer.unwrap_or(true) {
-            debug!("Enabled TLS-PEER verification.");
+            trace!("Enabled TLS-PEER verification.");
             curl.ssl_verify_peer(true).unwrap_or_default();
         } else {
-            warn!("Disabled TLS-PEER verification!");
+            debug!("Disabled TLS-PEER verification!");
             curl.ssl_verify_peer(false).unwrap_or_default();
         }
 
         // Verify SSL HOST
         if curl_options.ssl_verify_host.unwrap_or(true) {
-            debug!("Enabled TLS-HOST verification.");
+            trace!("Enabled TLS-HOST verification.");
             curl.ssl_verify_host(true).unwrap_or_default();
         } else {
-            warn!("Disabled TLS-HOST verification!");
+            debug!("Disabled TLS-HOST verification!");
             curl.ssl_verify_host(false).unwrap_or_default();
         }
 

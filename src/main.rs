@@ -23,13 +23,15 @@ extern crate fern;
 
 use actix::prelude::*;
 use chrono::*;
-use colored::Colorize;
 use curl::{
     easy::{Easy2, List},
     multi::{Easy2Handle, Multi},
     Error as CurlError, MultiError,
 };
-use fern::InitError;
+use fern::{
+    colors::{Color, ColoredLevelConfig},
+    InitError,
+};
 use krecik::{
     actors::{
         curl_multi_checker::{Checks, CurlMultiChecker},
@@ -76,14 +78,24 @@ use std::{
 
 
 fn setup_logger(level: LevelFilter) -> Result<(), InitError> {
+    let colors_line = ColoredLevelConfig::new()
+        .error(Color::Red)
+        .warn(Color::Yellow)
+        .info(Color::White)
+        .debug(Color::Magenta)
+        .trace(Color::Cyan);
     fern::Dispatch::new()
-        .format(|out, message, record| {
+        .format(move |out, message, record| {
             out.finish(format_args!(
-                "{}[{}][{}] {}",
-                Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
-                record.target(),
-                record.level(),
-                message
+                "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
+                color_line = format_args!(
+                    "\x1B[{}m",
+                    colors_line.get_color(&record.level()).to_fg_str()
+                ),
+                date = Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                target = record.target(),
+                level = record.level(),
+                message = message
             ))
         })
         .level(level)
@@ -96,8 +108,14 @@ fn setup_logger(level: LevelFilter) -> Result<(), InitError> {
 #[actix_macros::main]
 async fn main() {
     let logger_level = match var("DEBUG") {
-        Ok(value) => LevelFilter::Debug,
-        Err(_) => LevelFilter::Info,
+        Ok(value) => {
+            if value == String::from("2") {
+                LevelFilter::Trace
+            } else {
+                LevelFilter::Debug
+            }
+        }
+        Err(_) => LevelFilter::Info, /* TODO: read debug value from configuration and dynamically setup debug logging: */
     };
     setup_logger(logger_level).unwrap_or_default();
 

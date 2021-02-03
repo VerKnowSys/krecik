@@ -74,7 +74,7 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
             }
         }
     }
-    debug!("produce_list_absolute(): Elements: {:?}", list);
+    trace!("produce_list_absolute(): Elements: {:?}", list);
     list
 }
 
@@ -94,7 +94,7 @@ pub fn produce_list(glob_pattern: &str) -> Vec<String> {
             }
         }
     }
-    debug!("produce_list(): Elements: {:?}", list);
+    trace!("produce_list(): Elements: {:?}", list);
     list
 }
 
@@ -108,7 +108,7 @@ pub fn list_check_files() -> Vec<String> {
 /// List all check files from given dir
 pub fn list_check_files_from(checks_dir: &str) -> Vec<String> {
     let glob_pattern = format!("{}/*.json", checks_dir);
-    debug!("list_check_files(): {}", glob_pattern);
+    trace!("list_check_files(): {}", glob_pattern);
     produce_list(&glob_pattern)
 }
 
@@ -116,7 +116,7 @@ pub fn list_check_files_from(checks_dir: &str) -> Vec<String> {
 /// List all check files from given dir
 pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
     let glob_pattern = format!("{}/**/*.json", checks_dir);
-    debug!("list_all_checks_from(): {}", glob_pattern);
+    trace!("list_all_checks_from(): {}", glob_pattern);
     produce_list_absolute(&glob_pattern)
 }
 

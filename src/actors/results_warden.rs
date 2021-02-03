@@ -4,7 +4,6 @@ use crate::{
     Notificator, Notify,
 };
 use actix::prelude::*;
-use colored::Colorize;
 use std::fs;
 
 
@@ -46,7 +45,7 @@ impl Handler<ValidateResults> for ResultsWarden {
                 .unwrap_or_default();
         if last_stories.is_empty() {
             warn!(
-                "{}", "Last stories seems to be incomplete? Skipping validation until next iteration.".yellow()
+                "Last stories seems to be incomplete? Skipping validation until next iteration."
             );
             return Err(());
         }
@@ -112,29 +111,14 @@ impl Handler<ValidateResults> for ResultsWarden {
             debug!("[3]: {:?}", oldest_previous_stories_errors);
 
             let notifier = val.0;
-
-            // send success notification when previous_stories_errors or old_previous_stories_errors contain errors, and last_stories_errors is empty
-            if last_stories_errors.is_empty()
-                && !previous_stories_errors.is_empty()
-                && !old_previous_stories_errors.is_empty()
-                && !oldest_previous_stories_errors.is_empty()
-            {
-                notifier.do_send(Notify(vec![])); // empty vector means all is ok
-            }
-
-            if !last_stories_errors.is_empty()
-                && !previous_stories_errors.is_empty()
-                && !old_previous_stories_errors.is_empty()
-            {
-                notifier.do_send(Notify(
-                    [
-                        last_stories_errors.clone(),
-                        previous_stories_errors,
-                        old_previous_stories_errors,
-                    ]
-                    .concat(),
-                ));
-            }
+            notifier.do_send(Notify(
+                [
+                    last_stories_errors.clone(),
+                    previous_stories_errors,
+                    old_previous_stories_errors,
+                ]
+                .concat(),
+            ));
         }
 
         // TODO: if an error is detected in last stories, run next check without a pause in-between:
@@ -142,7 +126,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             debug!("No errors in last stories!");
             Ok(())
         } else {
-            debug!("{}", "There were errors in last stories!".magenta());
+            debug!("There were errors in last stories!");
             Err(())
         }
     }
