@@ -1,10 +1,7 @@
-use super::curl_generic_checker::GenericCurlChecker;
-use crate::{checks::check::*, configuration::CHECK_TIMEOUT, products::story::*, utilities};
+use crate::{products::story::*, utilities};
 use actix::prelude::*;
 use colored::Colorize;
-use curl::multi::Multi;
-use rayon::prelude::*;
-use std::{fs, time::Duration};
+use std::fs;
 
 
 /// Notificator actor for Curl Multi bulk checks

@@ -1,15 +1,13 @@
 use glob::glob;
 use slack_hook::{AttachmentBuilder, PayloadBuilder, Slack};
-use std::fs;
-use std::fs::OpenOptions;
-use std::io::prelude::*;
-use std::io::Error;
-use std::path::Path;
+use std::{
+    collections::HashSet,
+    fs::{self, OpenOptions},
+    io::{prelude::*, Error},
+    path::Path,
+};
 
 use crate::*;
-use std::cmp::Eq;
-use std::collections::HashSet;
-use std::hash::Hash;
 
 
 /// Helper to remove duplicates from vector

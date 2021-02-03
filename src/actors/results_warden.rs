@@ -5,7 +5,7 @@ use crate::{
 };
 use actix::prelude::*;
 use colored::Colorize;
-use std::{fs, thread, time::Duration};
+use std::fs;
 
 
 /// ResultsWarden actor will check stories result and send alert notification if necessary
@@ -140,7 +140,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             info!("No errors in last stories!");
             Ok(())
         } else {
-            error!("{}", format!("There were errors in last stories!").red());
+            error!("{}", "There were errors in last stories!".red());
             Err(())
         }
     }

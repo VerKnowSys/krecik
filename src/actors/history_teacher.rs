@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::{actors::results_warden::*, products::story::Story, utilities, Notificator};
 use actix::prelude::*;
 use chrono::Local;
