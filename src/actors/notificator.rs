@@ -19,8 +19,9 @@ impl Handler<Notify> for Notificator {
     type Result = ();
 
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
+        let ok_message = "All services are UP again!".to_string();
         let notification_contents = if stories.0.is_empty() {
-            ("All services are UP again!".to_string(), true)
+            (ok_message, true)
         } else {
             let mut sorted_strings = stories
                 .0
@@ -50,12 +51,12 @@ impl Handler<Notify> for Notificator {
                 .collect::<String>();
 
             if worth_notifying.is_empty() {
-                ("All services are UP again!".to_string(), true)
+                (ok_message, true)
             } else {
                 (worth_notifying, false)
             }
         };
-        let last_notifications_file = "/tmp/krecik-last-failures";
+        let last_notifications_file = "/tmp/krecik-last-notification";
         let last_notifications =
             utilities::read_text_file(&last_notifications_file).unwrap_or_default();
         debug!(
