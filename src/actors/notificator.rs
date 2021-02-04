@@ -18,74 +18,63 @@ impl Handler<Notify> for Notificator {
     type Result = ();
 
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
-        // TODO: read ok_message from confiruation:
-        let ok_message = "All services are UP.".to_string();
-        let ok_message = Config::load()
+        let notifiers = Config::load().notifiers.unwrap_or_default();
+        debug!("Defined notifiers: {:#?}", notifiers);
+
+        let mut sorted_tuples = stories
+            .0
+            .iter()
+            .map(|elem| {
+                let error = elem.error.clone().unwrap().to_string();
+                let notifier = elem.notifier.clone().unwrap_or_default();
+                (error, notifier)
+            })
+            .collect::<Vec<(String, String)>>();
+        sorted_tuples.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+
+        // let's iterate over each string and count occurences
+        // if there are 3 occurences - we should send notification about it:
+        let mut failure_occurences = HashMap::new();
+        for element in sorted_tuples {
+            let existing_value = failure_occurences.entry(element).or_insert(0);
+            *existing_value += 1;
+        }
+        debug!("Failure occurences: {:#?}", failure_occurences);
+
+        let _ok_message = Config::load()
             .ok_message
-            .unwrap_or(String::from("All services are UP."));
-        let notification_contents = {
-            let mut sorted_strings = stories
-                .0
-                .iter()
-                .map(|elem| {
-                    if let Some(error) = elem.error.clone() {
-                        format!("{}\n", error.to_string())
-                    } else {
-                        "\n".to_string()
-                    }
-                })
-                .collect::<Vec<String>>();
-            sorted_strings.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            .unwrap_or_else(|| String::from("All services are UP."));
 
-            // let's iterate over each string and count occurences
-            // if there are 3 occurences - we should send notification about it:
-            let mut failure_occurences = HashMap::new();
-            for element in sorted_strings {
-                let existing_value = failure_occurences.entry(element).or_insert(0);
-                *existing_value += 1;
-            }
-            debug!("Failure occurences: {:#?}", failure_occurences);
-            let worth_notifying = failure_occurences
-                .iter()
-                .filter(|&(_k, v)| *v == 3)
-                .map(|(k, _v)| k.to_string())
-                .collect::<String>();
+        let errors_with_webhooks = failure_occurences
+            .iter()
+            .filter(|&(_k, v)| *v == 3)
+            .map(|(tuple, _v)| {
+                let notifier = notifiers
+                    .iter()
+                    .find(|e| e.name == tuple.1)
+                    .cloned()
+                    .unwrap_or_default()
+                    .slack_webhook;
+                (format!("{}\n", tuple.clone().0), tuple.clone().1, notifier)
+            })
+            .collect::<Vec<(String, String, String)>>();
 
-            if worth_notifying.is_empty() {
-                (ok_message, true)
+        for (message, notifier_name, webhook) in errors_with_webhooks {
+            let last_notifications_file =
+                format!("/tmp/krecik-last-notification_{}", notifier_name);
+            let last_notifications =
+                utilities::read_text_file(&last_notifications_file).unwrap_or_default();
+
+            if last_notifications == message {
+                info!("Repeated notification skipped.");
             } else {
-                (worth_notifying, false)
-            }
-        };
-        let last_notifications_file = "/tmp/krecik-last-notification";
-        let last_notifications =
-            utilities::read_text_file(&last_notifications_file).unwrap_or_default();
-        debug!(
-            "Last notifications: {:?} == {:?}",
-            notification_contents.0, last_notifications,
-        );
-        if notification_contents.0.is_empty() {
-            debug!("No notification required.");
-        } else if last_notifications == notification_contents.0 {
-            debug!("Repeated notification skipped.");
-        } else {
-            fs::remove_file(&last_notifications_file).unwrap_or_default();
-            utilities::write_append(&last_notifications_file, &notification_contents.0);
-            warn!(
-                "Sending notification, type: {}, with message: {}",
-                if notification_contents.1 {
-                    "SUCCESS"
-                } else {
-                    "FAILURE"
-                },
-                format!("{}", notification_contents.0)
-            );
-            // TODO: retry failed notifications (rare but happens) by additional error handling
-            // TODO: read defined notifier webhook from configuration file
-            if notification_contents.1 {
-                utilities::notify_success("webhook", &notification_contents.0);
-            } else {
-                utilities::notify_failure("webhook", &notification_contents.0);
+                fs::remove_file(&last_notifications_file).unwrap_or_default();
+                utilities::write_append(&last_notifications_file, &format!("{:#?}", message));
+                warn!(
+                    "Sending FAIL notification: '{}' to notifier id: {}, webhook: '{}'",
+                    &message, &notifier_name, &webhook
+                );
+                // utilities::notify_failure(&webhook, &ok_message);
             }
         }
     }
