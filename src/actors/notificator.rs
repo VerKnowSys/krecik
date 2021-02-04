@@ -1,6 +1,6 @@
 use crate::{products::story::*, utilities, Config};
 use actix::prelude::*;
-use std::{collections::HashMap, fs};
+use std::{collections::HashMap, fs, path::Path};
 
 
 /// Notificator actor for Curl Multi bulk checks
@@ -19,7 +19,7 @@ impl Handler<Notify> for Notificator {
 
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
         let notifiers = Config::load().notifiers.unwrap_or_default();
-        debug!("Defined notifiers: {:#?}", notifiers);
+        trace!("Defined notifiers: {:#?}", notifiers);
 
         let mut sorted_tuples = stories
             .0
@@ -41,9 +41,23 @@ impl Handler<Notify> for Notificator {
         }
         debug!("Failure occurences: {:#?}", failure_occurences);
 
-        let _ok_message = Config::load()
+        let ok_message = Config::load()
             .ok_message
             .unwrap_or_else(|| String::from("All services are UP."));
+
+        let previous_errors_with_webhooks = failure_occurences
+            .iter()
+            .filter(|&(_k, v)| *v == 2)
+            .map(|(tuple, _v)| {
+                let notifier = notifiers
+                    .iter()
+                    .find(|e| e.name == tuple.1)
+                    .cloned()
+                    .unwrap_or_default()
+                    .slack_webhook;
+                (format!("{}\n", ok_message), tuple.clone().1, notifier)
+            })
+            .collect::<Vec<(String, String, String)>>();
 
         let errors_with_webhooks = failure_occurences
             .iter()
@@ -59,22 +73,58 @@ impl Handler<Notify> for Notificator {
             })
             .collect::<Vec<(String, String, String)>>();
 
-        for (message, notifier_name, webhook) in errors_with_webhooks {
-            let last_notifications_file =
-                format!("/tmp/krecik-last-notification_{}", notifier_name);
-            let last_notifications =
-                utilities::read_text_file(&last_notifications_file).unwrap_or_default();
+        // if errors_with_webhooks are empty and previous_errors_with_webhooks contains 2 error entries,
+        // we can pick which one it was and send succes notification to it (after previos failure):
+        if errors_with_webhooks.is_empty() {
+            for (message, notifier_name, webhook) in previous_errors_with_webhooks {
+                let last_notifications_file =
+                    format!("/tmp/krecik-last-notification_{}", notifier_name);
+                let last_notifications =
+                    utilities::read_text_file(&last_notifications_file).unwrap_or_default();
 
-            if last_notifications == message {
-                info!("Repeated notification skipped.");
-            } else {
-                fs::remove_file(&last_notifications_file).unwrap_or_default();
-                utilities::write_append(&last_notifications_file, &format!("{:#?}", message));
-                warn!(
-                    "Sending FAIL notification: '{}' to notifier id: {}, webhook: '{}'",
-                    &message, &notifier_name, &webhook
-                );
-                // utilities::notify_failure(&webhook, &ok_message);
+                if last_notifications == message {
+                    info!("Repeated OK notification skipped.");
+                } else if Path::new(&format!("{}.after-failure", &last_notifications_file))
+                    .exists()
+                {
+                    fs::remove_file(&format!("{}.after-failure", last_notifications_file))
+                        .unwrap_or_default();
+                    fs::remove_file(&last_notifications_file).unwrap_or_default();
+                    utilities::write_append(
+                        &last_notifications_file,
+                        &format!("{:#?}", message),
+                    );
+                    warn!(
+                        "Sending OK notification: '{}' to notifier id: {}, webhook: '{}'",
+                        &message, &notifier_name, &webhook
+                    );
+                    // utilities::notify_success(&webhook, &ok_message);
+                }
+            }
+        } else {
+            for (message, notifier_name, webhook) in errors_with_webhooks.clone() {
+                let last_notifications_file =
+                    format!("/tmp/krecik-last-notification_{}", notifier_name);
+                let last_notifications =
+                    utilities::read_text_file(&last_notifications_file).unwrap_or_default();
+                // create state that will be used by OK notification
+                fs::copy(
+                    &last_notifications_file,
+                    &format!("{}.after-failure", last_notifications_file),
+                )
+                .unwrap_or_default();
+
+                if last_notifications == message {
+                    info!("Repeated FAIL notification skipped.");
+                } else {
+                    fs::remove_file(&last_notifications_file).unwrap_or_default();
+                    utilities::write_append(&last_notifications_file, &message);
+                    warn!(
+                        "Sending FAIL notification: '{}' to notifier id: {}, webhook: '{}'",
+                        &message, &notifier_name, &webhook
+                    );
+                    // utilities::notify_failure(&webhook, &ok_message);
+                }
             }
         }
     }
