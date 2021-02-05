@@ -45,7 +45,7 @@ ns-std-threaded = "0.3.0"
 
 #bencher = "0.1.5"
 #jemallocator = "0.3.2"
-mimalloc = { version = "0.1.24", default-features = false }
+mimalloc = "0.1.24"
 
 slack-hook = "0.8.0"
 actix = "0.10.0"
