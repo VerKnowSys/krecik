@@ -1,4 +1,4 @@
-use crate::{products::story::*, Config};
+use crate::{products::story::*, utilities, Config};
 use actix::prelude::*;
 use lazy_static::lazy_static;
 use std::collections::HashMap;
@@ -89,7 +89,8 @@ impl Handler<Notify> for Notificator {
                         "Sending SUCCESS notification for notifier: {}, with message: {}",
                         &notifier_name, &ok_message
                     );
-                    //utilities::notify_success(&webhook, &ok_message);
+                    let webhook = a_notifier.slack_webhook; // TODO: add notification mechanisms other than Slack?
+                    utilities::notify_success(&webhook, &ok_message); // TODO: Since Slack API can fail… retry crate could be used
                     drop(history); // drop mutex lock
                     let mut history = NOTIFY_HISTORY.lock().unwrap();
                     history.retain(|(_, _, notifier, _)| notifier != &notifier_name);
@@ -141,13 +142,12 @@ impl Handler<Notify> for Notificator {
                     &failure_messages.join("")
                 );
             } else {
+                let messages = failure_messages.join("");
                 info!(
                     "Sending FAILURE notification: '{}' to notifier id: {}, webhook: '{}'",
-                    &failure_messages.join(""),
-                    &notifier_name,
-                    &webhook
+                    &messages, &notifier_name, &webhook
                 );
-                // utilities::notify_failure(&webhook, &ok_message);
+                utilities::notify_failure(&webhook, &messages);
 
                 drop(history);
                 let mut history = NOTIFY_HISTORY.lock().unwrap();
