@@ -31,7 +31,7 @@ impl Handler<Results> for HistoryTeacher {
         let history_json = format!("[{}]", stories_listof_json);
         let timestamp = Local::now().to_rfc3339();
         let stories_output = format!("/tmp/krecik-history-{}.json", timestamp);
-        info!("Storing check result stories to file: {}", stories_output);
+        debug!("Storing check result stories to file: {}", stories_output);
         utilities::write_append(&stories_output, &history_json);
         // then send message to ResultsWarden to validate results after stories were saved to a file
         history.1.do_send(ValidateResults(history.2));
