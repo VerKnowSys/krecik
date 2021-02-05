@@ -6,7 +6,7 @@ use std::sync::Mutex;
 
 
 lazy_static! {
-    /// List of (is_failure, message, notifier name, webhook) tuples:
+    /// List of (to_notify, message, notifier name, webhook) tuples:
     static ref NOTIFY_HISTORY: Mutex<Vec<(bool, String, String, String)>> = Mutex::new({
         #[allow(unused_mut)]
         let mut history = Vec::new();
@@ -38,23 +38,19 @@ impl Handler<Notify> for Notificator {
             .unwrap_or_else(|| String::from("All services are UP."));
 
         for a_notifier in notifiers.clone() {
-            let notifier_name = a_notifier.name;
-            let mut sorted_tuples = stories
+            let notifier_name = a_notifier.clone().name;
+            let mut sorted_errors = stories
                 .0
                 .iter()
                 .filter(|elem| notifier_name == elem.notifier.clone().unwrap_or_default())
-                .map(|elem| {
-                    let error = elem.error.clone().unwrap().to_string();
-                    let notifier = elem.notifier.clone().unwrap_or_default();
-                    (error, notifier)
-                })
-                .collect::<Vec<(String, String)>>();
-            sorted_tuples.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap());
+                .map(|elem| elem.error.clone().unwrap().to_string())
+                .collect::<Vec<String>>();
+            sorted_errors.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
             // let's iterate over each string and count occurences
             // if there are 3 occurences - we should send notification about it:
             let mut failure_occurences = HashMap::new();
-            for element in sorted_tuples {
+            for element in sorted_errors {
                 let existing_value = failure_occurences.entry(element).or_insert(0);
                 *existing_value += 1;
             }
@@ -66,15 +62,7 @@ impl Handler<Notify> for Notificator {
             let errors_with_webhooks = failure_occurences
                 .iter()
                 .filter(|&(_k, v)| *v == 3)
-                .map(|(tuple, _v)| {
-                    let notifier = notifiers
-                        .iter()
-                        .find(|e| e.name == tuple.1)
-                        .cloned()
-                        .unwrap_or_default()
-                        .slack_webhook;
-                    (format!("{}\n", tuple.clone().0), notifier)
-                })
+                .map(|(error, _v)| (format!("{}\n", error), a_notifier.clone().slack_webhook))
                 .collect::<Vec<(String, String)>>();
 
             // no errors, means that we can traverse NOTIFY_HISTORY and pick all previously failed entries and send ok_message
@@ -82,8 +70,8 @@ impl Handler<Notify> for Notificator {
                 let history = NOTIFY_HISTORY.lock().unwrap();
                 let history_of_failures = history
                     .iter()
-                    .filter(|(is_failure, _, notifier, _)| {
-                        notifier == &notifier_name && *is_failure
+                    .filter(|(to_notify, _, notifier, _)| {
+                        notifier == &notifier_name && !*to_notify
                     })
                     .collect::<Vec<_>>();
 
@@ -92,66 +80,88 @@ impl Handler<Notify> for Notificator {
                     &notifier_name, history_of_failures
                 );
                 if history_of_failures.is_empty() {
-                    info!(
+                    debug!(
                         "No need to send notification to notificator: {}",
                         &notifier_name
                     );
                 } else {
-                    warn!(
-                        "OK notification for notifier: {}, with message: {}",
+                    info!(
+                        "Sending SUCCESS notification for notifier: {}, with message: {}",
                         &notifier_name, &ok_message
                     );
+                    //utilities::notify_success(&webhook, &ok_message);
                     drop(history); // drop mutex lock
                     let mut history = NOTIFY_HISTORY.lock().unwrap();
-                    history.retain(|(is_failure, _, notifier, _)| {
-                        notifier != &notifier_name && *is_failure
-                    });
+                    history.retain(|(_, _, notifier, _)| notifier != &notifier_name);
                 }
             } else {
                 for (message, webhook) in errors_with_webhooks.clone() {
-                    let history = NOTIFY_HISTORY.lock().unwrap();
-                    let last_notifications = history
-                        .iter()
-                        .filter(|(is_failure, _, notifier, _)| {
-                            notifier == &notifier_name && *is_failure
-                        })
-                        .cloned()
-                        .collect::<Vec<_>>();
-
-                    if last_notifications.contains(&(
+                    let notified_entry = (
+                        false,
+                        message.clone(),
+                        notifier_name.clone(),
+                        webhook.clone(),
+                    );
+                    let unnotified_entry = (
                         true,
                         message.clone(),
                         notifier_name.clone(),
                         webhook.clone(),
-                    )) {
-                        info!(
-                            "Repeated FAIL notification skipped for for notifer: {} with message: {}",
-                            &notifier_name, &message
-                        );
+                    );
+                    let mut history = NOTIFY_HISTORY.lock().unwrap();
+                    if history.contains(&notified_entry) {
+                        debug!("Already notified message skipped: {}", &message);
                     } else {
-                        drop(history); // remove previous lock on NOTIFY_HISTORY!
-                        let mut history = NOTIFY_HISTORY.lock().unwrap();
-                        history.push((
-                            true,
-                            message.clone(),
-                            notifier_name.clone(),
-                            webhook.clone(),
-                        ));
-
-                        warn!(
-                            "Sending FAIL notification: '{}' to notifier id: {}, webhook: '{}'",
-                            &message.clone(),
-                            &notifier_name,
-                            &webhook
-                        );
-                        // utilities::notify_failure(&webhook, &ok_message);
+                        debug!("Pushing new entry: {:?}", unnotified_entry);
+                        history.push(unnotified_entry)
                     }
                 }
             }
         }
 
+        // iterate again over notifiers, determine webhooks and group messages together to send failure notification
+        for a_notifier in notifiers.clone() {
+            let notifier_name = a_notifier.name;
+            let history = NOTIFY_HISTORY.lock().unwrap();
+            let failure_messages = history
+                .iter()
+                .filter(|(to_notify, _, notifier, _)| notifier == &notifier_name && *to_notify)
+                .map(|(_, message, ..)| message.to_string())
+                .collect::<Vec<_>>();
+            let webhook = history // webhook is same for same notifier
+                .iter()
+                .filter(|(to_notify, _, notifier, _)| notifier == &notifier_name && *to_notify)
+                .map(|(_, _, _, webhook)| webhook.to_string())
+                .take(1)
+                .collect::<String>();
+
+            if failure_messages.is_empty() {
+                debug!(
+                    "Failure messages already notfied: {}",
+                    &failure_messages.join("")
+                );
+            } else {
+                info!(
+                    "Sending FAILURE notification: '{}' to notifier id: {}, webhook: '{}'",
+                    &failure_messages.join(""),
+                    &notifier_name,
+                    &webhook
+                );
+                // utilities::notify_failure(&webhook, &ok_message);
+
+                drop(history);
+                let mut history = NOTIFY_HISTORY.lock().unwrap();
+                history
+                    .iter_mut()
+                    .filter(|(to_notify, _, notifier, _)| {
+                        notifier == &notifier_name && *to_notify
+                    })
+                    .for_each(|(to_notify, ..)| *to_notify = false);
+            }
+        }
+
         let history = NOTIFY_HISTORY.lock().unwrap();
-        warn!("NOTIFY_HISTORY: {:?}", history);
+        debug!("NOTIFY_HISTORY state: {:?}", history);
     }
 }
 
