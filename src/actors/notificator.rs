@@ -54,7 +54,7 @@ impl Handler<Notify> for Notificator {
                 let existing_value = failure_occurences.entry(element).or_insert(0);
                 *existing_value += 1;
             }
-            debug!(
+            info!(
                 "Notifier {} failure occurences: {:#?}",
                 notifier_name, failure_occurences
             );
@@ -124,14 +124,14 @@ impl Handler<Notify> for Notificator {
         for a_notifier in notifiers.clone() {
             let notifier_name = a_notifier.name;
             let history = NOTIFY_HISTORY.lock().unwrap();
-            let failure_messages = history
-                .iter()
-                .filter(|(to_notify, _, notifier, _)| notifier == &notifier_name && *to_notify)
+            let filter = history.iter().filter(|(to_notify, _, notifier, _)| {
+                notifier == &notifier_name && *to_notify
+            });
+            let failure_messages = filter
+                .clone()
                 .map(|(_, message, ..)| message.to_string())
                 .collect::<Vec<_>>();
-            let webhook = history // webhook is same for same notifier
-                .iter()
-                .filter(|(to_notify, _, notifier, _)| notifier == &notifier_name && *to_notify)
+            let webhook = filter // webhook is always one per notifier
                 .map(|(_, _, _, webhook)| webhook.to_string())
                 .take(1)
                 .collect::<String>();
