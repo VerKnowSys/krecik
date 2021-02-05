@@ -56,7 +56,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             .collect::<Vec<Story>>();
 
         if files_list.len() < STORIES_TO_VALIDATE_COUNT {
-            debug!(
+            info!(
                 "Less than {} stories available, skipping validation…",
                 STORIES_TO_VALIDATE_COUNT
             );
