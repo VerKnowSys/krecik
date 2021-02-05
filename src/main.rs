@@ -80,7 +80,7 @@ use std::{
 fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
     let log_file = Config::load()
         .log_file
-        .unwrap_or(String::from("krecik.log"));
+        .unwrap_or_else(|| String::from("krecik.log"));
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
@@ -112,7 +112,7 @@ fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
 async fn main() {
     let logger_level = match var("DEBUG") {
         Ok(value) => {
-            if value == String::from("2") {
+            if value == *"2" {
                 LevelFilter::Trace
             } else {
                 LevelFilter::Debug
