@@ -95,20 +95,20 @@ impl Handler<ValidateResults> for ResultsWarden {
                 .cloned()
                 .collect::<Vec<Story>>();
 
-            let oldest_previous_stories: Vec<Story> =
-                serde_json::from_str(&read_text_file(&files_list[3]).unwrap_or_default())
-                    .unwrap_or_default();
-            let oldest_previous_stories_errors = oldest_previous_stories
-                .iter()
-                .filter(|entry| entry.error.is_some())
-                .cloned()
-                .collect::<Vec<Story>>();
+            // let oldest_previous_stories: Vec<Story> =
+            //     serde_json::from_str(&read_text_file(&files_list[3]).unwrap_or_default())
+            //         .unwrap_or_default();
+            // let oldest_previous_stories_errors = oldest_previous_stories
+            //     .iter()
+            //     .filter(|entry| entry.error.is_some())
+            //     .cloned()
+            //     .collect::<Vec<Story>>();
 
             debug!("Error stories:");
             debug!("[0]: {:?}", last_stories_errors);
             debug!("[1]: {:?}", previous_stories_errors);
             debug!("[2]: {:?}", old_previous_stories_errors);
-            debug!("[3]: {:?}", oldest_previous_stories_errors);
+            // debug!("[3]: {:?}", oldest_previous_stories_errors);
 
             let notifier = val.0;
             notifier.do_send(Notify(
@@ -116,6 +116,7 @@ impl Handler<ValidateResults> for ResultsWarden {
                     last_stories_errors.clone(),
                     previous_stories_errors,
                     old_previous_stories_errors,
+                    // oldest_previous_stories_errors,
                 ]
                 .concat(),
             ));
