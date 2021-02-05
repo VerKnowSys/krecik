@@ -1,20 +1,12 @@
 use glob::glob;
 use slack_hook::{AttachmentBuilder, PayloadBuilder, Slack};
 use std::{
-    collections::HashSet,
     fs::{self, OpenOptions},
     io::{prelude::*, Error},
     path::Path,
 };
 
 use crate::*;
-
-
-/// Helper to remove duplicates from vector
-pub fn remove_duplicates(elements: &mut Vec<String>) {
-    let list: HashSet<_> = elements.drain(..).collect();
-    elements.extend(list.into_iter());
-}
 
 
 /// Sends generic notification over Slack
