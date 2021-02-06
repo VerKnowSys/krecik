@@ -33,6 +33,27 @@ impl Handler<Notify> for Notificator {
         let notifiers = Config::load().notifiers.unwrap_or_default();
         trace!("Defined notifiers: {:#?}", notifiers);
 
+        // detect notifiers undefined in dynamic configuration:
+        let notifier_names = notifiers
+            .iter()
+            .cloned()
+            .map(|notifier| notifier.name)
+            .collect::<Vec<_>>();
+        stories
+            .0
+            .iter()
+            .cloned()
+            .filter(|elem| {
+                !notifier_names.contains(&elem.notifier.clone().unwrap_or_default())
+            })
+            .filter_map(|elem| elem.notifier)
+            .for_each(|notifier| {
+                warn!(
+                    "Notifier: '{}' is not defined in configuration file. Notifications won't be sent!",
+                    &notifier
+                )
+            });
+
         let ok_message = Config::load()
             .ok_message
             .unwrap_or_else(|| String::from("All services are UP."));
