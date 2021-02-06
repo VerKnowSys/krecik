@@ -9,6 +9,29 @@ use std::{
 use crate::*;
 
 
+/// Warns about notifiers undefined in dynamic configuration:
+pub fn warn_for_undefined_notifiers(stories: &Stories) {
+    let notifiers = Config::load().notifiers.unwrap_or_default();
+    let notifier_names = notifiers
+        .into_iter()
+        .map(|notifier| notifier.name)
+        .collect::<Vec<_>>();
+    let mut undefined = stories
+        .iter()
+        .cloned()
+        .filter(|elem| !notifier_names.contains(&elem.notifier.clone().unwrap_or_default()))
+        .filter_map(|elem| elem.notifier)
+        .collect::<Vec<String>>();
+    undefined.dedup();
+    undefined.iter().for_each(|notifier| {
+        warn!(
+            "Notifier: '{}' is not defined in configuration file. Notifications won't be sent!",
+            &notifier
+        )
+    });
+}
+
+
 /// Sends generic notification over Slack
 pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
     Slack::new(webhook)

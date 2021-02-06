@@ -163,6 +163,8 @@ async fn main() {
         let end = Local::now();
         let diff = end - start;
 
+        warn_for_undefined_notifiers(&stories);
+
         info!(
             "Remote checks took: {}s. Result stories count: {}.",
             diff.num_seconds(),
