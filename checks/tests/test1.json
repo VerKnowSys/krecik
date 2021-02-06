@@ -52,5 +52,5 @@
             ]
         }
     ],
-    "slack_webhook": null
+    "notifier": "some-unconfigured-test-notifier"
 }

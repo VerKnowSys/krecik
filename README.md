@@ -39,6 +39,7 @@ Daniel ([@dmilith](https://twitter.com/dmilith)) Dettlaff
 
 - Clang >= 6.x
 - Make >= 3.x
+- Cmake >= 3.16
 - Perl >= 5.x
 - POSIX compliant base-system (tested on systems: FreeBSD/ HardenedBSD/ Darwin and Linux)
 
@@ -90,9 +91,46 @@ Prebuilt version of `Curl_lib` bundle is available for systems:
 
 - [Darwin-10.14.x](http://software.verknowsys.com/binary/Darwin-10.14-x86_64/Curl_lib-7.64.0-Darwin-10.14-x86_64.txz)
 
-- [HardenedBSD-11.x](http://software.verknowsys.com/binary/FreeBSD-11.0-amd64/Curl_lib-7.64.0-FreeBSD-11.0-amd64.zfsx) - NOTE Under HardenedBSD, binary-bundle file is NOT a tar file, but Lz4 compressed ZFS dataset of software bundle.
+- [svdOS-12.2](http://software.verknowsys.com/binary/FreeBSD-12.2-amd64/Curl_lib-7.74.0-FreeBSD-12.2-amd64.zfsx) - NOTE Under svdOS, binary-bundle file is NOT a tar file, but Lz4 compressed ZFS dataset of software bundle.
 
-NOTE: Curl_lib binary-bundle provides all Krecik library requirements: CURL, OpenSSL, ngHTTP2, (IDN, SSH).
+NOTE: Curl_lib binary-bundle provides all Krecik library requirements: CURL, OpenSSL, ngHTTP2 and IDN2.
+
+
+# Configuration:
+
+By default Krecik looks for configuration under:
+
+- /etc/krecik/krecik.conf
+- /Services/Krecik/service.conf
+- /Projects/krecik/krecik.conf
+- krecik.conf
+
+## Configuration file format:
+
+```json
+{
+    "log_file": "/var/log/krecik.log",
+    "ok_message": "All services are UP as they should.",
+    "notifiers": [
+    {
+        "name": "notifier-name",
+        "notifier": "https://hooks.slack.com/services/1111111111/222222222/3333333333333"
+    },
+    {
+        "name": "notifier-other-name",
+        "notifier": "https://hooks.slack.com/services/1111111111/222222222/3333333333333"
+    }
+  ]
+}
+```
+
+Fields explanation:
+
+- `ok_message` - Notification message that will be sent (per notifier) when all checks are successful.
+
+- `log_file` - Krecik log file location.
+
+- `notifiers` - List of Slack notifiers used by each Check definition by name.
 
 
 
@@ -153,12 +191,9 @@ For now, the only defined remote resource type is: "PongoHost". To configure Pon
 ```JSON
 {
     "url": "https://pongo-api.your.domain.tld/api/ping?token=your-secret-token",
-    "only_vhost_contains": "services-domain.tld"
+    "notifier": "notifier-id"
 }
 ```
-
-NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defined hosts always accepted). If value is set, checker will limit processed checks to only URLs matching specified domain-name (or URL path fragment).
-
 
 
 # External JSON resources repositories support:
@@ -170,20 +205,6 @@ NOTE: If "only_vhost_contains" is "" - no domain filtering is applied (all defin
 3. Clone your checks-resource repository, here I called it "frontends": `git clone git@github.com:my-company-id/krecik-frontends.git frontends`.
 
 4. Start `krecik` web-server in dev mode: `bin/run dev` (starts MUCH faster in dev mode).
-
-5. Use provided WebAPI to perform checks. Examples below.
-
-
-
-# WebAPI usage examples
-
-NOTE: early stage, details may change in future!
-
-1. Perform all checks from local "frontends" resource: `curl http://127.0.0.1:60666/check/execute/frontends`
-
-2. Perform only checks defined in a single check-file of local "frontends" resource: "your-name.json": `curl http://127.0.0.1:60666/check/execute/frontends/your-name.json`
-
-3. Perform all checks provided by Pongo remote resource (requires valid mapper configuration per remote resource): `curl http://127.0.0.1:60666/check/execute_remote/remotes`
 
 
 
