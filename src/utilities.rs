@@ -94,40 +94,6 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
 }
 
 
-/// Produce list of dirs/files matching given glob pattern:
-pub fn produce_list(glob_pattern: &str) -> Vec<String> {
-    let mut list = vec![];
-    for entry in glob(&glob_pattern).unwrap() {
-        match entry {
-            Ok(path) => {
-                if let Some(element) = path.file_name().unwrap_or_default().to_str() {
-                    list.push(element.to_string())
-                }
-            }
-            Err(err) => {
-                error!("Error: produce_list(): {}", err);
-            }
-        }
-    }
-    trace!("produce_list(): Elements: {:?}", list);
-    list
-}
-
-
-/// List all check files found in default checks dir
-pub fn list_check_files() -> Vec<String> {
-    list_check_files_from(CHECKS_DIR)
-}
-
-
-/// List all check files from given dir
-pub fn list_check_files_from(checks_dir: &str) -> Vec<String> {
-    let glob_pattern = format!("{}/*.json", checks_dir);
-    trace!("list_check_files(): {}", glob_pattern);
-    produce_list(&glob_pattern)
-}
-
-
 /// List all check files from given dir
 pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
     let glob_pattern = format!("{}/**/*.json", checks_dir);
