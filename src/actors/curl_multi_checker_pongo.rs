@@ -77,9 +77,9 @@ impl Handler<Checks> for CurlMultiCheckerPongo {
                     // Collect History of results:
                     process_handlers
                         .into_iter()
-                        .flat_map(|(check, handler)| {
+                        .flat_map(|(page, handler)| {
                             Self::process_page_handler(
-                                &check,
+                                &page,
                                 handler,
                                 &multi,
                                 notifier.clone(),
