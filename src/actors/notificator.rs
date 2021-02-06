@@ -47,19 +47,21 @@ impl Handler<Notify> for Notificator {
                 .collect::<Vec<String>>();
             sorted_errors.sort_by(|a, b| a.partial_cmp(b).unwrap());
 
-            // let's iterate over each string and count occurences
-            // if there are 3 occurences - we should send notification about it:
-            let mut failure_occurences = HashMap::new();
+            // let's iterate over each string and count occurrences
+            // if there are 3 occurrences - we should send notification about it:
+            let mut failure_occurrences = HashMap::new();
             for element in sorted_errors {
-                let existing_value = failure_occurences.entry(element).or_insert(0);
+                let existing_value = failure_occurrences.entry(element).or_insert(0);
                 *existing_value += 1;
             }
-            info!(
-                "Notifier {} failure occurences: {:#?}",
-                notifier_name, failure_occurences
-            );
+            if !failure_occurrences.is_empty() {
+                info!(
+                    "Notifier: {}, failure occurrences: {:#?}",
+                    notifier_name, failure_occurrences
+                );
+            }
 
-            let errors_with_webhooks = failure_occurences
+            let errors_with_webhooks = failure_occurrences
                 .iter()
                 .filter(|&(_k, v)| *v == 3)
                 .map(|(error, _v)| (format!("{}\n", error), a_notifier.clone().slack_webhook))
@@ -138,7 +140,7 @@ impl Handler<Notify> for Notificator {
 
             if failure_messages.is_empty() {
                 debug!(
-                    "Failure messages already notfied: {}",
+                    "Failure messages already notfied: '{}'",
                     &failure_messages.join("")
                 );
             } else {
