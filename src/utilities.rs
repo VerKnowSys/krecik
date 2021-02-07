@@ -94,10 +94,23 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
 }
 
 
-/// List all check files from given dir
+/// List all check files from given dir, also considering krecik_root value
 pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
-    let glob_pattern = format!("{}/**/*.json", checks_dir);
-    trace!("list_all_checks_from(): {}", glob_pattern);
+    let krecik_root_dir = Config::load().krecik_root.unwrap_or_default();
+    let glob_pattern = if !Path::new(&krecik_root_dir).exists() {
+        if !krecik_root_dir.is_empty() {
+            warn!(
+                "Krecik root directory doesn't exists: {}. Falling back to current directory.",
+                krecik_root_dir
+            );
+        } else {
+            warn!("Krecik root directory wasn't specified, using current directory.");
+        }
+        format!("{}/**/*.json", checks_dir)
+    } else {
+        format!("{}/{}/**/*.json", krecik_root_dir, checks_dir)
+    };
+    debug!("list_all_checks_from(): {}", glob_pattern);
     produce_list_absolute(&glob_pattern)
 }
 

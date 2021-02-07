@@ -8,6 +8,9 @@ use std::{
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 /// Dynamic configuration read on demand by Krecik
 pub struct Config {
+    /// Absolute path to Krecik directory where "checks" are located
+    pub krecik_root: Option<String>,
+
     /// Log output from Krecik-server
     pub log_file: Option<String>,
 
