@@ -226,6 +226,13 @@ Fields explanation:
 ```
 
 
+## Default expectations:
+
+- Domain check expectation: `ValidExpiryPeriod(14)` (each domain has to be valid for at least 14 days).
+
+- Page check expectations: `ValidCode(200)` (http error code is 200) + `ValidLength(128)` (content length is at least 128 bytes long) + `ValidContent("body")` (content contains "body")
+
+
 # Development:
 
 
