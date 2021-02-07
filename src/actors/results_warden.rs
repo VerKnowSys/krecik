@@ -14,7 +14,7 @@ pub struct ResultsWarden;
 
 /// Validates results history
 #[derive(Message, Debug, Clone)]
-#[rtype(result = "Result<(), ()>")]
+#[rtype(result = "()")]
 pub struct ValidateResults(pub Addr<Notificator>);
 
 
@@ -23,7 +23,7 @@ const STORIES_TO_KEEP_COUNT: usize = 60 * 12; // keep half a day of stories
 
 
 impl Handler<ValidateResults> for ResultsWarden {
-    type Result = Result<(), ()>;
+    type Result = ();
 
     fn handle(&mut self, val: ValidateResults, _ctx: &mut Self::Context) -> Self::Result {
         info!("ResultsWarden validates results…");
@@ -36,7 +36,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             .collect::<Vec<String>>();
         if files_list.is_empty() {
             warn!("No results. Nothing to validate.");
-            return Ok(());
+            return;
         }
 
         debug!("Last stories file name: {}", &files_list[0]);
@@ -47,7 +47,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             warn!(
                 "Last stories seems to be incomplete? Skipping validation until next iteration."
             );
-            return Err(());
+            return;
         }
         let last_stories_errors = last_stories
             .iter()
@@ -95,20 +95,10 @@ impl Handler<ValidateResults> for ResultsWarden {
                 .cloned()
                 .collect::<Vec<Story>>();
 
-            // let oldest_previous_stories: Vec<Story> =
-            //     serde_json::from_str(&read_text_file(&files_list[3]).unwrap_or_default())
-            //         .unwrap_or_default();
-            // let oldest_previous_stories_errors = oldest_previous_stories
-            //     .iter()
-            //     .filter(|entry| entry.error.is_some())
-            //     .cloned()
-            //     .collect::<Vec<Story>>();
-
             debug!("Error stories:");
             debug!("[0]: {:?}", last_stories_errors);
             debug!("[1]: {:?}", previous_stories_errors);
             debug!("[2]: {:?}", old_previous_stories_errors);
-            // debug!("[3]: {:?}", oldest_previous_stories_errors);
 
             let notifier = val.0;
             notifier.do_send(Notify(
@@ -116,19 +106,9 @@ impl Handler<ValidateResults> for ResultsWarden {
                     last_stories_errors.clone(),
                     previous_stories_errors,
                     old_previous_stories_errors,
-                    // oldest_previous_stories_errors,
                 ]
                 .concat(),
             ));
-        }
-
-        // TODO: if an error is detected in last stories, run next check without a pause in-between:
-        if last_stories_errors.is_empty() {
-            debug!("No errors in last stories!");
-            Ok(())
-        } else {
-            debug!("There were errors in last stories!");
-            Err(())
         }
     }
 }
