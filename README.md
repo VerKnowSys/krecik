@@ -105,7 +105,7 @@ By default Krecik looks for configuration under:
 - /Projects/krecik/krecik.conf
 - krecik.conf
 
-## Configuration file format:
+## Krecik dynamic configuration file format:
 
 ```json
 {
@@ -132,6 +132,98 @@ Fields explanation:
 
 - `notifiers` - List of Slack notifiers used by each Check definition by name.
 
+
+## Fully featured Krecik check file example:
+
+```json
+{
+    "domains": [
+        {
+            "name": "some-page.com",
+            "expects": [
+                {
+                    "ValidExpiryPeriod": 10
+                }
+            ]
+        },
+        {
+            "name": "some-other-domain.com",
+            "expects": [
+                {
+                    "ValidExpiryPeriod": 90
+                }
+            ]
+        }
+    ],
+    "pages": [
+        {
+            "url": "https://some-page.com/",
+            "expects": [
+                {
+                    "ValidAddress": "https://some-page.com/after/for/example/302/redirect"
+                },
+                {
+                    "ValidCode": 200
+                },
+                {
+                    "ValidContent": "Some content"
+                },
+                {
+                    "ValidContent": "<title"
+                },
+                {
+                    "ValidContent": "and this thing"
+                },
+                {
+                    "ValidLength": 100000
+                }
+            ],
+            "options": {
+                "timeout": 15,
+                "connection_timeout": 30,
+                "verbose": false,
+                "ssl_verify_host": true,
+                "ssl_verify_peer": true,
+                "follow_redirects": true,
+                "headers": [
+                    "zala: takiheder",
+                    "atala: header123",
+                    "oitrala: 1"
+                ],
+                "cookies": [
+                    "ala: 123",
+                    "tala: aye sensei",
+                    "trala: 6"
+                ],
+                "agent": "Krtecek-Underground-Agent",
+
+                "method": "POST",
+                "post_data": [
+                    "some: value",
+                    "{\"more\": \"data\"}"
+                ]
+            }
+        },
+        {
+            "url": "http://google.com/fdgrtjkgengjkdfnglksfdgsdfg",
+            "expects": [
+                {
+                    "ValidCode": 404
+                }
+            ]
+        },
+        {
+            "url": "http://rust-lang.org/",
+            "expects": [
+                {
+                    "ValidCode": 200
+                }
+            ]
+        }
+    ],
+    "notifier": "notifier-name"
+}
+```
 
 
 # Development:
