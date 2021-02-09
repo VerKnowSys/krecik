@@ -63,7 +63,7 @@ impl Handler<Notify> for Notificator {
 
             let errors_with_webhooks = failure_occurrences
                 .iter()
-                .filter(|&(_k, v)| *v == 3)
+                .filter(|&(_k, v)| *v >= 3)
                 .map(|(error, _v)| (format!("{}\n", error), a_notifier.clone().slack_webhook))
                 .collect::<Vec<(String, String)>>();
 
