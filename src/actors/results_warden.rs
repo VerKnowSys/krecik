@@ -103,7 +103,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             let notifier = val.0;
             notifier.do_send(Notify(
                 [
-                    last_stories_errors.clone(),
+                    last_stories_errors,
                     previous_stories_errors,
                     old_previous_stories_errors,
                 ]

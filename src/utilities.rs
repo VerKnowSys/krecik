@@ -10,7 +10,7 @@ use crate::*;
 
 
 /// Warns about notifiers undefined in dynamic configuration:
-pub fn warn_for_undefined_notifiers(stories: &Stories) {
+pub fn warn_for_undefined_notifiers(stories: &[Story]) {
     let notifiers = Config::load().notifiers.unwrap_or_default();
     let notifier_names = notifiers
         .into_iter()
