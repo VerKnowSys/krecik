@@ -1,3 +1,5 @@
+use log::LevelFilter;
+
 use crate::read_text_file;
 use std::{
     io::{Error, ErrorKind},
@@ -13,6 +15,9 @@ pub struct Config {
 
     /// Log output from Krecik-server
     pub log_file: Option<String>,
+
+    /// Log level for Krecik-server
+    pub log_level: Option<String>,
 
     /// Notification message when all checks are fine
     pub ok_message: Option<String>,
@@ -55,5 +60,19 @@ impl Config {
                     .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
             })
             .unwrap_or_default()
+    }
+
+    /// Get LevelFilter (log level) from configuration
+    pub fn get_log_level(&self) -> LevelFilter {
+        let level = self.log_level.clone().unwrap_or_default();
+        match &level[..] {
+            "OFF" => LevelFilter::Off,
+            "ERROR" => LevelFilter::Error,
+            "WARN" => LevelFilter::Warn,
+            "INFO" => LevelFilter::Info,
+            "DEBUG" => LevelFilter::Debug,
+            "TRACE" => LevelFilter::Trace,
+            _ => LevelFilter::Info,
+        }
     }
 }

@@ -86,6 +86,7 @@ use krecik::{
     utilities::list_all_checks_from,
     *,
 };
+use lazy_static::lazy_static;
 use log::*;
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
@@ -97,9 +98,38 @@ use std::{
     thread,
     time::Duration,
 };
+use std::sync::RwLock;
+
+lazy_static! {
+    static ref LOG_LEVEL: RwLock<LevelFilter> = RwLock::new(LevelFilter::Info);
+}
 
 
-fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
+/// Set log level dynamically at runtime
+fn set_log_level() {
+    let level = Config::load().get_log_level();
+    match LOG_LEVEL.read() {
+        Ok(loglevel) => {
+            if level != *loglevel {
+                drop(loglevel);
+                match LOG_LEVEL.write() {
+                    Ok(mut log) => {
+                        println!("Changing log level to: {}", level);
+                        *log = level
+                    }
+                    Err(err) => {
+                        println!("Failed to change log level to: {}, cause: {}", level, err);
+                    }
+                }
+            }
+        }
+        Err(_) => {}
+    }
+}
+
+
+/// Initial setup of the fern logger
+fn setup_logger() -> Result<(), SetLoggerError> {
     let log_file = Config::load()
         .log_file
         .unwrap_or_else(|| String::from("krecik.log"));
@@ -110,6 +140,12 @@ fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
         .debug(Color::Magenta)
         .trace(Color::Cyan);
     Dispatch::new()
+        .filter(|metadata| {
+            match LOG_LEVEL.read() {
+                Ok(log) => metadata.level() <= *log,
+                Err(_err) => true,
+            }
+        })
         .format(move |out, message, record| {
             out.finish(format_args!(
                 "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
@@ -123,7 +159,7 @@ fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
                 message = message
             ))
         })
-        .level(level)
+        // .level(level)
         .chain(std::io::stdout())
         .chain(fern::DateBased::new(format!("{}.", log_file), "%Y-%m-%d"))
         .apply()
@@ -132,17 +168,7 @@ fn setup_logger(level: LevelFilter) -> Result<(), SetLoggerError> {
 
 #[actix_macros::main]
 async fn main() {
-    let logger_level = match var("DEBUG") {
-        Ok(value) => {
-            if value == *"2" {
-                LevelFilter::Trace
-            } else {
-                LevelFilter::Debug
-            }
-        }
-        Err(_) => LevelFilter::Info, /* TODO: read debug value from configuration and dynamically setup debug logging: */
-    };
-    setup_logger(logger_level).unwrap_or_default();
+    setup_logger().unwrap_or_default();
 
     ctrlc::set_handler(|| {
         println!("\n\nKrecik server was interrupted!");
@@ -165,6 +191,7 @@ async fn main() {
     let notificator = SyncArbiter::start(num, || Notificator);
 
     loop {
+        set_log_level();
         debug!("New execution iteration…");
 
         let start = Local::now();

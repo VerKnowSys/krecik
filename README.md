@@ -110,6 +110,7 @@ By default Krecik looks for configuration under:
 ```json
 {
     "log_file": "/var/log/krecik.log",
+    "log_level": "INFO",
     "ok_message": "All services are UP as they should.",
     "notifiers": [
     {
