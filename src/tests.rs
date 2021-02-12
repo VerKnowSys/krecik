@@ -5,7 +5,6 @@ mod all_tests {
     // Load all internal modules:
     use curl::easy::{Easy, Easy2, Handler, WriteError};
     use curl::multi::{Easy2Handle, Multi};
-    use regex::Regex;
 
     use ssl_expiration2::SslExpiration;
     use std::io::{Error, ErrorKind};
