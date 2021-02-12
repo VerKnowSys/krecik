@@ -75,7 +75,7 @@ use curl::easy::{Handler, WriteError};
 
 /// Collects async content from Curl:
 #[derive(Debug)]
-pub struct Collector(pub Vec<u8>);
+pub struct Collector(Vec<u8>);
 
 
 impl Handler for Collector {
