@@ -150,9 +150,9 @@ async fn main() {
     })
     .expect("Error setting Ctrl-C handler");
 
-    let num = num_cpus::get();
+    let num = 1;
     info!(
-        "Starting Krecik-server v{} with {} threads per check-actor.",
+        "Starting Krecik-server v{} with {} instance(s) of each actor.",
         env!("CARGO_PKG_VERSION"),
         num
     );
