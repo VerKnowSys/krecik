@@ -111,6 +111,8 @@ By default Krecik looks for configuration under:
 {
     "log_file": "/var/log/krecik.log",
     "log_level": "INFO",
+    "success_emoji": ":krecik-success:",
+    "failure_emoji": ":krecik-failure:",
     "ok_message": "All services are UP as they should.",
     "notifiers": [
     {
