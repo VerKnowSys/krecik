@@ -93,7 +93,7 @@ fn set_log_level() {
 fn setup_logger() -> Result<(), SetLoggerError> {
     let log_file = Config::load()
         .log_file
-        .unwrap_or_else(|| String::from("krecik.log"));
+        .unwrap_or_else(|| String::from(DEFAULT_LOG_FILE));
     let colors_line = ColoredLevelConfig::new()
         .error(Color::Red)
         .warn(Color::Yellow)
