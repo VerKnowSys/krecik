@@ -38,7 +38,6 @@
 )]
 #![warn(dead_code, unused_imports, unused_variables)]
 // For development:
-#![allow(deprecated)]
 // #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
 

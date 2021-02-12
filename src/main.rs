@@ -37,67 +37,28 @@
     unused_qualifications
 )]
 // For development:
-#![allow(dead_code, unused_imports, unused_variables, deprecated)]
+// #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
-
-#[macro_use]
-extern crate fern;
 
 use actix::prelude::*;
 use chrono::*;
-use curl::{
-    easy::{Easy2, List},
-    multi::{Easy2Handle, Multi},
-    Error as CurlError, MultiError,
-};
 use fern::{
     colors::{Color, ColoredLevelConfig},
-    Dispatch, InitError,
+    Dispatch,
 };
 use krecik::{
     actors::{
         curl_multi_checker::{Checks, CurlMultiChecker},
         curl_multi_checker_pongo::Checks as ChecksPongo,
         curl_multi_checker_pongo::CurlMultiCheckerPongo,
-        domain_expiry_checker::Checks as ChecksDomains,
-        domain_expiry_checker::DomainExpiryChecker,
         history_teacher::{HistoryTeacher, Results},
-        results_warden::{ResultsWarden, ValidateResults},
+        results_warden::ResultsWarden,
     },
     api::*,
-    checks::{
-        check::*,
-        domain::Domains,
-        page::{Method, Page},
-        pongo::{
-            collect_pongo_domains, collect_pongo_hosts, get_pongo_checks, read_pongo_mapper,
-        },
-    },
-    configuration::{
-        CHECKS_DIR, CHECK_CONNECTION_TIMEOUT, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
-        CHECK_MAX_CONNECTIONS, CHECK_MAX_REDIRECTIONS, CHECK_TIMEOUT, DEFAULT_SLACK_NAME,
-        REMOTE_CHECKS_DIR,
-    },
-    products::{
-        expected::{Expected, PageExpectation, PageExpectations},
-        story::*,
-        unexpected::{Unexpected, UnexpectedMinor},
-    },
-    utilities::list_all_checks_from,
     *,
 };
 use lazy_static::lazy_static;
 use log::*;
-use rayon::prelude::*;
-use ssl_expiration2::SslExpiration;
-use std::{
-    env::{self, var},
-    fs,
-    io::{Error, ErrorKind},
-    path::Path,
-    thread,
-    time::Duration,
-};
 use std::sync::RwLock;
 
 lazy_static! {

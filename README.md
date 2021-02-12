@@ -261,12 +261,12 @@ Eager developer mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, w
 ## Run:
 
 
-Launch "dev" WebAPI server (NOTE: enables DEBUG logger level and makes cargo build process verbose):
+Launch "dev" server:
 
 `bin/run dev`
 
 
-Launch "release" WebAPI server:
+Launch "release" server:
 
 `bin/run`
 
