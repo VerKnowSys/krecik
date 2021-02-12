@@ -24,6 +24,12 @@ pub struct Config {
 
     /// List of named notifiers
     pub notifiers: Option<Vec<Notifiers>>,
+
+    /// Success emoji used for notifications
+    pub success_emoji: Option<String>,
+
+    /// Failure emoji used for notifications
+    pub failure_emoji: Option<String>,
 }
 
 

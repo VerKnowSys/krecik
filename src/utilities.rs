@@ -64,13 +64,19 @@ pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
 
 /// Sends success notification to Slack
 pub fn notify_success(webhook: &str, message: &str) {
-    notify(webhook, message, DEFAULT_SLACK_SUCCESS_ICON, false)
+    let success_emoji = Config::load()
+        .success_emoji
+        .unwrap_or_else(|| String::from(DEFAULT_SLACK_SUCCESS_ICON));
+    notify(webhook, message, &success_emoji, false)
 }
 
 
 /// Sends failure notification to Slack
 pub fn notify_failure(webhook: &str, message: &str) {
-    notify(webhook, message, DEFAULT_SLACK_FAILURE_ICON, true)
+    let failure_emoji = Config::load()
+        .failure_emoji
+        .unwrap_or_else(|| String::from(DEFAULT_SLACK_FAILURE_ICON));
+    notify(webhook, message, &failure_emoji, true)
 }
 
 

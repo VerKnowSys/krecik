@@ -10,7 +10,7 @@ pub const DEFAULT_LOG_FILE: &str = "logs/krecik.log";
 pub const DEFAULT_SLACK_NAME: &str = "Krecik";
 
 /// Default Notification failure icon:
-pub const DEFAULT_SLACK_FAILURE_ICON: &str = ":krecik-failure:";
+pub const DEFAULT_SLACK_FAILURE_ICON: &str = ":error:";
 
 /// Default Notification success icon:
 pub const DEFAULT_SLACK_SUCCESS_ICON: &str = ":white_check_mark:";
