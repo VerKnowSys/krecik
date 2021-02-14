@@ -79,12 +79,14 @@ fn set_log_level() {
                         *log = level
                     }
                     Err(err) => {
-                        println!("Failed to change log level to: {}, cause: {}", level, err);
+                        eprintln!("Failed to change log level to: {}, cause: {}", level, err);
                     }
                 }
             }
         }
-        Err(_) => {}
+        Err(err) => {
+            eprintln!("Couldn't read LOG_LEVEL, cause: {:?}", err);
+        }
     }
 }
 
@@ -120,7 +122,6 @@ fn setup_logger() -> Result<(), SetLoggerError> {
                 message = message
             ))
         })
-        // .level(level)
         .chain(std::io::stdout())
         .chain(fern::DateBased::new(format!("{}.", log_file), "%Y-%m-%d"))
         .apply()
@@ -129,22 +130,17 @@ fn setup_logger() -> Result<(), SetLoggerError> {
 
 #[actix_macros::main]
 async fn main() {
-    setup_logger().unwrap_or_default();
-
+    setup_logger().expect("Couldn't initialize logger");
     ctrlc::set_handler(|| {
         println!("\n\nKrecik server was interrupted!");
         std::process::exit(0);
     })
-    .expect("Error setting Ctrl-C handler");
+    .expect("Couldn't initialize Ctrl-C handler");
 
-    let num = 1;
-    info!(
-        "Starting Krecik-server v{} with {} instance(s) of each actor.",
-        env!("CARGO_PKG_VERSION"),
-        num
-    );
+    info!("Starting Krecik-server v{}", env!("CARGO_PKG_VERSION"));
 
     // Define system actors
+    let num = 1;
     let curl_multi_checker = SyncArbiter::start(num, || CurlMultiChecker);
     let curl_multi_checker_pongo = SyncArbiter::start(num, || CurlMultiCheckerPongo);
     let history_teacher = SyncArbiter::start(num, || HistoryTeacher);
