@@ -26,7 +26,81 @@ use std::{
 
 
 /// Trait implementing all helper functions for Curl-driven checks
-pub trait GenericCurlChecker {
+pub trait GenericChecker {
+    /// Executes domain checks, returns Stories
+    fn check_domains(checks: Vec<Check>) -> Stories {
+        checks
+            .into_par_iter()
+            .flat_map(|check| {
+                let notifier = check.notifier;
+                check
+                    .domains
+                    .par_iter()
+                    .flat_map(|domains| {
+                        domains
+                            .par_iter()
+                            .flat_map(|domain| {
+                                domain
+                                    .expects
+                                    .par_iter()
+                                    .map(|expectation| {
+                                        Self::check_ssl_expire(
+                                            &domain.name,
+                                            *expectation,
+                                            notifier.clone(),
+                                        )
+                                    })
+                                    .collect::<Stories>()
+                            })
+                            .collect::<Stories>()
+                    })
+                    .collect::<Stories>()
+            })
+            .collect()
+    }
+
+
+    /// Executes page checks, returns Stories
+    fn check_pages(checks: Vec<Check>) -> Stories {
+        checks
+            .iter()
+            .flat_map(|check| {
+                let notifier = check.clone().notifier;
+                check.pages.iter().flat_map(move |pages| {
+                    let mut multi = Multi::new();
+                    multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex
+
+                    // collect tuple of page-checks and Curl handler:
+                    let process_handlers: Vec<_> = pages
+                        .iter()
+                        .map(|check| (check, Self::load_handler_for(&check, &multi)))
+                        .collect();
+
+                    // perform all checks at once:
+                    while multi.perform().unwrap_or_default() > 0 {
+                        multi
+                            .wait(&mut [], Duration::from_secs(CHECK_TIMEOUT))
+                            .unwrap_or_default();
+                    }
+
+                    // Collect History of results:
+                    process_handlers
+                        .into_iter()
+                        .flat_map(|(page, handler)| {
+                            Self::process_page_handler(
+                                &page,
+                                handler,
+                                &multi,
+                                notifier.clone(),
+                            )
+                        })
+                        .collect::<Stories>()
+                })
+            })
+            .collect()
+    }
+
+
     /// Check SSL certificate expiration using OpenSSL function
     fn check_ssl_expire(
         domain_name: &str,
