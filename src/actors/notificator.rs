@@ -36,7 +36,7 @@ impl Handler<Notify> for Notificator {
             .ok_message
             .unwrap_or_else(|| String::from(CHECK_DEFAULT_SUCCESS_NOTIFICATION_MSG));
 
-        for a_notifier in notifiers.clone() {
+        for a_notifier in &notifiers {
             let notifier_name = a_notifier.clone().name;
             let mut sorted_errors = stories
                 .0
@@ -90,14 +90,13 @@ impl Handler<Notify> for Notificator {
                         "Sending SUCCESS notification for notifier: {}, with message: {}",
                         &notifier_name, &ok_message
                     );
-                    let webhook = a_notifier.slack_webhook; // TODO: add notification mechanisms other than Slack?
-                    utilities::notify_success(&webhook, &ok_message); // TODO: Since Slack API can fail… retry crate could be used
+                    utilities::notify_success(&a_notifier.slack_webhook, &ok_message); // TODO: Since Slack API can fail… retry crate could be used
                     drop(history); // drop mutex lock
                     let mut history = NOTIFY_HISTORY.lock().unwrap();
                     history.retain(|(_, _, notifier, _)| notifier != &notifier_name);
                 }
             } else {
-                for (message, webhook) in errors_with_webhooks.clone() {
+                for (message, webhook) in &errors_with_webhooks {
                     let notified_entry = (
                         false,
                         message.clone(),
@@ -122,7 +121,7 @@ impl Handler<Notify> for Notificator {
         }
 
         // iterate again over notifiers, determine webhooks and group messages together to send failure notification
-        for a_notifier in notifiers.clone() {
+        for a_notifier in notifiers {
             let notifier_name = a_notifier.name;
             let history = NOTIFY_HISTORY.lock().unwrap();
             let filter = history.iter().filter(|(to_notify, _, notifier, _)| {

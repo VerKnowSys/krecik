@@ -28,11 +28,11 @@ use std::{
 /// Trait implementing all helper functions for Curl-driven checks
 pub trait GenericChecker {
     /// Executes domain checks, returns Stories
-    fn check_domains(checks: Vec<Check>) -> Stories {
+    fn check_domains(checks: &[Check]) -> Stories {
         checks
             .into_par_iter()
             .flat_map(|check| {
-                let notifier = check.notifier;
+                let notifier = check.notifier.clone();
                 check
                     .domains
                     .par_iter()
@@ -61,11 +61,11 @@ pub trait GenericChecker {
 
 
     /// Executes page checks, returns Stories
-    fn check_pages(checks: Vec<Check>) -> Stories {
+    fn check_pages(checks: &[Check]) -> Stories {
         checks
             .iter()
             .flat_map(|check| {
-                let notifier = check.clone().notifier;
+                let notifier = check.notifier.clone();
                 check.pages.iter().flat_map(move |pages| {
                     let mut multi = Multi::new();
                     multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex

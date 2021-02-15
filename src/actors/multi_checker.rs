@@ -17,9 +17,9 @@ pub struct Checks(pub Vec<Check>);
 impl Handler<Checks> for MultiChecker {
     type Result = Result<Stories, Stories>;
 
-    fn handle(&mut self, msg: Checks, _ctx: &mut Self::Context) -> Self::Result {
-        let stories_from_domains = Self::check_domains(msg.clone().0);
-        let stories_from_pages = Self::check_pages(msg.0);
+    fn handle(&mut self, checks: Checks, _ctx: &mut Self::Context) -> Self::Result {
+        let stories_from_domains = Self::check_domains(&checks.0);
+        let stories_from_pages = Self::check_pages(&checks.0);
         Ok([stories_from_domains, stories_from_pages].concat())
     }
 }

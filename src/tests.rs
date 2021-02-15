@@ -236,7 +236,7 @@ mod all_tests {
     #[test]
     fn test_domain_check_history_length() {
         let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
-        let history = MultiChecker::check_domains(vec![check]);
+        let history = MultiChecker::check_domains(&vec![check]);
         assert_eq!(history.len(), 1);
         for element in history {
             assert!(!element.timestamp.is_empty());
@@ -250,7 +250,7 @@ mod all_tests {
     #[test]
     fn test_page_check_history_length() {
         let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
-        let history = MultiChecker::check_pages(vec![check]);
+        let history = MultiChecker::check_pages(&vec![check]);
         assert_eq!(history.len(), 11);
         for element in history {
             assert!(!element.timestamp.is_empty());
@@ -264,7 +264,7 @@ mod all_tests {
     #[test]
     fn test_single_page_check_history_length() {
         let check = read_single_check("checks/tests/test2.json").unwrap_or_default();
-        let history = MultiChecker::check_pages(vec![check]);
+        let history = MultiChecker::check_pages(&vec![check]);
         assert_eq!(history.len(), 3);
         for element in history {
             assert!(!element.timestamp.is_empty());
@@ -278,7 +278,7 @@ mod all_tests {
     #[test]
     fn test_redirect_no_follow() {
         let check = read_single_check("checks/tests/test3.json").unwrap_or_default();
-        let history = MultiChecker::check_pages(vec![check]);
+        let history = MultiChecker::check_pages(&vec![check]);
         assert_eq!(history.len(), 3);
         for story in history {
             assert!(story.success.is_some());
@@ -291,7 +291,7 @@ mod all_tests {
     #[test]
     fn test_gibberish_url_check() {
         let check = read_single_check("checks/tests/test4.json").unwrap_or_default();
-        let history = MultiChecker::check_pages(vec![check]);
+        let history = MultiChecker::check_pages(&vec![check]);
         assert_eq!(history.len(), 1);
         for story in history {
             assert!(story.success.is_none());
@@ -308,7 +308,7 @@ mod all_tests {
         let options = page.options.clone().unwrap_or_default();
         let cookies = options.cookies;
         let headers = options.headers;
-        let history = MultiChecker::check_pages(vec![check]);
+        let history = MultiChecker::check_pages(&vec![check]);
         assert_eq!(history.len(), 3);
         assert!(headers.is_some());
         assert!(cookies.is_some());
@@ -330,7 +330,7 @@ mod all_tests {
     #[test]
     fn test_when_everything_is_a_failure_test9() {
         let check = read_single_check("checks/tests/test9.json").unwrap_or_default();
-        MultiChecker::check_pages(vec![check])
+        MultiChecker::check_pages(&vec![check])
             .iter()
             .for_each(|story| {
                 assert!(story.success.is_none());
