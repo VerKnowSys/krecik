@@ -1,6 +1,6 @@
 [package]
 name = "krecik"
-version = "0.10.4"
+version = "0.10.5"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 description = "Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL."
 keywords = ["curl", "web", "check", "tls-expire", "openssl"]
