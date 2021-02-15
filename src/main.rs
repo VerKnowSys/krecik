@@ -48,10 +48,8 @@ use fern::{
 };
 use krecik::{
     actors::{
-        curl_multi_checker::{Checks, CurlMultiChecker},
-        curl_multi_checker_pongo::Checks as ChecksPongo,
-        curl_multi_checker_pongo::CurlMultiCheckerPongo,
         history_teacher::{HistoryTeacher, Results},
+        multi_checker::{Checks, MultiChecker},
         results_warden::ResultsWarden,
     },
     api::*,
@@ -137,12 +135,13 @@ async fn main() {
     })
     .expect("Couldn't initialize Ctrl-C handler");
 
+    // TODO: implement validation of all defined checks using read_single_check_result()
+
     info!("Starting Krecik-server v{}", env!("CARGO_PKG_VERSION"));
 
     // Define system actors
     let num = 1;
-    let curl_multi_checker = SyncArbiter::start(num, || CurlMultiChecker);
-    let curl_multi_checker_pongo = SyncArbiter::start(num, || CurlMultiCheckerPongo);
+    let multi_checker = SyncArbiter::start(num, || MultiChecker);
     let history_teacher = SyncArbiter::start(num, || HistoryTeacher);
     let results_warden = SyncArbiter::start(num, || ResultsWarden);
     let notificator = SyncArbiter::start(num, || Notificator);
@@ -153,18 +152,12 @@ async fn main() {
 
         let start = Local::now();
 
-        let pongo_checks = &curl_multi_checker_pongo
-            .send(ChecksPongo(all_checks_pongo_merged()))
-            .await;
-
-        let regular_checks = curl_multi_checker
-            .send(Checks(all_checks_but_remotes()))
-            .await;
-        let stories = [
-            pongo_checks.clone().unwrap().unwrap_or_default(),
-            regular_checks.unwrap().unwrap_or_default(),
-        ]
-        .concat();
+        let all_checks = [all_checks_pongo_merged(), all_checks_but_remotes()].concat();
+        let stories = multi_checker
+            .send(Checks(all_checks))
+            .await
+            .unwrap()
+            .unwrap_or_default();
 
         let end = Local::now();
         let diff = end - start;
