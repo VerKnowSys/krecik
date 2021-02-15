@@ -7,19 +7,42 @@ use std::io::{Error, ErrorKind};
    Public library API for Krecik remote-checks functionality
 **/
 
+/// Read single Check from text file, return error on parse error
+pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
+    read_text_file(&check_path).and_then(|file_contents| {
+        serde_json::from_str(&*file_contents)
+            .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
+    })
+}
+
+
+/// Read single Check from text file
+pub fn read_single_check(check_path: &str) -> Option<Check> {
+    let result = read_text_file(&check_path).and_then(|file_contents| {
+        serde_json::from_str(&*file_contents)
+            .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
+    });
+    match result {
+        Ok(check) => Some(check),
+        Err(err) => {
+            debug!(
+                "Error reading Check from path: {}. Cause: {}",
+                check_path, err
+            );
+            None
+        }
+    }
+}
+
+
 /// Return checks from path, excluding remotes
 pub fn all_checks_but_remotes() -> Vec<Check> {
     list_all_checks_from(CHECKS_DIR)
         .par_iter()
         .filter_map(|check_path| {
             if !check_path.contains(REMOTE_CHECKS_DIR) && !check_path.contains(TESTS_DIR) {
-                read_text_file(&check_path)
-                    .and_then(|file_contents| {
-                        serde_json::from_str(&*file_contents).map_err(|err| {
-                            Error::new(ErrorKind::InvalidInput, err.to_string())
-                        })
-                    })
-                    .unwrap_or_default()
+                // select only valid Check, just ignore any malformed ones
+                read_single_check(&check_path)
             } else {
                 None
             }
