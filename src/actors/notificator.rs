@@ -1,8 +1,7 @@
-use crate::{products::story::*, utilities, Config};
+use crate::{products::story::*, utilities, Config, CHECK_DEFAULT_SUCCESS_NOTIFICATION_MSG};
 use actix::prelude::*;
 use lazy_static::lazy_static;
-use std::collections::HashMap;
-use std::sync::Mutex;
+use std::{collections::HashMap, sync::Mutex};
 
 
 lazy_static! {

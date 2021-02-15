@@ -3,24 +3,25 @@
 mod all_tests {
 
     // Load all internal modules:
-    use curl::easy::{Easy, Easy2, Handler, WriteError};
-    use curl::multi::{Easy2Handle, Multi};
+    use curl::{
+        easy::{Easy, Easy2, Handler, WriteError},
+        multi::{Easy2Handle, Multi},
+    };
 
     use ssl_expiration2::SslExpiration;
-    use std::io::{Error, ErrorKind};
-    use std::time::Duration;
+    use std::{
+        io::{Error, ErrorKind},
+        time::Duration,
+    };
 
-    use crate::checks::*;
-    use crate::configuration::*;
-    use crate::products::expected::*;
-    use crate::products::unexpected::*;
-    use crate::products::*;
-    use crate::utilities::*;
-    use crate::*;
-    use crate::{actors::generic_checker::GenericChecker, checks::page::*};
-    use crate::{actors::multi_checker::MultiChecker, checks::domain::*};
-    use crate::{api::read_single_check, checks::check::*};
-    use crate::{api::read_single_check_result, checks::pongo::*};
+    use crate::{
+        actors::{generic_checker::GenericChecker, multi_checker::MultiChecker},
+        checks::{check::*, domain::*, page::*, pongo::*, *},
+        configuration::*,
+        products::{expected::*, unexpected::*, *},
+        utilities::*,
+        *,
+    };
 
 
     struct CollectorForTests(Vec<u8>);

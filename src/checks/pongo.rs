@@ -1,6 +1,5 @@
 use crate::{
-    checks::domain::*,
-    checks::page::*,
+    checks::{domain::*, page::*},
     configuration::*,
     products::expected::{PageExpectation, PageExpectations},
     utilities::read_text_file,

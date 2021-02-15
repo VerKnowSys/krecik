@@ -2,7 +2,7 @@ use glob::glob;
 use slack_hook::{AttachmentBuilder, PayloadBuilder, Slack};
 use std::{
     fs::{self, OpenOptions},
-    io::{prelude::*, Error},
+    io::{prelude::*, Error, ErrorKind},
     path::Path,
 };
 

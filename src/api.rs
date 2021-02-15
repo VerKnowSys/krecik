@@ -1,6 +1,5 @@
 use crate::{checks::pongo::*, *};
 use rayon::prelude::*;
-use std::io::{Error, ErrorKind};
 
 
 /**
