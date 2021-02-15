@@ -35,7 +35,7 @@ impl Handler<Notify> for Notificator {
 
         let ok_message = Config::load()
             .ok_message
-            .unwrap_or_else(|| String::from("All services are UP."));
+            .unwrap_or_else(|| String::from(CHECK_DEFAULT_SUCCESS_NOTIFICATION_MSG));
 
         for a_notifier in notifiers.clone() {
             let notifier_name = a_notifier.clone().name;

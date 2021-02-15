@@ -45,6 +45,9 @@ pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 128;
 /// Default page content expectation:
 pub const CHECK_DEFAULT_CONTENT_EXPECTATION: &str = "body";
 
+/// Default successful notification content
+pub const CHECK_DEFAULT_SUCCESS_NOTIFICATION_MSG: &str = "All services are UP!";
+
 /// Checks directory:
 pub const CHECKS_DIR: &str = "checks";
 
