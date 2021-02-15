@@ -48,21 +48,3 @@ pub fn all_checks_pongo_merged() -> Vec<Check> {
         })
         .collect()
 }
-
-
-/// Return remote domain checks via mapper
-pub fn all_checks_pongo_remote_domains() -> Vec<Check> {
-    list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
-        .into_par_iter()
-        .map(get_domain_checks)
-        .collect()
-}
-
-
-/// Return remote page checks via mapper
-pub fn all_checks_pongo_remote_pages() -> Vec<Check> {
-    list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
-        .into_par_iter()
-        .map(get_page_checks)
-        .collect()
-}
