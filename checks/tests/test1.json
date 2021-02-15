@@ -11,7 +11,7 @@
     ],
     "pages": [
         {
-            "url": "http://centra.com/",
+            "url": "https://centra.com/",
             "expects": [
                 {
                     "ValidCode": 200
@@ -21,6 +21,9 @@
                 },
                 {
                     "ValidContent": "<title"
+                },
+                {
+                    "ValidLength": 500
                 }
             ],
             "options": {
@@ -43,10 +46,13 @@
             ]
         },
         {
-            "url": "http://rust-lang.org/",
+            "url": "https://rust-lang.org/",
             "expects": [
                 {
                     "ValidCode": 200
+                },
+                {
+                    "ValidLength": 500
                 }
             ]
         }

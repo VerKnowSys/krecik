@@ -10,10 +10,6 @@ mod all_tests {
     use std::io::{Error, ErrorKind};
     use std::time::Duration;
 
-    use crate::checks::check::*;
-    use crate::checks::domain::*;
-    use crate::checks::page::*;
-    use crate::checks::pongo::*;
     use crate::checks::*;
     use crate::configuration::*;
     use crate::products::expected::*;
@@ -21,6 +17,10 @@ mod all_tests {
     use crate::products::*;
     use crate::utilities::*;
     use crate::*;
+    use crate::{actors::generic_checker::GenericChecker, checks::page::*};
+    use crate::{actors::multi_checker::MultiChecker, checks::domain::*};
+    use crate::{api::read_single_check, checks::check::*};
+    use crate::{api::read_single_check_result, checks::pongo::*};
 
 
     struct CollectorForTests(Vec<u8>);
@@ -200,169 +200,192 @@ mod all_tests {
     }
 
 
-    // #[test]
-    // fn test_filecheck_to_json_serialization() {
-    //     let check = GenCheck {
-    //         domains: Some(vec![Domain {
-    //             name: "nask.pl".to_string(),
-    //             expects: vec![DomainExpectation::ValidExpiryPeriod(
-    //                 CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY,
-    //             )],
-    //         }]),
-    //         pages: Some(vec![Page {
-    //             url: "http://rust-lang.org/".to_string(),
-    //             expects: vec![PageExpectation::ValidCode(
-    //                 CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
-    //             )],
-    //             options: Some(PageOptions::default()),
-    //         }]),
-    //         notifier: None,
-    //     };
-    //     let output = serde_json::to_string(&check).unwrap_or_default();
-    //     println!("Output: {}", output);
-    //     assert!(output.len() > 100);
-    // }
+    #[test]
+    fn test_filecheck_to_json_serialization() {
+        let check = Check {
+            domains: Some(vec![Domain {
+                name: "nask.pl".to_string(),
+                expects: vec![DomainExpectation::ValidExpiryPeriod(
+                    CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY,
+                )],
+            }]),
+            pages: Some(vec![Page {
+                url: "http://rust-lang.org/".to_string(),
+                expects: vec![PageExpectation::ValidCode(
+                    CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE,
+                )],
+                options: Some(PageOptions::default()),
+            }]),
+            notifier: None,
+        };
+        let output = serde_json::to_string(&check).unwrap_or_default();
+        println!("Output: {}", output);
+        assert!(output.len() > 100);
+    }
 
 
-    // #[test]
-    // fn test_check_json_to_filecheck_deserialization() {
-    //     let check = GenCheck::load("checks/tests/test1.json").unwrap_or_default();
-    //     assert!(check.pages.is_some());
-    //     assert!(check.domains.is_some());
-    // }
+    #[test]
+    fn test_check_json_to_filecheck_deserialization() {
+        let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
+        assert!(check.pages.is_some());
+        assert!(check.domains.is_some());
+    }
 
 
-    // #[test]
-    // fn test_domain_check_history_length() {
-    //     let check = GenCheck::load("checks/tests/test1.json").unwrap_or_default();
-    //     let history = GenCheck::check_domains(check.domains);
-    //     println!("TEST1({}): {}", history.length(), history.to_string());
-    //     assert!(history.length() > 0);
-    //     assert!(history.length() == 1);
-    //     let first = history.head();
-    //     assert!(first.timestamp.len() > 10);
-    //     assert!(first.success.is_some());
-    // }
+    #[test]
+    fn test_domain_check_history_length() {
+        let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
+        let history = MultiChecker::check_domains(vec![check]);
+        assert_eq!(history.len(), 1);
+        for element in history {
+            assert!(!element.timestamp.is_empty());
+            assert!(element.success.is_some());
+            assert!(element.minor.is_none());
+            assert!(element.error.is_none());
+        }
+    }
 
 
-    // #[test]
-    // fn test_page_check_history_length() {
-    //     let check = GenCheck::load("checks/tests/test2.json").unwrap_or_default();
-    //     let history = check.execute("");
-    //     println!("TEST2({}): {}", history.length(), history.to_string());
-    //     assert!(history.length() == 3);
-    //     let first = history.head();
-    //     assert!(first.timestamp.len() > 10);
-    // }
+    #[test]
+    fn test_page_check_history_length() {
+        let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
+        let history = MultiChecker::check_pages(vec![check]);
+        assert_eq!(history.len(), 11);
+        for element in history {
+            assert!(!element.timestamp.is_empty());
+            assert!(element.success.is_some());
+            assert!(element.minor.is_none());
+            assert!(element.error.is_none());
+        }
+    }
 
 
-    // #[test]
-    // fn test_redirect_no_follow() {
-    //     let check = GenCheck::load("checks/tests/test3.json").unwrap_or_default();
-    //     let history = check.execute("");
-    //     println!("TEST3({}): {}", history.length(), history.to_string());
-    //     assert!(history.length() == 3);
-    //     history.stories().iter().for_each(|story| {
-    //         assert!(story.success.is_some());
-    //         assert!(story.error.is_none());
-    //         assert!(story.minor.is_none());
-    //     });
-    // }
+    #[test]
+    fn test_single_page_check_history_length() {
+        let check = read_single_check("checks/tests/test2.json").unwrap_or_default();
+        let history = MultiChecker::check_pages(vec![check]);
+        assert_eq!(history.len(), 3);
+        for element in history {
+            assert!(!element.timestamp.is_empty());
+            assert!(element.success.is_some());
+            assert!(element.minor.is_none());
+            assert!(element.error.is_none());
+        }
+    }
 
 
-    // #[test]
-    // fn test_gibberish_url_check() {
-    //     let check = GenCheck::load("checks/tests/test4.json").unwrap_or_default();
-    //     let history = check.execute("");
-    //     println!("TEST4({}): {}", history.length(), history.to_string());
-    //     assert!(history.length() == 3);
-    //     let first = history.head();
-    //     assert!(first.timestamp.len() > 10);
-    //     assert!(first.success.is_some());
-    //     assert!(first.error.is_none());
-    //     assert!(first.minor.is_none());
-    // }
+    #[test]
+    fn test_redirect_no_follow() {
+        let check = read_single_check("checks/tests/test3.json").unwrap_or_default();
+        let history = MultiChecker::check_pages(vec![check]);
+        assert_eq!(history.len(), 3);
+        for story in history {
+            assert!(story.success.is_some());
+            assert!(story.minor.is_none());
+            assert!(story.error.is_none());
+        }
+    }
 
 
-    // #[test]
-    // fn test_page_content_length_check() {
-    //     let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
-    //     let page: &Page = &check.clone().pages.unwrap_or_default()[0];
-    //     let options = page.options.clone().unwrap_or_default();
-    //     let cookies = options.cookies;
-    //     let headers = options.headers;
-    //     let history = check.execute("");
-    //     println!("TEST5({}): {}", history.length(), history.to_string());
-    //     assert!(history.length() == 3);
-    //     let first = history.head();
-    //     assert!(headers.is_some());
-    //     assert!(cookies.is_some());
-    //     assert!(cookies.unwrap_or_default().len() == 3);
-    //     assert!(first.timestamp.len() > 10);
-    // }
+    #[test]
+    fn test_gibberish_url_check() {
+        let check = read_single_check("checks/tests/test4.json").unwrap_or_default();
+        let history = MultiChecker::check_pages(vec![check]);
+        assert_eq!(history.len(), 1);
+        for story in history {
+            assert!(story.success.is_none());
+            assert!(story.minor.is_none());
+            assert!(story.error.is_some());
+        }
+    }
 
 
-    // #[test]
-    // fn test_agent_check() {
-    //     let check = GenCheck::load("checks/tests/test5.json").unwrap_or_default();
-    //     let page: &Page = &check.pages.unwrap_or_default()[0];
-    //     let options = page.options.clone().unwrap_or_default();
-    //     let agent = options.agent;
-    //     assert!(agent.is_some());
-    //     assert!(agent.unwrap_or_default() == "Krtecek-Underground-Agent");
-    // }
+    #[test]
+    fn test_page_check_options_in_check() {
+        let check = read_single_check("checks/tests/test5.json").unwrap_or_default();
+        let page: &Page = &check.clone().pages.unwrap_or_default()[0];
+        let options = page.options.clone().unwrap_or_default();
+        let cookies = options.cookies;
+        let headers = options.headers;
+        let history = MultiChecker::check_pages(vec![check]);
+        assert_eq!(history.len(), 3);
+        assert!(headers.is_some());
+        assert!(cookies.is_some());
+        assert_eq!(cookies.unwrap_or_default().len(), 3);
+    }
 
 
-    // #[test]
-    // fn test_when_everything_is_a_failure_test9() {
-    //     GenCheck::load("checks/tests/test9.json")
-    //         .unwrap_or_default()
-    //         .execute("")
-    //         .stories()
-    //         .iter()
-    //         .for_each(|story| {
-    //             assert!(story.success.is_none());
-    //             assert!(story.minor.is_some() || story.error.is_some()); // validation check for undefined domain is minor not error
-    //         });
-    // }
+    #[test]
+    fn test_agent_check() {
+        let check = read_single_check("checks/tests/test5.json").unwrap_or_default();
+        let page: &Page = &check.pages.unwrap_or_default()[0];
+        let options = page.options.clone().unwrap_or_default();
+        let agent = options.agent;
+        assert!(agent.is_some());
+        assert_eq!(agent.unwrap_or_default(), "Krtecek-Underground-Agent");
+    }
 
 
-    // #[test]
-    // fn test_parsing_bogus_validators() {
-    //     GenCheck::load("checks/tests/test10.json")
-    //         .map(|_check| assert!(false))
-    //         .unwrap_or_else(|err| {
-    //             assert!(
-    //                 err.to_string()
-    //                     .contains("unknown variant `ValidMoonFlower`")
-    //             );
-    //         });
-    // }
+    #[test]
+    fn test_when_everything_is_a_failure_test9() {
+        let check = read_single_check("checks/tests/test9.json").unwrap_or_default();
+        MultiChecker::check_pages(vec![check])
+            .iter()
+            .for_each(|story| {
+                assert!(story.success.is_none());
+                assert!(story.minor.is_some() || story.error.is_some()); // validation check for undefined domain is minor not error
+            });
+    }
 
 
-    // #[test]
-    // fn test_parsing_invalid_validator_value_type() {
-    //     GenCheck::load("checks/tests/test11.json")
-    //         .map(|_check| assert!(false))
-    //         .unwrap_or_else(|err| {
-    //             assert!(err.to_string().contains("invalid type: string"));
-    //         });
-    // }
+    #[test]
+    fn test_parsing_bogus_validators() {
+        match read_single_check("checks/tests/test10.json") {
+            Some(_) => assert!(false),
+            None => assert!(true),
+        }
+    }
 
 
-    // #[test]
-    // fn test_empty_check() {
-    //     GenCheck::load("checks/tests/test12.json")
-    //         .map(|check| {
-    //             assert!(check.pages.is_some());
-    //             assert!(check.domains.is_none());
-    //             check.execute("").stories().iter().for_each(|story| {
-    //                 assert!(story.success.is_some());
-    //                 assert!(story.error.is_none());
-    //             });
-    //         })
-    //         .unwrap_or_else(|_err| assert!(false));
-    // }
+    #[test]
+    fn test_parsing_bogus_validators_with_result() {
+        read_single_check_result("checks/tests/test10.json")
+            .map(|_check| assert!(false))
+            .unwrap_or_else(|err| {
+                assert!(
+                    err.to_string()
+                        .contains("unknown variant `ValidMoonFlower`")
+                );
+            });
+    }
+
+
+    #[test]
+    fn test_parsing_invalid_validator_value_type() {
+        match read_single_check("checks/tests/test11.json") {
+            Some(_) => assert!(false),
+            None => assert!(true),
+        }
+    }
+
+
+    #[test]
+    fn test_parsing_invalid_validator_value_type_with_result() {
+        read_single_check_result("checks/tests/test11.json")
+            .map(|_check| assert!(false))
+            .unwrap_or_else(|err| {
+                assert!(err.to_string().contains("invalid type: string"));
+            });
+    }
+
+
+    #[test]
+    fn test_bogus_formatted_check() {
+        match read_single_check("checks/tests/test11.json") {
+            Some(_) => assert!(false),
+            None => assert!(true),
+        }
+    }
 
 
     #[test]
