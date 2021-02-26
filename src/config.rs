@@ -62,8 +62,15 @@ impl Config {
             .collect();
         read_text_file(&config)
             .and_then(|file_contents| {
-                serde_json::from_str(&*file_contents)
-                    .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
+                serde_json::from_str(&*file_contents).map_err(|err| {
+                    let config_error = Error::new(ErrorKind::InvalidInput, err.to_string());
+                    error!(
+                        "Configuration error: {} in file: {}",
+                        err.to_string(),
+                        config
+                    );
+                    config_error
+                })
             })
             .unwrap_or_default()
     }
