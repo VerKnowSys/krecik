@@ -27,11 +27,10 @@ Daniel ([@dmilith](https://twitter.com/dmilith)) Dettlaff
 
 ## Software requirements:
 
-- Rust >= 1.32.0
+- Rust >= 1.50.0
 - Curl >= 7.x
 - OpenSSL >= 1.1.1a
 - NgHTTP2 >= 1.36.0
-- Jq >= 1.5
 
 
 
@@ -45,55 +44,8 @@ Daniel ([@dmilith](https://twitter.com/dmilith)) Dettlaff
 
 
 
-## Few words about design solutions…
-
-… and especially about current state of linking with shared dynamic libraries
-by Cargo on LLVM-driven FreeBSD systems…
-
-To make a long story short - Cargo on FreeBSD/ HardenedBSD/ Linux, doesn't set
-proper runtime path (RPATH/RUNPATH in binary header), when shared libraries are
-outside of standard /lib:/usr/lib:/usr/local/lib library paths.
-
-There are two quick solutions for this problem - one is `bad`, one is `ugly`.
-
-Bad solution is hacking LD_LIBRARY_PATH shell-env value - and this is
-considered to be unethical choice (but still… choice of the many…).
-
-Ugly solution is ugly, but at least solves problem for development time…
-
-NOTE: Krecik at current stage will use static linking by default.
-This means that each release will encapsulate exact versions of:
-Curl, OpenSSL and ngHTTP2 libraries - linked directly into `krecik` binary.
-
-
-
 ![krecik-ojej](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik_ojej.png?raw=true)
 
-
-
-# Caveats. Solutions for potential problems:
-
-
-Krecik relies on fully featured build of Curl, which is available via Sofin binary-bundle: `Curl_lib`. To install prebuilt "Curl_lib" on supported system:
-
-```bash
-_myusername="${USER}"
-sudo mkdir "/Software"
-sudo chown "${_myusername}" "/Software"
-cd "/Software"
-curl -O "http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz"
-tar xfJ "Curl_lib-7.64.0-Darwin-10.11-x86_64.txz" --directory "/Software"
-
-```
-Prebuilt version of `Curl_lib` bundle is available for systems:
-
-- [Darwin-10.11.x](http://software.verknowsys.com/binary/Darwin-10.11-x86_64/Curl_lib-7.64.0-Darwin-10.11-x86_64.txz)
-
-- [Darwin-10.14.x](http://software.verknowsys.com/binary/Darwin-10.14-x86_64/Curl_lib-7.64.0-Darwin-10.14-x86_64.txz)
-
-- [svdOS-12.2](http://software.verknowsys.com/binary/FreeBSD-12.2-amd64/Curl_lib-7.74.0-FreeBSD-12.2-amd64.zfsx) - NOTE Under svdOS, binary-bundle file is NOT a tar file, but Lz4 compressed ZFS dataset of software bundle.
-
-NOTE: Curl_lib binary-bundle provides all Krecik library requirements: CURL, OpenSSL, ngHTTP2 and IDN2.
 
 
 # Configuration:
