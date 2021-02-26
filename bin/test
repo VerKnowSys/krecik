@@ -6,26 +6,3 @@
 . bin/common "test"
 
 test_project
-
-_maybe_server_in_background="$(ps xd 2>/dev/null \
-    | grep -Ev 'egrep|awk|grep|tail|cat|bat' 2>/dev/null \
-    | grep -E "${_bin_name}" 2>/dev/null \
-    | awk '{print $1;}' 2>/dev/null \
-    | head -n1 2>/dev/null)"
-
-if [ -n "${_maybe_server_in_background}" ]; then
-    kill -0 "${_maybe_server_in_background}"
-    if [ "0" = "${?}" ]; then
-        printf "Spawning all tests at once…\n"
-        _request="$(curl -s "http://${_webapi_endpoint}${_webapi_request_path}/tests" 2>> "${_krecik_logfile}")"
-        if [ "0" != "${?}" ]; then
-            failure "Test: HTTP test #${_tst} has failed: http://${_webapi_endpoint}${_webapi_request_path}/tests"
-        fi
-        printf "%b\n" "${_request}" \
-            | jq '.' 2>> "${_krecik_logfile}"
-
-        printf "Test completed\n\n"
-    else
-        printf "\n\nNo %b-WebAPI service available in background… Additional Web-API tests skipped! Invoke \`bin/run dev\` to start it.\n\n" "${_project_name}"
-    fi
-fi
