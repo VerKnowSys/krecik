@@ -1,7 +1,7 @@
 {
     "pages": [
         {
-            "url": "https://centra.com/",
+            "url": "https://google.com/",
             "expects": [
                 {
                     "ValidCode": 200
