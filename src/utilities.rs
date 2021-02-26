@@ -1,4 +1,5 @@
 use glob::glob;
+use retry::{delay::Fixed, retry_with_index, OperationResult};
 use slack_hook::{AttachmentBuilder, PayloadBuilder, Slack};
 use std::{
     fs::{self, OpenOptions},
@@ -62,8 +63,12 @@ pub fn warn_for_undefined_notifiers(stories: &[Story]) {
 
 /// Sends generic notification over Slack
 pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
-    Slack::new(webhook)
-        .and_then(|slack| {
+    retry_with_index(Fixed::from_millis(1000), |current_try| {
+        if current_try > 3 {
+            return OperationResult::Err("Did not succeed within 3 tries");
+        }
+
+        let notification = Slack::new(webhook).and_then(|slack| {
             PayloadBuilder::new()
                 .username(DEFAULT_SLACK_NAME)
                 .icon_emoji(icon)
@@ -85,8 +90,18 @@ pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
                     debug!("Sending notification with payload: {:?}", &payload);
                     slack.send(&payload)
                 })
-        })
-        .unwrap_or_default(); // just ignore case when notification throws an error
+        });
+
+        match notification {
+            Ok(_) => OperationResult::Ok("Sent!"),
+            Err(_) => OperationResult::Retry("Failed to send notification!"),
+        }
+    })
+    .map_err(|err| {
+        error!("Error sending notification: {:?}", err);
+        err
+    })
+    .unwrap_or_default();
 }
 
 
