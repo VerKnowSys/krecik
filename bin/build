@@ -5,7 +5,6 @@
 
 . bin/common "${*}"
 
-setup_environment
 sanity_checks
 print_project_info
 build_project
