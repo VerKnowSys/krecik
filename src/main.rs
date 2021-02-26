@@ -41,7 +41,7 @@
 
 
 use actix::prelude::*;
-use chrono::*;
+use chrono::Local;
 use fern::{
     colors::{Color, ColoredLevelConfig},
     Dispatch,
@@ -57,7 +57,7 @@ use krecik::{
 };
 use lazy_static::lazy_static;
 use log::*;
-use std::sync::RwLock;
+use std::{sync::RwLock, thread, time::Duration};
 
 lazy_static! {
     static ref LOG_LEVEL: RwLock<LevelFilter> = RwLock::new(LevelFilter::Info);
@@ -153,31 +153,43 @@ async fn main() {
         let start = Local::now();
 
         let all_checks = [all_checks_pongo_merged(), all_checks_but_remotes()].concat();
-        let stories = multi_checker
-            .send(Checks(all_checks))
-            .await
-            .unwrap()
-            .unwrap_or_default();
+        if all_checks.is_empty() {
+            warn!(
+                "No checks defined under root dir: '{}'! Iteration skipped…",
+                format!(
+                    "{}/{}",
+                    Config::load().krecik_root.unwrap_or(".".to_string()),
+                    CHECKS_DIR
+                )
+            );
+            thread::sleep(Duration::from_secs(60));
+        } else {
+            let stories = multi_checker
+                .send(Checks(all_checks))
+                .await
+                .unwrap()
+                .unwrap_or_default();
 
-        let end = Local::now();
-        let diff = end - start;
+            let end = Local::now();
+            let diff = end - start;
 
-        warn_for_undefined_notifiers(&stories);
+            warn_for_undefined_notifiers(&stories);
 
-        info!(
-            "Remote checks took: {}s. Result stories count: {}.",
-            diff.num_seconds(),
-            stories.len(),
-        );
+            info!(
+                "Remote checks took: {}s. Result stories count: {}.",
+                diff.num_seconds(),
+                stories.len(),
+            );
 
-        debug!("Sending results to HistoryTeacher…");
-        history_teacher
-            .send(Results(
-                stories,
-                results_warden.clone(),
-                notificator.clone(),
-            ))
-            .await
-            .unwrap_or_default();
+            debug!("Sending results to HistoryTeacher…");
+            history_teacher
+                .send(Results(
+                    stories,
+                    results_warden.clone(),
+                    notificator.clone(),
+                ))
+                .await
+                .unwrap_or_default();
+        }
     }
 }
