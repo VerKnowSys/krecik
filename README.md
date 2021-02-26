@@ -69,11 +69,11 @@ By default Krecik looks for configuration under:
     "notifiers": [
     {
         "name": "notifier-name",
-        "notifier": "https://hooks.slack.com/services/1111111111/222222222/3333333333333"
+        "slack_webhook": "https://hooks.slack.com/services/1111111111/222222222/3333333333333"
     },
     {
         "name": "notifier-other-name",
-        "notifier": "https://hooks.slack.com/services/1111111111/222222222/3333333333333"
+        "slack_webhook": "https://hooks.slack.com/services/1111111111/222222222/3333333333333"
     }
   ]
 }
