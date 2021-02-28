@@ -283,6 +283,16 @@ After build bring back dynamic env setup with:
 
 
 
+# How it works
+
+Krecik by default runs in a loop. Every loop iteration loads combined pages and domains from all defined checks. Every iteration produces json history file under /tmp. When there's more than 3 history files available, Krecik performs results validation. When it detects 3 consecutive failures of any type, it will send failure notification using defined notifier (Slack webhook).
+
+
+# Performance
+
+Check of 750+ pages (3 expectations per check), 750+ domains (1 expectation per check) takes approximately 20-30s per iteration.
+
+
 # Why "Krecik"?
 
 It's been my favorite cartoon… It's a little tribute for mr Zdeněk Miler as well :)
