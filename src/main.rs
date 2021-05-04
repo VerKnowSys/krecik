@@ -158,7 +158,9 @@ async fn main() {
                 "No checks defined under root dir: '{}'! Iteration skipped…",
                 format!(
                     "{}/{}",
-                    Config::load().krecik_root.unwrap_or(".".to_string()),
+                    Config::load()
+                        .krecik_root
+                        .unwrap_or_else(|| ".".to_string()),
                     CHECKS_DIR
                 )
             );
