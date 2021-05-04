@@ -637,6 +637,17 @@ pub trait GenericChecker {
     }
 
 
+    /// Build cookies list for Curl
+    fn list_of_cookies(headers: Option<Vec<String>>) -> String {
+        let mut cookies = vec![];
+        for cookie in headers.unwrap_or_default() {
+            debug!("Setting cookie: {}", cookie);
+            cookies.push(cookie);
+        }
+        cookies.join(";")
+    }
+
+
     /// Load page check handler
     fn load_handler_for(page_check: &Page, multi: &Multi) -> CurlHandler {
         // Initialize Curl, set URL
@@ -716,10 +727,8 @@ pub trait GenericChecker {
         // Pass headers and cookies
         curl.http_headers(Self::list_of_headers(curl_options.headers))
             .unwrap_or_default();
-        for cookie in curl_options.cookies.unwrap_or_default() {
-            trace!("Setting cookie: {}", cookie);
-            curl.cookie(&cookie).unwrap_or_default();
-        }
+        curl.cookie(&Self::list_of_cookies(curl_options.cookies))
+            .unwrap_or_default();
 
         // Set connection and request timeout with default fallback to 30s for each
         curl.connect_timeout(Duration::from_secs(
