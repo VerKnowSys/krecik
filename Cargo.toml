@@ -24,10 +24,10 @@ path = "src/main.rs"
 log = "0.4.14"
 fern = { version = "0.6.0", features = ["colored", "date-based"] }
 mimalloc = { version = "0.1.25", features = ["local_dynamic_tls", "secure"] }
-curl = { version = "0.4.36", features = ["http2", "ssl"] }
+curl = { version = "0.4.37", features = ["http2", "ssl"] }
 
-serde = "1.0.125"
-serde_derive = "1.0.125"
+serde = "1.0.126"
+serde_derive = "1.0.126"
 serde_json = "1.0.64"
 
 ssl-expiration2 = "0.3.0"
