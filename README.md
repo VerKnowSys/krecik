@@ -162,7 +162,7 @@ Fields explanation:
                 ],
                 "agent": "Krtecek-Underground-Agent",
 
-                "method": "POST",
+                "method": "Post",
                 "post_data": [
                     "some: value",
                     "{\"more\": \"data\"}"
