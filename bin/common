@@ -116,6 +116,7 @@ run_project () {
 test_project () {
     cargo test \
         --jobs 4 \
+        --lib \
         --tests \
         ${_cargo_color_flag} \
         -- \
