@@ -24,7 +24,7 @@ path = "src/main.rs"
 log = "0.4.14"
 fern = { version = "0.6.0", features = ["colored", "date-based"] }
 mimalloc = { version = "0.1.25", features = ["local_dynamic_tls", "secure"] }
-curl = { version = "0.4.37", features = ["http2", "ssl"] }
+curl = { version = "0.4.37", features = ["http2", "mesalink"] }
 
 serde = "1.0.126"
 serde_derive = "1.0.126"
