@@ -45,22 +45,20 @@ mod all_tests {
 
 
     #[test]
-    fn test_curl_basic_test() {
+    fn test_curl_basic_test() -> Result<(), curl::Error> {
         let mut easy = Easy2::new(CollectorForTests(Vec::new()));
-        easy.get(true).unwrap_or_default();
-        // easy.verbose(true).unwrap_or_default();
-        easy.url("https://www.rust-lang.org/").unwrap_or_default();
-        easy.perform().unwrap_or_default();
-        assert_eq!(
-            easy.response_code().unwrap_or_default(),
-            CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
-        );
+        easy.get(true)?;
+        // easy.verbose(true)?;
+        easy.url("https://www.rust-lang.org/")?;
+        easy.perform()?;
+        assert_eq!(easy.response_code()?, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
         assert!(raw_page.contains("<meta "));
         assert!(raw_page.contains("<head>"));
         assert!(raw_page.contains("<body>"));
+        Ok(())
     }
 
 
@@ -109,7 +107,7 @@ mod all_tests {
         let easy2handle = multi.add2(easy2)?;
         let easy3handle = multi.add2(easy3)?;
 
-        while multi.perform().unwrap_or_default() > 0 {
+        while multi.perform().unwrap() > 0 {
             multi.wait(&mut [], Duration::from_secs(1))?;
         }
 
@@ -132,79 +130,62 @@ mod all_tests {
         assert!(raw_page.len() == 0);
 
         let mut handler1after = multi.remove2(easy1handle)?;
-        assert!(
-            handler1after.response_code().unwrap_or_default()
-                == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
-        );
-        assert!(handler1after.download_size().unwrap_or_default() > 0f64);
+        assert!(handler1after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert!(handler1after.download_size().unwrap() > 0f64);
 
         let mut handler2after = multi.remove2(easy2handle)?;
-        assert!(
-            handler2after.response_code().unwrap_or_default()
-                == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
-        );
-        assert!(handler2after.download_size().unwrap_or_default() > 0f64);
+        assert!(handler2after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
+        assert!(handler2after.download_size().unwrap() > 0f64);
 
         let mut handler3after = multi.remove2(easy3handle)?;
-        assert!(handler3after.response_code().unwrap_or_default() == 0); // NOTE: 0 since no connection is possible to non existing server
-        assert!(handler2after.download_size().unwrap_or_default() > 0f64); // even if connection failed, we sent some bytes
+        assert!(handler3after.response_code().unwrap() == 0); // NOTE: 0 since no connection is possible to non existing server
+        assert!(handler2after.download_size().unwrap() > 0f64); // even if connection failed, we sent some bytes
 
         Ok(())
     }
 
 
     #[test]
-    fn test_curl_all_options_test() {
+    fn test_curl_all_options_test() -> Result<(), curl::Error> {
         let mut easy = Easy2::new(CollectorForTests(Vec::new()));
-        easy.get(true).unwrap_or_default();
-        easy.follow_location(true).unwrap_or_default();
-        easy.ssl_verify_peer(true).unwrap_or_default();
-        easy.ssl_verify_host(true).unwrap_or_default();
-        easy.connect_timeout(Duration::from_secs(30))
-            .unwrap_or_default();
-        easy.timeout(Duration::from_secs(30)).unwrap_or_default();
-        easy.max_connects(10).unwrap_or_default();
-        easy.max_redirections(10).unwrap_or_default();
+        easy.get(true)?;
+        easy.follow_location(true)?;
+        easy.ssl_verify_peer(true)?;
+        easy.ssl_verify_host(true)?;
+        easy.connect_timeout(Duration::from_secs(30))?;
+        easy.timeout(Duration::from_secs(30))?;
+        easy.max_connects(10)?;
+        easy.max_redirections(10)?;
 
         let url = "http://rust-lang.org/";
-        easy.url(&url).unwrap_or_default();
-        easy.perform().unwrap_or_default();
+        easy.url(&url)?;
+        easy.perform()?;
 
         println!("URL: {}", &url);
-        println!(
-            "Redirect count: {:?}",
-            easy.redirect_count().unwrap_or_default()
-        );
-        // println!("Final URL: {:?}", easy.redirect_url().unwrap_or_default());
-        println!(
-            "Effective URL: {:?}",
-            easy.effective_url().unwrap_or_default()
-        );
-        println!("Local IPv4: {:?}", easy.local_ip().unwrap_or_default());
-        println!("Remote IPv4: {:?}", easy.primary_ip().unwrap_or_default());
-        println!(
-            "Content type: {:?}",
-            easy.content_type().unwrap_or_default()
-        );
-        println!("Cookies: {:?}", easy.cookies().unwrap());
+        println!("Redirect count: {:?}", easy.redirect_count()?);
+        // println!("Final URL: {:?}", easy.redirect_url()?);
+        println!("Effective URL: {:?}", easy.effective_url()?);
+        println!("Local IPv4: {:?}", easy.local_ip()?);
+        println!("Remote IPv4: {:?}", easy.primary_ip()?);
+        println!("Content type: {:?}", easy.content_type()?);
+        println!("Cookies: {:?}", easy.cookies()?);
         println!(
             "TIMINGS: Connect time: {:?}, Name lookup time: {:?}, Redirect time: {:?}, Total time: {:?}",
-            easy.connect_time().unwrap_or_default(),
-            easy.namelookup_time().unwrap_or_default(),
-            easy.redirect_time().unwrap_or_default(),
-            easy.total_time().unwrap_or_default()
+            easy.connect_time()?,
+            easy.namelookup_time()?,
+            easy.redirect_time()?,
+            easy.total_time()?
         );
 
-        assert_eq!(
-            easy.response_code().unwrap_or_default(),
-            CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
-        );
+        assert_eq!(easy.response_code()?, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
         let raw_page = String::from_utf8_lossy(&contents.0);
         assert!(raw_page.contains("Rust"));
         assert!(raw_page.contains("<meta "));
         assert!(raw_page.contains("<head>"));
         assert!(raw_page.contains("<body>"));
+
+        Ok(())
     }
 
 
@@ -226,7 +207,7 @@ mod all_tests {
             }]),
             notifier: None,
         };
-        let output = serde_json::to_string(&check).unwrap_or_default();
+        let output = serde_json::to_string(&check).unwrap();
         println!("Output: {}", output);
         assert!(output.len() > 100);
     }
@@ -234,7 +215,7 @@ mod all_tests {
 
     #[test]
     fn test_check_json_to_filecheck_deserialization() {
-        let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test1.json").unwrap();
         assert!(check.pages.is_some());
         assert!(check.domains.is_some());
     }
@@ -242,9 +223,9 @@ mod all_tests {
 
     #[test]
     fn test_domain_check_history_length() {
-        let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test1.json").unwrap();
         let history = MultiChecker::check_domains(&[check]);
-        assert_eq!(history.len(), 1);
+        assert_eq!(history.len(), 2);
         for element in history {
             assert!(!element.timestamp.is_empty());
             assert!(element.success.is_some());
@@ -256,9 +237,9 @@ mod all_tests {
 
     #[test]
     fn test_page_check_history_length() {
-        let check = read_single_check("checks/tests/test1.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test1.json").unwrap();
         let history = MultiChecker::check_pages(&[check]);
-        assert_eq!(history.len(), 11);
+        assert_eq!(history.len(), 12);
         for element in history {
             assert!(!element.timestamp.is_empty());
             assert!(element.success.is_some());
@@ -270,7 +251,7 @@ mod all_tests {
 
     #[test]
     fn test_single_page_check_history_length() {
-        let check = read_single_check("checks/tests/test2.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test2.json").unwrap();
         let history = MultiChecker::check_pages(&[check]);
         assert_eq!(history.len(), 3);
         for element in history {
@@ -284,7 +265,7 @@ mod all_tests {
 
     #[test]
     fn test_redirect_no_follow() {
-        let check = read_single_check("checks/tests/test3.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test3.json").unwrap();
         let history = MultiChecker::check_pages(&[check]);
         assert_eq!(history.len(), 3);
         for story in history {
@@ -297,7 +278,7 @@ mod all_tests {
 
     #[test]
     fn test_gibberish_url_check() {
-        let check = read_single_check("checks/tests/test4.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test4.json").unwrap();
         let history = MultiChecker::check_pages(&[check]);
         assert_eq!(history.len(), 1);
         for story in history {
@@ -310,33 +291,33 @@ mod all_tests {
 
     #[test]
     fn test_page_check_options_in_check() {
-        let check = read_single_check("checks/tests/test5.json").unwrap_or_default();
-        let page: &Page = &check.clone().pages.unwrap_or_default()[0];
-        let options = page.options.clone().unwrap_or_default();
+        let check = read_single_check("checks/tests/test5.json").unwrap();
+        let page: &Page = &check.clone().pages.unwrap()[0];
+        let options = page.options.clone().unwrap();
         let cookies = options.cookies;
         let headers = options.headers;
         let history = MultiChecker::check_pages(&[check]);
         assert_eq!(history.len(), 3);
         assert!(headers.is_some());
         assert!(cookies.is_some());
-        assert_eq!(cookies.unwrap_or_default().len(), 3);
+        assert_eq!(cookies.unwrap().len(), 3);
     }
 
 
     #[test]
     fn test_agent_check() {
-        let check = read_single_check("checks/tests/test5.json").unwrap_or_default();
-        let page: &Page = &check.pages.unwrap_or_default()[0];
-        let options = page.options.clone().unwrap_or_default();
+        let check = read_single_check("checks/tests/test5.json").unwrap();
+        let page: &Page = &check.pages.unwrap()[0];
+        let options = page.options.clone().unwrap();
         let agent = options.agent;
         assert!(agent.is_some());
-        assert_eq!(agent.unwrap_or_default(), "Krtecek-Underground-Agent");
+        assert_eq!(agent.unwrap(), "Krtecek-Underground-Agent");
     }
 
 
     #[test]
     fn test_when_everything_is_a_failure_test9() {
-        let check = read_single_check("checks/tests/test9.json").unwrap_or_default();
+        let check = read_single_check("checks/tests/test9.json").unwrap();
         MultiChecker::check_pages(&[check])
             .iter()
             .for_each(|story| {

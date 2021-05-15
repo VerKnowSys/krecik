@@ -7,34 +7,45 @@
                     "ValidExpiryPeriod": 10
                 }
             ]
+        },
+        {
+            "name": "verknowsys.com",
+            "expects": [
+                {
+                    "ValidExpiryPeriod": 10
+                }
+            ]
         }
     ],
     "pages": [
         {
-            "url": "https://centra.com/",
+            "url": "https://verknowsys.com/",
             "expects": [
                 {
                     "ValidCode": 200
                 },
                 {
-                    "ValidContent": "Centra"
+                    "ValidContent": "Versatile"
                 },
                 {
-                    "ValidContent": "<title"
+                    "ValidContent": "Knowledge"
                 },
                 {
-                    "ValidLength": 500
+                    "ValidContent": "Systems"
+                },
+                {
+                    "ValidLength": 100
                 }
             ],
             "options": {
-                "cookies": null,
-                "headers": null,
-                "data": null,
+                "cookies": [],
+                "headers": [],
+                "data": "",
                 "follow_redirects": true,
-                "method": "GET",
-                "agent": null,
-                "timeout":15,
-                "connection_timeout":30
+                "method": "Get",
+                "agent": "",
+                "timeout": 15,
+                "connection_timeout": 30
             }
         },
         {
