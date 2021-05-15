@@ -696,7 +696,7 @@ pub trait GenericChecker {
 
         // Setup Curl configuration based on given options
         match curl_options.method {
-            Some(Method::PUT) => {
+            Some(Method::Put) => {
                 trace!("Curl method: {}", "PUT");
                 let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();
@@ -705,7 +705,7 @@ pub trait GenericChecker {
                 curl.post_field_size(post_data.len() as u64)
                     .unwrap_or_default();
             }
-            Some(Method::POST) => {
+            Some(Method::Post) => {
                 trace!("Curl method: {}", "POST");
                 let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();

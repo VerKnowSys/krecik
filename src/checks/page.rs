@@ -119,24 +119,24 @@ impl Default for PageOptions {
 /// HTTP methods allowed
 pub enum Method {
     /// HTTP HEAD
-    HEAD,
+    Head,
 
     /// HTTP PUT
-    PUT,
+    Put,
 
     /// HTTP GET
-    GET,
+    Get,
 
     /// HTTP POST
-    POST,
+    Post,
 
     /// HTTP DELETE
-    DELETE,
+    Delete,
 }
 
 
 impl Default for Method {
     fn default() -> Method {
-        Method::GET
+        Method::Get
     }
 }
