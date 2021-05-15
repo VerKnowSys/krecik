@@ -65,45 +65,52 @@ mod all_tests {
 
 
     #[test]
-    fn test_curl_multi_test() {
+    fn test_curl_multi_test() -> Result<(), curl::Error> {
         let url1 = "https://www.rust-lang.org/";
 
         let mut easy1 = Easy2::new(CollectorForTests(Vec::new()));
-        easy1.get(true).unwrap_or_default();
-        easy1.follow_location(true).unwrap_or_default();
-        // easy1.verbose(true).unwrap_or_default();
-        easy1.url(url1).unwrap_or_default();
-        easy1.max_connects(10).unwrap_or_default();
-        easy1.max_redirections(10).unwrap_or_default();
+        easy1.get(true)?;
+        easy1.follow_location(true)?;
+        // easy1.verbose(true)?;
+        easy1.url(url1)?;
+        easy1.max_connects(10)?;
+        easy1.max_redirections(10)?;
 
         let mut easy2 = Easy2::new(CollectorForTests(Vec::new()));
-        easy2.get(true).unwrap_or_default();
-        easy2.follow_location(true).unwrap_or_default();
-        // easy2.verbose(true).unwrap_or_default();
-        easy2.url("https://docs.rs/").unwrap_or_default();
-        easy2.max_connects(10).unwrap_or_default();
-        easy2.max_redirections(10).unwrap_or_default();
+        easy2.get(true)?;
+        easy2.follow_location(true)?;
+        // easy2.verbose(true)?;
+        easy2.url("https://docs.rs/")?;
+        easy2.max_connects(10)?;
+        easy2.max_redirections(10)?;
 
         let mut easy3 = Easy2::new(CollectorForTests(Vec::new()));
-        easy3.get(true).unwrap_or_default();
-        easy3.follow_location(true).unwrap_or_default();
-        // easy3.verbose(true).unwrap_or_default();
-        easy3
-            .url("http://sdfsdfsdfdsfdsfds.pl/")
-            .unwrap_or_default();
-        easy3.max_connects(10).unwrap_or_default();
-        easy3.max_redirections(10).unwrap_or_default();
+        easy3.get(true)?;
+        easy3.follow_location(true)?;
+        // easy3.verbose(true)?;
+        easy3.url("http://sdfsdfsdfdsfdsfds.pl/")?;
+        easy3.max_connects(10)?;
+        easy3.max_redirections(10)?;
 
+        call_multi_helper(easy1, easy2, easy3).map_err(|_err| {
+            assert!(false);
+            curl::Error::new(1)
+        })
+    }
+
+    fn call_multi_helper(
+        easy1: Easy2<CollectorForTests>,
+        easy2: Easy2<CollectorForTests>,
+        easy3: Easy2<CollectorForTests>,
+    ) -> Result<(), curl::MultiError> {
         let mut multi = Multi::new();
-        multi.pipelining(true, true).unwrap_or_default();
-        let easy1handle = multi.add2(easy1).unwrap();
-        let easy2handle = multi.add2(easy2).unwrap();
-        let easy3handle = multi.add2(easy3).unwrap();
+        multi.pipelining(false, true)?;
+        let easy1handle = multi.add2(easy1)?;
+        let easy2handle = multi.add2(easy2)?;
+        let easy3handle = multi.add2(easy3)?;
 
         while multi.perform().unwrap_or_default() > 0 {
-            multi
-                .wait(&mut [], Duration::from_secs(1))
-                .unwrap_or_default();
+            multi.wait(&mut [], Duration::from_secs(1))?;
         }
 
         // 1
@@ -124,25 +131,25 @@ mod all_tests {
         let raw_page = String::from_utf8_lossy(&handler3.0);
         assert!(raw_page.len() == 0);
 
-        let mut handler1after = multi.remove2(easy1handle).unwrap();
+        let mut handler1after = multi.remove2(easy1handle)?;
         assert!(
             handler1after.response_code().unwrap_or_default()
                 == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
         );
         assert!(handler1after.download_size().unwrap_or_default() > 0f64);
 
-        let mut handler2after = multi.remove2(easy2handle).unwrap();
+        let mut handler2after = multi.remove2(easy2handle)?;
         assert!(
             handler2after.response_code().unwrap_or_default()
                 == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE
         );
         assert!(handler2after.download_size().unwrap_or_default() > 0f64);
 
-        let mut handler3after = multi.remove2(easy3handle).unwrap();
+        let mut handler3after = multi.remove2(easy3handle)?;
         assert!(handler3after.response_code().unwrap_or_default() == 0); // NOTE: 0 since no connection is possible to non existing server
         assert!(handler2after.download_size().unwrap_or_default() > 0f64); // even if connection failed, we sent some bytes
 
-        //multi.close().unwrap_or_default();
+        Ok(())
     }
 
 
