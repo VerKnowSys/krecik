@@ -11,37 +11,6 @@ use rayon::prelude::*;
 use std::io::{Error, ErrorKind};
 
 
-/// Read domain checks from pongo mapper
-pub fn get_domain_checks(pongo_mapper: String) -> Check {
-    let mapper = read_pongo_mapper(&pongo_mapper);
-    let domain_checks = get_pongo_checks(&mapper.url)
-        .into_par_iter()
-        .flat_map(|check| collect_pongo_domains(&check))
-        .collect();
-    Check {
-        domains: Some(domain_checks),
-        notifier: mapper.notifier,
-        ..Check::default()
-    }
-}
-
-
-/// Read page checks from pongo mapper
-pub fn get_page_checks(pongo_mapper: String) -> Check {
-    let mapper = read_pongo_mapper(&pongo_mapper);
-    let pongo_checks = get_pongo_checks(&mapper.url)
-        .into_par_iter()
-        .flat_map(|check| collect_pongo_hosts(&check, &mapper))
-        .collect();
-
-    Check {
-        pages: Some(pongo_checks),
-        notifier: mapper.notifier,
-        ..Check::default()
-    }
-}
-
-
 /// Collect pongo domain check by host
 pub fn collect_pongo_domains(check: &PongoCheck) -> Vec<Domain> {
     check
