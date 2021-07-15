@@ -37,7 +37,10 @@ pub trait GenericChecker {
                     .domains
                     .par_iter()
                     .flat_map(|domains| {
-                        domains
+                        let mut all_domains = domains.clone();
+                        all_domains.sort();
+                        all_domains.dedup();
+                        all_domains
                             .par_iter()
                             .flat_map(|domain| {
                                 domain
@@ -67,11 +70,14 @@ pub trait GenericChecker {
             .flat_map(|check| {
                 let notifier = check.notifier.clone();
                 check.pages.iter().flat_map(move |pages| {
+                    let mut all_pages = pages.clone();
+                    all_pages.sort();
+                    all_pages.dedup();
                     let mut multi = Multi::new();
                     multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex
 
                     // collect tuple of page-checks and Curl handler:
-                    let process_handlers: Vec<_> = pages
+                    let process_handlers: Vec<_> = all_pages
                         .iter()
                         .map(|check| (check, Self::load_handler_for(&check, &multi)))
                         .collect();
