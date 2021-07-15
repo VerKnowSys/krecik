@@ -1,7 +1,7 @@
 use crate::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 /// Domain check structure
 pub struct Domain {
     /// Domain name

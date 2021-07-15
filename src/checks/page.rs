@@ -6,7 +6,7 @@ use curl::{multi::Easy2Handle, MultiError};
 pub type CurlHandler = Result<Easy2Handle<Collector>, MultiError>;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 /// Page check structure
 pub struct Page {
     /// Page URL
@@ -36,7 +36,7 @@ pub fn default_page_expectations() -> PageExpectations {
 pub type Pages = Vec<Page>;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 /// Page options - passed to Curl
 pub struct PageOptions {
     /// HTTP headers
@@ -115,7 +115,7 @@ impl Default for PageOptions {
 }
 
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 /// HTTP methods allowed
 pub enum Method {
     /// HTTP HEAD

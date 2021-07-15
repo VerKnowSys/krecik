@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// Describes all supported page expectations
 pub enum PageExpectation {
     /// Valid error code
@@ -35,7 +35,7 @@ pub enum PageExpectation {
 pub type PageExpectations = Vec<PageExpectation>;
 
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, Fail)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, PartialOrd, Ord)]
 /// Describes all supported domain expectations
 pub enum DomainExpectation {
     /// Domain expiry minimum period in days
