@@ -118,7 +118,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                             Some(Page {
                                 url: vhost.to_string(),
                                 expects: showroom_page_expectations(),
-                                options: None,
+                                options: options.clone(),
                             })
                         } else {
                             debug!("Skipping not active client: {}", &client);
