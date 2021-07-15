@@ -19,7 +19,9 @@ impl Handler<Checks> for MultiChecker {
 
     fn handle(&mut self, checks: Checks, _ctx: &mut Self::Context) -> Self::Result {
         let stories_from_domains = Self::check_domains(&checks.0);
+        trace!("stories_from_domains: {:?}", stories_from_domains);
         let stories_from_pages = Self::check_pages(&checks.0);
+        trace!("stories_from_pages: {:?}", stories_from_pages);
         Ok([stories_from_domains, stories_from_pages].concat())
     }
 }
