@@ -37,6 +37,7 @@
     unused_qualifications
 )]
 #![warn(dead_code, unused_imports, unused_variables)]
+
 // For development:
 // #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
