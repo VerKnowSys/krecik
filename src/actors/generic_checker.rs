@@ -77,10 +77,9 @@ pub trait GenericChecker {
                     multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex
 
                     // collect tuple of page-checks and Curl handler:
-                    let process_handlers: Vec<_> = all_pages
+                    let process_handlers = all_pages
                         .iter()
-                        .map(|check| (check, Self::load_handler_for(&check, &multi)))
-                        .collect();
+                        .map(|check| (check, Self::load_handler_for(check, &multi)));
 
                     // perform all checks at once:
                     while multi.perform().unwrap_or_default() > 0 {
