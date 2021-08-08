@@ -12,7 +12,7 @@ use crate::*;
 
 /// Read single Check from text file, return error on parse error
 pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
-    read_text_file(&check_path).and_then(|file_contents| {
+    read_text_file(check_path).and_then(|file_contents| {
         serde_json::from_str(&*file_contents)
             .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
     })
@@ -21,7 +21,7 @@ pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
 
 /// Read single Check from text file
 pub fn read_single_check(check_path: &str) -> Option<Check> {
-    let result = read_text_file(&check_path).and_then(|file_contents| {
+    let result = read_text_file(check_path).and_then(|file_contents| {
         serde_json::from_str(&*file_contents)
             .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
     });
@@ -126,7 +126,7 @@ pub fn notify_failure(webhook: &str, message: &str) {
 /// Produce list of absolute paths to all files matching given glob pattern:
 pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
     let mut list = vec![];
-    for entry in glob(&glob_pattern).unwrap() {
+    for entry in glob(glob_pattern).unwrap() {
         match entry {
             Ok(path) => {
                 if let Some(element) = path.to_str() {

@@ -104,7 +104,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
 
 /// Read Pongo mapper object
 pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
-    read_text_file(&pongo_mapper)
+    read_text_file(pongo_mapper)
         .and_then(|file_contents| {
             serde_json::from_str(&file_contents)
                 .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
@@ -117,7 +117,7 @@ pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
 pub fn get_pongo_checks(url: &str) -> PongoChecks {
     let mut easy = Easy2::new(Collector(Vec::new()));
     easy.get(true).unwrap_or_default();
-    easy.url(&url).unwrap_or_default();
+    easy.url(url).unwrap_or_default();
     easy.perform().unwrap_or_default();
     let contents = easy.get_ref();
     let remote_raw = String::from_utf8_lossy(&contents.0);

@@ -38,7 +38,7 @@ mod all_tests {
     #[test]
     fn test_ssl_domain_expiration() {
         let domain = "google.com";
-        let expiration = SslExpiration::from_domain_name(&domain).unwrap();
+        let expiration = SslExpiration::from_domain_name(domain).unwrap();
         assert!(!expiration.is_expired());
         assert!(expiration.days() > 10);
     }
@@ -158,7 +158,7 @@ mod all_tests {
         easy.max_redirections(10)?;
 
         let url = "http://rust-lang.org/";
-        easy.url(&url)?;
+        easy.url(url)?;
         easy.perform()?;
 
         println!("URL: {}", &url);

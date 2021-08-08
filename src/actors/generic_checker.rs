@@ -92,12 +92,7 @@ pub trait GenericChecker {
                     process_handlers
                         .into_iter()
                         .flat_map(|(page, handler)| {
-                            Self::process_page_handler(
-                                &page,
-                                handler,
-                                &multi,
-                                notifier.clone(),
-                            )
+                            Self::process_page_handler(page, handler, &multi, notifier.clone())
                         })
                         .collect::<Stories>()
                 })
@@ -112,7 +107,7 @@ pub trait GenericChecker {
         domain_expectation: DomainExpectation,
         notifier: Option<String>,
     ) -> Story {
-        SslExpiration::from_domain_name_with_timeout(&domain_name, CHECK_TIMEOUT)
+        SslExpiration::from_domain_name_with_timeout(domain_name, CHECK_TIMEOUT)
             .map(|ssl_validator| {
                 match domain_expectation {
                     DomainExpectation::ValidExpiryPeriod(expected_days)
@@ -588,7 +583,7 @@ pub trait GenericChecker {
         let result_final_address = result_handler.effective_url().unwrap_or_default();
         let result_final_address_story = vec![Self::handle_page_address_expectation(
             &page_check.url,
-            &result_final_address.unwrap_or_default(),
+            result_final_address.unwrap_or_default(),
             expected_final_address,
             notifier.clone(),
         )];

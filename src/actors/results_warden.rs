@@ -28,7 +28,7 @@ impl Handler<ValidateResults> for ResultsWarden {
     fn handle(&mut self, val: ValidateResults, _ctx: &mut Self::Context) -> Self::Result {
         info!("ResultsWarden validates results…");
         let stories_glob = "/tmp/krecik-history-*.json";
-        let files_list = produce_list_absolute(&stories_glob)
+        let files_list = produce_list_absolute(stories_glob)
             .iter()
             .rev()
             .take(STORIES_TO_VALIDATE_COUNT)
@@ -66,7 +66,7 @@ impl Handler<ValidateResults> for ResultsWarden {
                 STORIES_TO_VALIDATE_COUNT, files_list
             );
 
-            let old_files_list = produce_list_absolute(&stories_glob)
+            let old_files_list = produce_list_absolute(stories_glob)
                 .iter()
                 .rev()
                 .skip(STORIES_TO_KEEP_COUNT)
