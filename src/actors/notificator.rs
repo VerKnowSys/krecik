@@ -44,7 +44,8 @@ impl Handler<Notify> for Notificator {
                 .filter(|elem| notifier_name == elem.notifier.clone().unwrap_or_default())
                 .map(|elem| elem.error.clone().unwrap().to_string())
                 .collect::<Vec<String>>();
-            sorted_errors.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            // sorted_errors.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            sorted_errors.sort();
 
             // let's iterate over each string and count occurrences
             // if there are 3 occurrences - we should send notification about it:
