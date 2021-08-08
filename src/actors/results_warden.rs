@@ -1,7 +1,7 @@
 use crate::{
     products::story::Story,
     utilities::{produce_list_absolute, read_text_file},
-    Notificator, Notify,
+    Notificator, Notify, STORIES_TO_KEEP_COUNT, STORIES_TO_VALIDATE_COUNT,
 };
 use actix::prelude::*;
 use std::fs;
@@ -16,10 +16,6 @@ pub struct ResultsWarden;
 #[derive(Message, Debug, Clone)]
 #[rtype(result = "()")]
 pub struct ValidateResults(pub Addr<Notificator>);
-
-
-const STORIES_TO_VALIDATE_COUNT: usize = 4;
-const STORIES_TO_KEEP_COUNT: usize = 60 * 12; // keep half a day of stories
 
 
 impl Handler<ValidateResults> for ResultsWarden {

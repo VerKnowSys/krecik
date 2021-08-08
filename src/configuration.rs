@@ -62,3 +62,9 @@ pub const TESTS_DIR: &str = "tests";
 
 /// Default Web proto:
 pub const CHECK_DEFAULT_PROTOCOL: &str = "https://";
+
+/// Stories required for the validation
+pub const STORIES_TO_VALIDATE_COUNT: usize = 4;
+
+/// Amount of stories to keep in /tmp/
+pub const STORIES_TO_KEEP_COUNT: usize = 60 * 12; // keep 720 stories
