@@ -192,6 +192,15 @@ async fn main() {
                 ))
                 .await
                 .unwrap_or_default();
+
+            // Let's make sure Krecik is not flooding with checks
+            if diff.num_seconds() < CHECK_MINIMUM_INTERVAL as i64 {
+                debug!(
+                    "Throttling next iteration by {ch_intval}, since checks took less than {ch_intval} seconds",
+                    ch_intval = CHECK_MINIMUM_INTERVAL
+                );
+                thread::sleep(Duration::from_secs(CHECK_MINIMUM_INTERVAL as u64));
+            }
         }
     }
 }

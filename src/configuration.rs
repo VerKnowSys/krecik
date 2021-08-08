@@ -42,6 +42,9 @@ pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;
 /// Default minimum length of HTTP content
 pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 128;
 
+/// Default interval (in seconds) between checks to not exceed 3 checks per minute (considered a flood)
+pub const CHECK_MINIMUM_INTERVAL: usize = 20;
+
 /// Default page content expectation:
 pub const CHECK_DEFAULT_CONTENT_EXPECTATION: &str = "body";
 
