@@ -86,6 +86,24 @@ impl Handler for Collector {
 }
 
 
+impl Debug for Collector {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct(&format!(
+            "Collector buffer (first 50 in hex): {}…",
+            self.to_string()
+        ))
+        .finish()
+    }
+}
+
+
+impl ToString for Collector {
+    fn to_string(&self) -> String {
+        self.0.iter().take(50).map(|c| format!("{:x}", c)).collect()
+    }
+}
+
+
 //
 // Public modules:
 //
