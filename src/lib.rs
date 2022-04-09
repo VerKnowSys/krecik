@@ -50,9 +50,6 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 // Load all useful macros:
 
 #[macro_use]
-pub extern crate log;
-
-#[macro_use]
 pub extern crate failure;
 
 #[macro_use]
@@ -70,7 +67,11 @@ pub use crate::products::history::*;
 pub use crate::products::story::*;
 pub use crate::products::unexpected::*;
 pub use crate::utilities::*;
+use core::fmt::Debug;
+use core::fmt::Formatter;
 use curl::easy::{Handler, WriteError};
+use std::fmt;
+pub use tracing::{debug, error, info, instrument, trace, warn};
 
 
 /// Collects async content from Curl:

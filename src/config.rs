@@ -1,6 +1,4 @@
-use log::LevelFilter;
-
-use crate::read_text_file;
+use crate::*;
 use std::{
     io::{Error, ErrorKind},
     path::Path,

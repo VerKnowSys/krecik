@@ -1,5 +1,5 @@
 use super::generic_checker::GenericChecker;
-use crate::{checks::check::*, products::story::*};
+use crate::{checks::check::*, products::story::*, trace};
 use actix::prelude::*;
 
 

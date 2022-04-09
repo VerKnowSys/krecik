@@ -1,10 +1,10 @@
 use crate::{
-    products::story::Story,
     utilities::{produce_list_absolute, read_text_file},
-    Notificator, Notify, STORIES_TO_KEEP_COUNT, STORIES_TO_VALIDATE_COUNT,
+    Notificator, Notify, Stories, STORIES_TO_KEEP_COUNT, STORIES_TO_VALIDATE_COUNT,
 };
 use actix::prelude::*;
 use std::fs;
+use tracing::{debug, info, log::trace, warn};
 
 
 /// ResultsWarden actor will check stories result and send alert notification if necessary

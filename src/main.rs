@@ -40,13 +40,22 @@
 // For development:
 // #![allow(dead_code, unused_imports, unused_variables, deprecated)]
 
-
 use actix::prelude::*;
+use addy::Signal::*;
 use chrono::Local;
-use fern::{
-    colors::{Color, ColoredLevelConfig},
-    Dispatch,
+use tracing_subscriber::{
+    // filter,
+    fmt::{
+        format::{Compact, DefaultFields, Format},
+        Layer, *,
+    },
+    layer::Layered,
+    // registry,
+    reload::*,
+    EnvFilter,
+    Registry,
 };
+
 use krecik::{
     actors::{
         history_teacher::{HistoryTeacher, Results},
@@ -56,9 +65,6 @@ use krecik::{
     api::*,
     *,
 };
-use lazy_static::lazy_static;
-use log::*;
-use std::{sync::RwLock, thread, time::Duration};
 
 lazy_static! {
     static ref LOG_LEVEL: RwLock<LevelFilter> = RwLock::new(LevelFilter::Info);
