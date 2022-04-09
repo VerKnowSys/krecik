@@ -99,17 +99,18 @@ async fn main() {
     let log_reload_handle = initialize_logger();
 
     addy::mediate(SIGUSR1)
-        .register("toggle_log_level", move |_signal| {
+        .register("toggle_log_level", move |signal| {
             log_reload_handle
                 .modify(|env_filter| {
-                    if env_filter.to_string() == *"info" {
-                        println!("SIGNAL: Enabling DEBUG log level after signal: SIGUSR1");
+                    let env = env_filter.to_string();
+                    if env == *"info" {
+                        println!("SIGNAL: Enabling DEBUG log level after: {signal}");
                         *env_filter = EnvFilter::from("debug");
-                    } else if env_filter.to_string() == *"debug" {
-                        println!("SIGNAL: Enabling TRACE log level after signal: SIGUSR1");
+                    } else if env == *"debug" {
+                        println!("SIGNAL: Enabling TRACE log level after: {signal}");
                         *env_filter = EnvFilter::from("trace");
-                    } else if env_filter.to_string() == *"trace" {
-                        println!("SIGNAL: Enabling INFO log level after signal: SIGUSR1");
+                    } else {
+                        println!("SIGNAL: Enabling INFO log level after: {signal}");
                         *env_filter = EnvFilter::from("info");
                     }
                 })
