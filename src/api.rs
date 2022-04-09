@@ -7,6 +7,7 @@ use rayon::prelude::*;
 **/
 
 /// Return checks from path, excluding remotes
+#[instrument]
 pub fn all_checks_but_remotes() -> Vec<Check> {
     list_all_checks_from(CHECKS_DIR)
         .par_iter()
@@ -23,6 +24,7 @@ pub fn all_checks_but_remotes() -> Vec<Check> {
 
 
 /// Return remote domain+pages checks via mapper
+#[instrument]
 pub fn all_checks_pongo_merged() -> Vec<Check> {
     list_all_checks_from(&format!("{}/{}", CHECKS_DIR, REMOTE_CHECKS_DIR))
         .into_iter()

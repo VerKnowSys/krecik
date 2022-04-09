@@ -11,6 +11,7 @@ use crate::*;
 
 
 /// Read single Check from text file, return error on parse error
+#[instrument]
 pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
     read_text_file(check_path).and_then(|file_contents| {
         serde_json::from_str(&*file_contents)
@@ -20,6 +21,7 @@ pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
 
 
 /// Read single Check from text file
+#[instrument]
 pub fn read_single_check(check_path: &str) -> Option<Check> {
     let result = read_text_file(check_path).and_then(|file_contents| {
         serde_json::from_str(&*file_contents)
@@ -36,6 +38,7 @@ pub fn read_single_check(check_path: &str) -> Option<Check> {
 
 
 /// Warns about notifiers undefined in dynamic configuration:
+#[instrument]
 pub fn warn_for_undefined_notifiers(stories: &[Story]) {
     let notifiers = Config::load().notifiers.unwrap_or_default();
     let notifier_names = notifiers
@@ -58,6 +61,7 @@ pub fn warn_for_undefined_notifiers(stories: &[Story]) {
 
 
 /// Sends generic notification over Slack
+#[instrument]
 pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
     retry_with_index(Fixed::from_millis(1000), |current_try| {
         if current_try > 3 {
@@ -102,6 +106,7 @@ pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
 
 
 /// Sends success notification to Slack
+#[instrument]
 pub fn notify_success(webhook: &str, message: &str) {
     let success_emoji = Config::load()
         .success_emoji
@@ -111,6 +116,7 @@ pub fn notify_success(webhook: &str, message: &str) {
 
 
 /// Sends failure notification to Slack
+#[instrument]
 pub fn notify_failure(webhook: &str, message: &str) {
     let failure_emoji = Config::load()
         .failure_emoji
@@ -120,6 +126,7 @@ pub fn notify_failure(webhook: &str, message: &str) {
 
 
 /// Produce list of absolute paths to all files matching given glob pattern:
+#[instrument]
 pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
     let mut list = vec![];
     for entry in glob(glob_pattern).unwrap() {
@@ -140,6 +147,7 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
 
 
 /// List all check files from given dir, also considering krecik_root value
+#[instrument]
 pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
     let krecik_root_dir = Config::load().krecik_root.unwrap_or_default();
     let glob_pattern = if !Path::new(&krecik_root_dir).exists() {
@@ -158,12 +166,14 @@ pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
 
 
 /// Read text file
+#[instrument]
 pub fn read_text_file(name: &str) -> Result<String, Error> {
     fs::read_to_string(name)
 }
 
 
 /// Write-once-and-atomic to a file
+#[instrument]
 pub fn write_append(file_path: &str, contents: &str) {
     // NOTE: since file is written in "write only, all at once" mode, we have to be sure not to write empty buffer
     if !contents.is_empty() {
@@ -188,6 +198,7 @@ pub fn write_append(file_path: &str, contents: &str) {
 
 
 /// Extracts file name from full path
+#[instrument]
 pub fn file_name_from_path(path: &str) -> String {
     let path = Path::new(path);
     path.file_name()

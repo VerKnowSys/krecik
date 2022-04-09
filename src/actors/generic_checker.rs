@@ -28,6 +28,7 @@ use std::{
 /// Trait implementing all helper functions for Curl-driven checks
 pub trait GenericChecker {
     /// Executes domain checks, returns Stories
+    #[instrument]
     fn check_domains(checks: &[Check]) -> Stories {
         checks
             .into_par_iter()
@@ -64,6 +65,7 @@ pub trait GenericChecker {
 
 
     /// Executes page checks, returns Stories
+    #[instrument]
     fn check_pages(checks: &[Check]) -> Stories {
         checks
             .iter()
@@ -104,6 +106,7 @@ pub trait GenericChecker {
 
 
     /// Check SSL certificate expiration using OpenSSL function
+    #[instrument]
     fn check_ssl_expire(
         domain_name: &str,
         domain_expectation: DomainExpectation,
@@ -146,6 +149,7 @@ pub trait GenericChecker {
     }
 
     /// Build a Story from a Length PageExpectation
+    #[instrument]
     fn handle_page_length_expectation(
         url: &str,
         raw_page_content: &str,
@@ -191,6 +195,7 @@ pub trait GenericChecker {
 
 
     /// Find and extract code validation from validations
+    #[instrument]
     fn find_code_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
@@ -202,6 +207,7 @@ pub trait GenericChecker {
 
 
     /// Find and extract content validations
+    #[instrument]
     fn find_content_validations(page_expectations: &[PageExpectation]) -> PageExpectations {
         page_expectations
             .par_iter()
@@ -212,6 +218,7 @@ pub trait GenericChecker {
 
 
     /// Find and extract content length validation from validations
+    #[instrument]
     fn find_content_length_validation(
         page_expectations: &[PageExpectation],
     ) -> &PageExpectation {
@@ -223,6 +230,7 @@ pub trait GenericChecker {
 
 
     /// Find and extract address validation from validations
+    #[instrument]
     fn find_address_validation(page_expectations: &[PageExpectation]) -> &PageExpectation {
         page_expectations
             .par_iter()
@@ -232,6 +240,7 @@ pub trait GenericChecker {
 
 
     /// Converts CurlError to Error
+    #[instrument]
     fn produce_curl_response_error(err: CurlError) -> Error {
         let mut reason = "";
         if err.is_failed_init() {
@@ -324,6 +333,7 @@ pub trait GenericChecker {
 
 
     /// Build a Story from a Length PageExpectation
+    #[instrument]
     fn handle_page_content_expectations(
         url: &str,
         raw_page_content: &str,
@@ -373,6 +383,7 @@ pub trait GenericChecker {
 
 
     /// Build a Story from a Address PageExpectation
+    #[instrument]
     fn handle_page_address_expectation(
         url: &str,
         address: &str,
@@ -419,6 +430,7 @@ pub trait GenericChecker {
 
 
     /// Build a Story from a HttpCode PageExpectation
+    #[instrument]
     fn handle_page_httpcode_expectation(
         url: &str,
         connect_oserror: Option<Error>,
@@ -489,6 +501,7 @@ pub trait GenericChecker {
 
 
     /// Process Curl page requests using given handler
+    #[instrument]
     fn process_page_handler(
         page_check: &Page,
         handler: CurlHandler,
@@ -594,6 +607,7 @@ pub trait GenericChecker {
 
 
     /// Build headers List for Curl
+    #[instrument]
     fn list_of_headers(headers: Option<Vec<String>>) -> List {
         // Build List of HTTP headers
         // ex. header:
@@ -608,6 +622,7 @@ pub trait GenericChecker {
 
 
     /// Build cookies list for Curl
+    #[instrument]
     fn list_of_cookies(headers: Option<Vec<String>>) -> String {
         let mut cookies = vec![];
         for cookie in headers.unwrap_or_default() {
@@ -619,6 +634,7 @@ pub trait GenericChecker {
 
 
     /// Load page check handler
+    #[instrument]
     fn load_handler_for(page_check: &Page, multi: &Multi) -> CurlHandler {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));

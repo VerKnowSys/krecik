@@ -96,7 +96,7 @@ fn set_log_level() {
 }
 
 
-/// Initial setup of the fern logger
+#[instrument]
 fn setup_logger() -> Result<(), SetLoggerError> {
     let log_file = Config::load()
         .log_file
@@ -133,6 +133,7 @@ fn setup_logger() -> Result<(), SetLoggerError> {
 }
 
 
+#[instrument]
 #[actix_macros::main]
 async fn main() {
     setup_logger().expect("Couldn't initialize logger");

@@ -23,6 +23,7 @@ pub struct Page {
 
 
 /// Provide own default page expectations if nothing defined in check input:
+#[instrument]
 pub fn default_page_expectations() -> PageExpectations {
     vec![
         PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),

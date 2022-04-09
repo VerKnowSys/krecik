@@ -45,6 +45,7 @@ pub struct Notifiers {
 
 impl Config {
     /// Load Krecik configuration file
+    #[instrument]
     pub fn load() -> Config {
         let config_paths = [
             "/etc/krecik/krecik.conf",

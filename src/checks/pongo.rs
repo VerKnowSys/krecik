@@ -12,6 +12,7 @@ use std::io::{Error, ErrorKind};
 
 
 /// Collect pongo domain check by host
+#[instrument]
 pub fn collect_pongo_domains(check: &PongoCheck) -> Vec<Domain> {
     check
         .data
@@ -36,6 +37,7 @@ pub fn collect_pongo_domains(check: &PongoCheck) -> Vec<Domain> {
 
 
 /// Collect pongo page checks by host
+#[instrument]
 pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Vec<Page> {
     let ams = check.clone().data.ams.unwrap_or_default();
     let active = check.active.unwrap_or(false);
@@ -103,6 +105,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
 
 
 /// Read Pongo mapper object
+#[instrument]
 pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
     read_text_file(pongo_mapper)
         .and_then(|file_contents| {
@@ -114,6 +117,7 @@ pub fn read_pongo_mapper(pongo_mapper: &str) -> PongoRemoteMapper {
 
 
 /// Read checks from Pongo remote
+#[instrument]
 pub fn get_pongo_checks(url: &str) -> PongoChecks {
     let mut easy = Easy2::new(Collector(Vec::new()));
     easy.get(true).unwrap_or_default();
@@ -133,6 +137,7 @@ pub fn get_pongo_checks(url: &str) -> PongoChecks {
 
 
 /// Provide pongo page expectations:
+#[instrument]
 pub fn pongo_page_expectations() -> PageExpectations {
     vec![
         PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),
@@ -144,6 +149,7 @@ pub fn pongo_page_expectations() -> PageExpectations {
 
 
 /// Provide pongo showroom page expectations:
+#[instrument]
 pub fn showroom_page_expectations() -> PageExpectations {
     vec![
         PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),

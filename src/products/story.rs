@@ -35,6 +35,7 @@ pub struct Story {
 
 impl Story {
     /// New success-story
+    #[instrument]
     pub fn success(success: Expected, notifier: Option<String>) -> Story {
         Story {
             timestamp: Local::now().to_rfc3339(),
@@ -47,6 +48,7 @@ impl Story {
 
 
     /// New error-story
+    #[instrument]
     pub fn error(error: Unexpected, notifier: Option<String>) -> Story {
         Story {
             timestamp: Local::now().to_rfc3339(),
@@ -59,6 +61,7 @@ impl Story {
 
 
     /// New minor-failure-story (not notified)
+    #[instrument]
     pub fn minor(minor: UnexpectedMinor) -> Story {
         Story {
             timestamp: Local::now().to_rfc3339(),
