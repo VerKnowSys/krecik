@@ -31,7 +31,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             .cloned()
             .collect::<Vec<String>>();
         if files_list.is_empty() {
-            warn!("No results. Nothing to validate.");
+            info!("No results. Nothing to validate.");
             return;
         }
 
@@ -40,9 +40,7 @@ impl Handler<ValidateResults> for ResultsWarden {
             serde_json::from_str(&read_text_file(&files_list[0]).unwrap_or_default())
                 .unwrap_or_default();
         if last_stories.is_empty() {
-            warn!(
-                "Last stories seems to be incomplete? Skipping validation until next iteration."
-            );
+            warn!("Stories seems to be incomplete? Skipping validation until next iteration.");
             return;
         }
         let last_stories_errors = last_stories
@@ -53,13 +51,11 @@ impl Handler<ValidateResults> for ResultsWarden {
 
         if files_list.len() < STORIES_TO_VALIDATE_COUNT {
             info!(
-                "Less than {} stories available, skipping validation…",
-                STORIES_TO_VALIDATE_COUNT
+                "Less than {STORIES_TO_VALIDATE_COUNT} stories available, skipping validation…"
             );
         } else {
             debug!(
-                "Validating last stories from {} recent files: {:?}",
-                STORIES_TO_VALIDATE_COUNT, files_list
+                "Validating last stories from {STORIES_TO_VALIDATE_COUNT} recent files: {files_list:?}"
             );
 
             let old_files_list = produce_list_absolute(stories_glob)

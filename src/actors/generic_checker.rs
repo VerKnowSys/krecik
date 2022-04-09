@@ -496,10 +496,6 @@ pub trait GenericChecker {
         notifier: Option<String>,
     ) -> Stories {
         let page_expectations = page_check.clone().expects;
-        trace!(
-            "process_page_handler::page_expectations: {:?}",
-            page_expectations
-        );
 
         // take control over curl handler, perform validations, produce stories…
         let a_handler = match handler {
@@ -527,27 +523,10 @@ pub trait GenericChecker {
 
         let handle = a_handler.get_ref().0.to_owned();
         let raw_page_content = String::from_utf8(handle).unwrap_or_default();
-        trace!(
-            "process_page_handler::raw_page_content: {:?}",
-            raw_page_content
-        );
         let expected_code = Self::find_code_validation(&page_expectations);
-        trace!("process_page_handler::expected_code: {:?}", expected_code);
         let expected_contents = Self::find_content_validations(&page_expectations);
-        trace!(
-            "process_page_handler::expected_contents: {:?}",
-            expected_contents
-        );
         let expected_content_length = Self::find_content_length_validation(&page_expectations);
-        trace!(
-            "process_page_handler::expected_content_length: {:?}",
-            expected_content_length
-        );
         let expected_final_address = Self::find_address_validation(&page_expectations);
-        trace!(
-            "process_page_handler::expected_final_address: {:?}",
-            expected_final_address
-        );
 
         // Gather Story from expectations
         let content_stories = Self::handle_page_content_expectations(
@@ -556,17 +535,12 @@ pub trait GenericChecker {
             &expected_contents,
             notifier.clone(),
         );
-        trace!("process_page_handler::content_story: {:?}", content_stories);
         let content_length_story = vec![Self::handle_page_length_expectation(
             &page_check.url,
             &raw_page_content,
             expected_content_length,
             notifier.clone(),
         )];
-        trace!(
-            "process_page_handler::content_length_story: {:?}",
-            content_length_story
-        );
 
         let mut result_handler = match multi.remove2(a_handler) {
             Ok(res_handler) => res_handler,
@@ -589,17 +563,11 @@ pub trait GenericChecker {
             expected_final_address,
             notifier.clone(),
         )];
-        trace!(
-            "process_page_handler::result_final_address_story: {:?}",
-            result_final_address_story
-        );
         let connect_oserror = match result_handler.os_errno() {
             Ok(0) => None,
             Ok(err_code) => Some(Error::from_raw_os_error(err_code)),
             Err(error) => Some(Error::from_raw_os_error(error.code() as i32)),
         };
-        trace!("Connect OS error: {:?}", connect_oserror);
-
         let result_handler_story = vec![Self::handle_page_httpcode_expectation(
             &page_check.url,
             connect_oserror,
@@ -609,9 +577,9 @@ pub trait GenericChecker {
             expected_code,
             notifier,
         )];
+
         trace!(
-            "process_page_handler::handle_page_httpcode_expectation: {:?}",
-            result_handler_story
+            "process_page_handler::page_expectations: {page_expectations:?}. process_page_handler::expected_code: {expected_code:?}. process_page_handler::expected_contents: {expected_contents:?}. process_page_handler::expected_content_length: {expected_content_length:?}. process_page_handler::expected_final_address: {expected_final_address:?}. process_page_handler::content_story: {content_stories:?}. process_page_handler::content_length_story: {content_length_story:?}. process_page_handler::result_final_address_story: {result_final_address_story:?}. process_page_handler::handle_page_httpcode_expectation: {result_handler_story:?}. process_page_handler::raw_page_content: {raw_page_content:?}."
         );
 
         // Collect the history results
@@ -655,7 +623,7 @@ pub trait GenericChecker {
         // Initialize Curl, set URL
         let mut curl = Easy2::new(Collector(Vec::new()));
         curl.url(&page_check.url).unwrap_or_default();
-        trace!("Curl URL: {}", &page_check.url);
+        trace!("Curl URL: {}", page_check.url);
 
         // Load Curl request options from check:
         let curl_options = page_check.clone().options.unwrap_or_default();

@@ -28,10 +28,7 @@ pub fn read_single_check(check_path: &str) -> Option<Check> {
     match result {
         Ok(check) => Some(check),
         Err(err) => {
-            debug!(
-                "Error reading Check from path: {}. Cause: {}",
-                check_path, err
-            );
+            debug!("Error reading Check from path: {check_path}. Cause: {err}");
             None
         }
     }
@@ -52,10 +49,9 @@ pub fn warn_for_undefined_notifiers(stories: &[Story]) {
         .filter_map(|elem| elem.notifier)
         .collect::<Vec<String>>();
     undefined.dedup();
-    undefined.iter().for_each(|notifier| {
+    undefined.into_iter().for_each(|notifier| {
         warn!(
-            "Notifier: '{}' is not defined in configuration file. Notifications won't be sent!",
-            &notifier
+            "Notifier: '{notifier}' is not defined in configuration file. Notifications won't be sent!"
         )
     });
 }
@@ -87,7 +83,7 @@ pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
                 ])
                 .build()
                 .and_then(|payload| {
-                    debug!("Sending notification with payload: {:?}", &payload);
+                    debug!("Sending notification with payload: {payload:?}");
                     slack.send(&payload)
                 })
         });
@@ -98,7 +94,7 @@ pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
         }
     })
     .map_err(|err| {
-        error!("Error sending notification: {:?}", err);
+        error!("Error sending notification: {err:?}");
         err
     })
     .unwrap_or_default();
@@ -134,11 +130,11 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
                 }
             }
             Err(err) => {
-                error!("Error: produce_list(): {}", err);
+                error!("Error: produce_list(): {err}");
             }
         }
     }
-    trace!("produce_list_absolute(): Elements: {:?}", list);
+    debug!("produce_list_absolute('{glob_pattern}'): {list:?}");
     list
 }
 
@@ -148,18 +144,15 @@ pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
     let krecik_root_dir = Config::load().krecik_root.unwrap_or_default();
     let glob_pattern = if !Path::new(&krecik_root_dir).exists() {
         if !krecik_root_dir.is_empty() {
-            warn!(
-                "Krecik root directory doesn't exists: {}. Falling back to current directory.",
-                krecik_root_dir
-            );
+            warn!("Krecik root directory doesn't exists: {krecik_root_dir}!");
         } else {
-            warn!("Krecik root directory wasn't specified, using current directory.");
+            info!("Krecik root directory wasn't specified, using current working directory.");
         }
         format!("{}/**/*.json", checks_dir)
     } else {
         format!("{}/{}/**/*.json", krecik_root_dir, checks_dir)
     };
-    debug!("list_all_checks_from(): {}", glob_pattern);
+    debug!("list_all_checks_from(): {glob_pattern}");
     produce_list_absolute(&glob_pattern)
 }
 
@@ -178,15 +171,14 @@ pub fn write_append(file_path: &str, contents: &str) {
         match options.create(true).append(true).open(&file_path) {
             Ok(mut file) => {
                 file.write_all(contents.as_bytes()).unwrap_or_else(|_| {
-                    panic!("Access denied? File can't be written: {}", &file_path)
+                    panic!("Access denied? File can't be written: {}", file_path)
                 });
-                debug!("Atomically written data to file: {}", &file_path);
+                debug!("Atomically written data to file: {file_path}");
             }
 
             Err(err) => {
                 error!(
-                    "Atomic write to: {} has failed! Cause: {}",
-                    &file_path,
+                    "Atomic write to: {file_path} has failed! Cause: {}",
                     err.to_string()
                 )
             }

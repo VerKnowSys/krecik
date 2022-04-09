@@ -137,8 +137,11 @@ async fn main() {
     .expect("Couldn't initialize Ctrl-C handler");
 
     // TODO: implement validation of all defined checks using read_single_check_result()
-
-    info!("Starting Krecik-server v{}", env!("CARGO_PKG_VERSION"));
+    info!(
+        "Starting {} version {}",
+        env!("CARGO_BIN_NAME"),
+        env!("CARGO_PKG_VERSION")
+    );
 
     // Define system actors
     let num = 1;
@@ -196,10 +199,7 @@ async fn main() {
 
             // Let's make sure Krecik is not flooding with checks
             if diff.num_seconds() < CHECK_MINIMUM_INTERVAL as i64 {
-                debug!(
-                    "Throttling next iteration by {ch_intval}, since checks took less than {ch_intval} seconds",
-                    ch_intval = CHECK_MINIMUM_INTERVAL
-                );
+                debug!("Throttling next iteration by {CHECK_MINIMUM_INTERVAL}s");
                 thread::sleep(Duration::from_secs(CHECK_MINIMUM_INTERVAL as u64));
             }
         }

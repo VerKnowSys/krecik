@@ -78,18 +78,13 @@ impl Handler<Notify> for Notificator {
                     .collect::<Vec<_>>();
 
                 debug!(
-                    "History of failures for notifier: {}: {:?}",
-                    &notifier_name, history_of_failures
+                    "History of failures for notifier: {notifier_name}: {history_of_failures:?}"
                 );
                 if history_of_failures.is_empty() {
-                    debug!(
-                        "No need to send notification to notificator: {}",
-                        &notifier_name
-                    );
+                    debug!("No need to send notification to notificator: {notifier_name}");
                 } else {
                     info!(
-                        "Sending SUCCESS notification for notifier: {}, with message: {}",
-                        &notifier_name, &ok_message
+                        "Sending SUCCESS notification for notifier: {notifier_name}, with message: {ok_message}"
                     );
                     utilities::notify_success(&a_notifier.slack_webhook, &ok_message); // TODO: Since Slack API can fail… retry crate could be used
                     drop(history); // drop mutex lock
@@ -112,9 +107,9 @@ impl Handler<Notify> for Notificator {
                     );
                     let mut history = NOTIFY_HISTORY.lock().unwrap();
                     if history.contains(&notified_entry) {
-                        debug!("Already notified message skipped: {}", &message);
+                        debug!("Already notified message skipped: '{message}'");
                     } else {
-                        debug!("Pushing new entry: {:?}", unnotified_entry);
+                        debug!("Pushing new entry: {unnotified_entry:?}");
                         history.push(unnotified_entry)
                     }
                 }
@@ -138,15 +133,11 @@ impl Handler<Notify> for Notificator {
                 .collect::<String>();
 
             if failure_messages.is_empty() {
-                debug!(
-                    "Failure messages already notfied: '{}'",
-                    &failure_messages.join("")
-                );
+                debug!("No new failure messages!");
             } else {
                 let messages = failure_messages.join("");
-                info!(
-                    "Sending FAILURE notification: '{}' to notifier id: {}, webhook: '{}'",
-                    &messages, &notifier_name, &webhook
+                debug!(
+                    "Sending failure notification: '{messages}' to notifier id: {notifier_name}, webhook: '{webhook}'"
                 );
                 utilities::notify_failure(&webhook, &messages);
 
@@ -162,7 +153,7 @@ impl Handler<Notify> for Notificator {
         }
 
         let history = NOTIFY_HISTORY.lock().unwrap();
-        debug!("NOTIFY_HISTORY state: {:?}", history);
+        debug!("NOTIFY_HISTORY state: {history:?}");
     }
 }
 
