@@ -128,6 +128,15 @@ async fn main() {
         .enable()
         .expect("SIGINT handler couldn't be enabled");
 
+    addy::mediate(SIGTERM)
+        .register("terminate", |_signal| {
+            println!("\n\n{} was terminated!", env!("CARGO_BIN_NAME"));
+            std::process::exit(0);
+        })
+        .expect("Couldn't initialize SIGTERM handler")
+        .enable()
+        .expect("SIGTERM handler couldn't be enabled");
+
     // TODO: implement validation of all defined checks using read_single_check_result()
     info!(
         "Starting {} version {}",
