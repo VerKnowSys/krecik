@@ -1,0 +1,11 @@
+#!/bin/sh
+# blame: @dmilith
+# 2022-02-06
+
+export LOG=warn
+export CARGO_PROFILE_RELEASE_DEBUG=true
+
+. bin/common "${*}"
+
+echo "NOTE: Script may ask for sudo password to enable DTrace"
+cargo flamegraph --root --palette rust --inverted --open --flamechart
