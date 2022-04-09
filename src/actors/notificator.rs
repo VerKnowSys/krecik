@@ -40,13 +40,18 @@ impl Handler<Notify> for Notificator {
             .unwrap_or_else(|| String::from(CHECK_DEFAULT_SUCCESS_NOTIFICATION_MSG));
 
         for a_notifier in &notifiers {
-            let notifier_name = a_notifier.clone().name;
+            let notifier_name = a_notifier.name.to_owned();
             let mut sorted_errors = stories
                 .0
                 .iter()
-                .filter(|elem| notifier_name == elem.notifier.clone().unwrap_or_default())
-                .map(|elem| elem.error.clone().unwrap().to_string())
-                .collect::<Vec<String>>();
+                .filter_map(|story| {
+                    if notifier_name == story.notifier.to_owned().unwrap_or_default() {
+                        Some(story.error.to_owned().unwrap().to_string())
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>();
             // sorted_errors.sort_by(|a, b| a.partial_cmp(b).unwrap());
             sorted_errors.sort();
 
@@ -66,9 +71,14 @@ impl Handler<Notify> for Notificator {
 
             let errors_with_webhooks = failure_occurrences
                 .iter()
-                .filter(|&(_k, v)| *v >= 3)
-                .map(|(error, _v)| (format!("{}\n", error), a_notifier.clone().slack_webhook))
-                .collect::<Vec<(String, String)>>();
+                .filter_map(|(error, value)| {
+                    if value >= &3 {
+                        Some((format!("{error}\n"), a_notifier.slack_webhook.to_owned()))
+                    } else {
+                        None
+                    }
+                })
+                .collect::<Vec<_>>();
 
             // no errors, means that we can traverse NOTIFY_HISTORY and pick all previously failed entries and send ok_message
             if errors_with_webhooks.is_empty() {
@@ -98,15 +108,15 @@ impl Handler<Notify> for Notificator {
                 for (message, webhook) in &errors_with_webhooks {
                     let notified_entry = (
                         false,
-                        message.clone(),
-                        notifier_name.clone(),
-                        webhook.clone(),
+                        message.to_owned(),
+                        notifier_name.to_owned(),
+                        webhook.to_owned(),
                     );
                     let unnotified_entry = (
                         true,
-                        message.clone(),
-                        notifier_name.clone(),
-                        webhook.clone(),
+                        message.to_owned(),
+                        notifier_name.to_owned(),
+                        webhook.to_owned(),
                     );
                     let mut history = NOTIFY_HISTORY.lock().unwrap();
                     if history.contains(&notified_entry) {
@@ -127,7 +137,7 @@ impl Handler<Notify> for Notificator {
                 notifier == &notifier_name && *to_notify
             });
             let failure_messages = filter
-                .clone()
+                .to_owned()
                 .map(|(_, message, ..)| message.to_string())
                 .collect::<Vec<_>>();
             let webhook = filter // webhook is always one per notifier

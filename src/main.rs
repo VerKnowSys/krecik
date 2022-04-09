@@ -158,7 +158,6 @@ async fn main() {
     let notificator = SyncArbiter::start(num, || Notificator);
 
     loop {
-        set_log_level();
         debug!("New execution iteration…");
 
         let start = Local::now();

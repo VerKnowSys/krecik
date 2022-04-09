@@ -75,7 +75,6 @@ pub use tracing::{debug, error, info, instrument, trace, warn};
 
 
 /// Collects async content from Curl:
-#[derive(Debug)]
 pub struct Collector(Vec<u8>);
 
 

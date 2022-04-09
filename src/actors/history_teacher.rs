@@ -11,11 +11,7 @@ pub struct HistoryTeacher;
 /// List of result stories
 #[derive(Message, Debug, Clone)]
 #[rtype(result = "()")]
-pub struct Results(
-    pub Vec<Story>,
-    pub Addr<ResultsWarden>,
-    pub Addr<Notificator>,
-);
+pub struct Results(pub Stories, pub Addr<ResultsWarden>, pub Addr<Notificator>);
 
 
 impl Handler<Results> for HistoryTeacher {

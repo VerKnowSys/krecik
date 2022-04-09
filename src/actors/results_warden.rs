@@ -22,13 +22,12 @@ impl Handler<ValidateResults> for ResultsWarden {
     type Result = ();
 
     fn handle(&mut self, val: ValidateResults, _ctx: &mut Self::Context) -> Self::Result {
-        info!("ResultsWarden validates results…");
+        debug!("ResultsWarden validates results…");
         let stories_glob = "/tmp/krecik-history-*.json";
         let files_list = produce_list_absolute(stories_glob)
-            .iter()
+            .into_iter()
             .rev()
             .take(STORIES_TO_VALIDATE_COUNT)
-            .cloned()
             .collect::<Vec<String>>();
         if files_list.is_empty() {
             info!("No results. Nothing to validate.");
@@ -36,7 +35,7 @@ impl Handler<ValidateResults> for ResultsWarden {
         }
 
         debug!("Last stories file name: {}", &files_list[0]);
-        let last_stories: Vec<Story> =
+        let last_stories: Stories =
             serde_json::from_str(&read_text_file(&files_list[0]).unwrap_or_default())
                 .unwrap_or_default();
         if last_stories.is_empty() {
@@ -44,10 +43,9 @@ impl Handler<ValidateResults> for ResultsWarden {
             return;
         }
         let last_stories_errors = last_stories
-            .iter()
+            .into_iter()
             .filter(|entry| entry.error.is_some())
-            .cloned()
-            .collect::<Vec<Story>>();
+            .collect::<Stories>();
 
         if files_list.len() < STORIES_TO_VALIDATE_COUNT {
             info!(
@@ -59,38 +57,45 @@ impl Handler<ValidateResults> for ResultsWarden {
             );
 
             let old_files_list = produce_list_absolute(stories_glob)
-                .iter()
+                .into_iter()
                 .rev()
                 .skip(STORIES_TO_KEEP_COUNT)
-                .cloned()
                 .collect::<Vec<String>>();
-            debug!("Wiping out old stories: {:?}", old_files_list);
-            for old_file in old_files_list {
+            for old_file in &old_files_list {
+                trace!("Wiping out old stories: {old_files_list:?}");
                 fs::remove_file(&old_file).unwrap_or_default();
             }
 
-            let previous_stories: Vec<Story> =
+            let previous_stories: Stories =
                 serde_json::from_str(&read_text_file(&files_list[1]).unwrap_or_default())
                     .unwrap_or_default();
             let previous_stories_errors = previous_stories
-                .iter()
+                .into_iter()
                 .filter(|entry| entry.error.is_some())
-                .cloned()
-                .collect::<Vec<Story>>();
+                .collect::<Stories>();
 
-            let old_previous_stories: Vec<Story> =
+            let old_previous_stories: Stories =
                 serde_json::from_str(&read_text_file(&files_list[2]).unwrap_or_default())
                     .unwrap_or_default();
             let old_previous_stories_errors = old_previous_stories
-                .iter()
+                .into_iter()
                 .filter(|entry| entry.error.is_some())
-                .cloned()
-                .collect::<Vec<Story>>();
+                .collect::<Stories>();
 
-            debug!("Error stories:");
-            debug!("[0]: {:?}", last_stories_errors);
-            debug!("[1]: {:?}", previous_stories_errors);
-            debug!("[2]: {:?}", old_previous_stories_errors);
+            match (
+                last_stories_errors.is_empty(),
+                previous_stories_errors.is_empty(),
+                old_previous_stories_errors.is_empty(),
+            ) {
+                (true, true, true) => {
+                    debug!("No error Stories");
+                }
+                (..) => {
+                    debug!("Error Stories[0]: {last_stories_errors:?}");
+                    debug!("Error Stories[1]: {previous_stories_errors:?}");
+                    debug!("Error Stories[2]: {old_previous_stories_errors:?}");
+                }
+            }
 
             let notifier = val.0;
             notifier.do_send(Notify(
