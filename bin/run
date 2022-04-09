@@ -2,6 +2,7 @@
 # blame: @dmilith
 # 2018-11-22-0129-1542846591
 
+export LOG="krecik=debug"
 
 . bin/common "${*}"
 

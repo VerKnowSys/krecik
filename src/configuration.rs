@@ -3,9 +3,6 @@
 //
 
 
-/// Default log file:
-pub const DEFAULT_LOG_FILE: &str = "krecik.log";
-
 /// Default Notification name:
 pub const DEFAULT_SLACK_NAME: &str = "Krecik";
 

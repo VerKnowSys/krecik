@@ -66,82 +66,67 @@ use krecik::{
     *,
 };
 
-lazy_static! {
-    static ref LOG_LEVEL: RwLock<LevelFilter> = RwLock::new(LevelFilter::Info);
-}
+use std::{thread, time::Duration};
 
 
-/// Set log level dynamically at runtime
-fn set_log_level() {
-    let level = Config::load().get_log_level();
-    match LOG_LEVEL.read() {
-        Ok(loglevel) => {
-            if level != *loglevel {
-                drop(loglevel);
-                match LOG_LEVEL.write() {
-                    Ok(mut log) => {
-                        println!("Changing log level to: {}", level);
-                        *log = level
-                    }
-                    Err(err) => {
-                        eprintln!("Failed to change log level to: {}, cause: {}", level, err);
-                    }
-                }
-            }
-        }
-        Err(err) => {
-            eprintln!("Couldn't read LOG_LEVEL, cause: {:?}", err);
-        }
-    }
-}
+type TracingEnvFilterHandle =
+    Handle<EnvFilter, Layered<Layer<Registry, DefaultFields, Format<Compact>>, Registry>>;
 
 
 #[instrument]
-fn setup_logger() -> Result<(), SetLoggerError> {
-    let log_file = Config::load()
-        .log_file
-        .unwrap_or_else(|| String::from(DEFAULT_LOG_FILE));
-    let colors_line = ColoredLevelConfig::new()
-        .error(Color::Red)
-        .warn(Color::Yellow)
-        .info(Color::White)
-        .debug(Color::Magenta)
-        .trace(Color::Cyan);
-    Dispatch::new()
-        .filter(|metadata| {
-            match LOG_LEVEL.read() {
-                Ok(log) => metadata.level() <= *log,
-                Err(_err) => true,
-            }
-        })
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
-                color_line = format_args!(
-                    "\x1B[{}m",
-                    colors_line.get_color(&record.level()).to_fg_str()
-                ),
-                date = Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
-                target = record.target(),
-                level = record.level(),
-                message = message
-            ))
-        })
-        .chain(std::io::stdout())
-        .chain(fern::DateBased::new(format!("{}.", log_file), "%Y-%m-%d"))
-        .apply()
+fn initialize_logger() -> TracingEnvFilterHandle {
+    let env_log_filter = match EnvFilter::try_from_env("LOG") {
+        Ok(env_value_from_env) => env_value_from_env,
+        Err(_) => EnvFilter::from("info"),
+    };
+    let fmt = fmt()
+        .compact()
+        .with_thread_names(false)
+        .with_thread_ids(false)
+        .with_ansi(true)
+        .with_env_filter(env_log_filter)
+        .with_filter_reloading();
+
+    let handle = fmt.reload_handle();
+    fmt.init();
+    handle
 }
 
 
 #[instrument]
 #[actix_macros::main]
 async fn main() {
-    setup_logger().expect("Couldn't initialize logger");
-    ctrlc::set_handler(|| {
-        println!("\n\nKrecik server was interrupted!");
-        std::process::exit(0);
-    })
-    .expect("Couldn't initialize Ctrl-C handler");
+    let log_reload_handle = initialize_logger();
+
+    addy::mediate(SIGUSR1)
+        .register("toggle_log_level", move |_signal| {
+            log_reload_handle
+                .modify(|env_filter| {
+                    if env_filter.to_string() == *"info" {
+                        println!("SIGNAL: Enabling DEBUG log level after signal: SIGUSR1");
+                        *env_filter = EnvFilter::from("debug");
+                    } else if env_filter.to_string() == *"debug" {
+                        println!("SIGNAL: Enabling TRACE log level after signal: SIGUSR1");
+                        *env_filter = EnvFilter::from("trace");
+                    } else if env_filter.to_string() == *"trace" {
+                        println!("SIGNAL: Enabling INFO log level after signal: SIGUSR1");
+                        *env_filter = EnvFilter::from("info");
+                    }
+                })
+                .unwrap_or_default();
+        })
+        .expect("Couldn't initialize SIGUSR1 handler")
+        .enable()
+        .expect("SIGUSR1 handler couldn't be enabled");
+
+    addy::mediate(SIGINT)
+        .register("interrupt", |_signal| {
+            println!("\n\n{} was interrupted!", env!("CARGO_BIN_NAME"));
+            std::process::exit(0);
+        })
+        .expect("Couldn't initialize SIGINT handler")
+        .enable()
+        .expect("SIGINT handler couldn't be enabled");
 
     // TODO: implement validation of all defined checks using read_single_check_result()
     info!(

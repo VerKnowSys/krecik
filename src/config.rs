@@ -11,12 +11,6 @@ pub struct Config {
     /// Absolute path to Krecik directory where "checks" are located
     pub krecik_root: Option<String>,
 
-    /// Log output from Krecik-server
-    pub log_file: Option<String>,
-
-    /// Log level for Krecik-server
-    pub log_level: Option<String>,
-
     /// Notification message when all checks are fine
     pub ok_message: Option<String>,
 
@@ -72,19 +66,5 @@ impl Config {
                 })
             })
             .unwrap_or_default()
-    }
-
-    /// Get LevelFilter (log level) from configuration
-    pub fn get_log_level(&self) -> LevelFilter {
-        let level = self.log_level.clone().unwrap_or_default();
-        match &level[..] {
-            "OFF" => LevelFilter::Off,
-            "ERROR" => LevelFilter::Error,
-            "WARN" => LevelFilter::Warn,
-            "INFO" => LevelFilter::Info,
-            "DEBUG" => LevelFilter::Debug,
-            "TRACE" => LevelFilter::Trace,
-            _ => LevelFilter::Info,
-        }
     }
 }
