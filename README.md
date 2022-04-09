@@ -1,6 +1,6 @@
 # Krecik
 
-> Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL.
+> Asynchronous, parallel external service checker (with Slack notifications), using industry standard libraries: Curl, ngHTTP2 and OpenSSL.
 
 
 ![krecik](https://github.com/dmilith/krecik/blob/master/src/imgs/krecik.png?raw=true)
@@ -31,7 +31,7 @@ Krecik by default runs in a loop. Every loop iteration loads combined pages and 
 
 # Performance
 
-Check of 750+ pages (3 expectations per check), 750+ domains (1 expectation per check) takes approximately 20-30s per iteration.
+Check of 750+ pages (3 expectations per check), 750+ domains (1 expectation per check) takes approximately 20-30s per iteration to complete.
 
 
 
@@ -90,8 +90,6 @@ By default Krecik looks for configuration under:
 Fields explanation:
 
 - `ok_message` - Notification message that will be sent (per notifier) when all checks are successful.
-
-- `log_file` - Krecik log file location.
 
 - `notifiers` - List of Slack notifiers used by each Check definition by name.
 
@@ -196,6 +194,11 @@ Fields explanation:
 - Page check expectations: `ValidCode(200)` (http error code is 200) + `ValidLength(128)` (content length is at least 128 bytes long) + `ValidContent("body")` (content contains "body")
 
 
+## Runtime log level control:
+
+Krecik handles SIGUSR1 signal to trigger changes of the log level while running. Depending on how many times it receives SIGUSR1 signal it will cycle between "info", "debug" and "trace" log levels.
+
+
 # Development:
 
 
@@ -223,12 +226,12 @@ Eager developer mode (using `cargo-watch` + `cargo-clippy`, warnings: enabled, w
 ## Run:
 
 
-Launch "dev" server:
+Launch "dev" environment:
 
 `bin/run dev`
 
 
-Launch "release" server:
+Launch "release" environment:
 
 `bin/run`
 
