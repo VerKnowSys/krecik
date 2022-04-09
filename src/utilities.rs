@@ -63,6 +63,10 @@ pub fn warn_for_undefined_notifiers(stories: &[Story]) {
 /// Sends generic notification over Slack
 #[instrument]
 pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
+    if webhook.is_empty() {
+        warn!("Webhook undefined. Notifications will not be sent.");
+        return;
+    }
     retry_with_index(Fixed::from_millis(1000), |current_try| {
         if current_try > 3 {
             return OperationResult::Err("Did not succeed within 3 tries");
