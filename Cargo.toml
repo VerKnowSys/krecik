@@ -14,10 +14,9 @@ build = "build.rs"
 [lib]
 name = "krecik"
 path = "src/lib.rs"
-crate-type = ["rlib"]
 
 [[bin]]
-name = "krecik-server"
+name = "krecikd"
 path = "src/main.rs"
 
 [dependencies]

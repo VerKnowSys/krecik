@@ -13,7 +13,7 @@
 			"type": "lldb",
 			"request": "launch",
 			"name": "Launch",
-			"program": "${workspaceFolder}/target/debug/krecik-server",
+			"program": "${workspaceFolder}/target/debug/krecikd",
 			"args": [],
 			"cwd": "${workspaceFolder}"
 		}
