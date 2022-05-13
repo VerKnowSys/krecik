@@ -43,18 +43,6 @@
 use actix::prelude::*;
 use addy::Signal::*;
 use chrono::Local;
-use tracing_subscriber::{
-    // filter,
-    fmt::{
-        format::{Compact, DefaultFields, Format},
-        Layer, *,
-    },
-    layer::Layered,
-    // registry,
-    reload::*,
-    EnvFilter,
-    Registry,
-};
 
 use krecik::{
     actors::{
@@ -64,6 +52,16 @@ use krecik::{
     },
     *,
 };
+use tracing_subscriber::{
+    fmt::{
+        format::{Compact, DefaultFields, Format},
+        Layer, *,
+    },
+    layer::Layered,
+    reload::*,
+    EnvFilter, Registry,
+};
+
 
 use std::{thread, time::Duration};
 

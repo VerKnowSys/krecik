@@ -1,3 +1,6 @@
+use crate::*;
+
+
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
 /// Unexpected check result that's considered minor - we don't want notifications from those
 pub enum UnexpectedMinor {

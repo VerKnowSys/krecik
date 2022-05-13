@@ -1,3 +1,6 @@
+use crate::*;
+
+
 #[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// Describes all supported page expectations
 pub enum PageExpectation {

@@ -1,6 +1,7 @@
 use crate::{
     checks::{domain::*, page::*},
     products::story::*,
+    *,
 };
 use actix::prelude::*;
 

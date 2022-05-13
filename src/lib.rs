@@ -1,4 +1,4 @@
-//! "Traversing Mole" utility
+//! "Traversing Mole" utility: Krecik
 
 //! Crate docs
 
@@ -52,10 +52,6 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 #[macro_use]
 pub extern crate failure;
 
-#[macro_use]
-pub extern crate serde_derive;
-
-
 pub use crate::actors::notificator::*;
 pub use crate::api::*;
 pub use crate::checks::check::*;
@@ -68,11 +64,11 @@ pub use crate::products::history::*;
 pub use crate::products::story::*;
 pub use crate::products::unexpected::*;
 pub use crate::utilities::*;
-use core::fmt::Debug;
-use core::fmt::Formatter;
+use core::fmt::{Debug, Formatter};
 use curl::easy::{Handler, WriteError};
+pub use serde::{Deserialize, Serialize};
 use std::fmt;
-pub use tracing::{debug, error, info, instrument, trace, warn};
+pub use tracing::{debug, error, event, info, instrument, span, trace, warn, Level};
 
 
 /// Collects async content from Curl:
