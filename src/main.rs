@@ -62,7 +62,6 @@ use krecik::{
         multi_checker::{Checks, MultiChecker},
         results_warden::ResultsWarden,
     },
-    api::*,
     *,
 };
 

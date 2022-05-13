@@ -57,6 +57,7 @@ pub extern crate serde_derive;
 
 
 pub use crate::actors::notificator::*;
+pub use crate::api::*;
 pub use crate::checks::check::*;
 pub use crate::checks::page::*;
 pub use crate::checks::pongo::*;
