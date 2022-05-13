@@ -177,7 +177,7 @@ pub fn read_text_file(name: &str) -> Result<String, Error> {
 
 
 /// Write-once-and-atomic to a file
-#[instrument]
+#[instrument(skip(contents))]
 pub fn write_append(file_path: &str, contents: &str) {
     // NOTE: since file is written in "write only, all at once" mode, we have to be sure not to write empty buffer
     if !contents.is_empty() {

@@ -28,7 +28,7 @@ use std::{
 /// Trait implementing all helper functions for Curl-driven checks
 pub trait GenericChecker {
     /// Executes domain checks, returns Stories
-    #[instrument]
+    #[instrument(skip(checks))]
     fn check_domains(checks: &[Check]) -> Stories {
         checks
             .into_par_iter()
@@ -65,7 +65,7 @@ pub trait GenericChecker {
 
 
     /// Executes page checks, returns Stories
-    #[instrument]
+    #[instrument(skip(checks))]
     fn check_pages(checks: &[Check]) -> Stories {
         checks
             .iter()
