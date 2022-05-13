@@ -78,6 +78,9 @@ fn initialize_logger() -> TracingEnvFilterHandle {
     };
     let fmt = fmt()
         .compact()
+        .with_target(true)
+        .with_line_number(false)
+        .with_file(false)
         .with_thread_names(false)
         .with_thread_ids(false)
         .with_ansi(true)
