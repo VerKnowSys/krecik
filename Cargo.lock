@@ -784,7 +784,6 @@ dependencies = [
  "rayon",
  "retry",
  "serde",
- "serde_derive",
  "serde_json",
  "slack-hook",
  "ssl-expiration2",
