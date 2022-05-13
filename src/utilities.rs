@@ -102,7 +102,7 @@ pub fn notify(webhook: &str, message: &str, icon: &str, fail: bool) {
         }
     })
     .map_err(|err| {
-        error!("Error sending notification: {err:?}");
+        error!("Error sending notification: {err}");
         err
     })
     .unwrap_or_default();
@@ -145,7 +145,8 @@ pub fn produce_list_absolute(glob_pattern: &str) -> Vec<String> {
             }
         }
     }
-    debug!("produce_list_absolute('{glob_pattern}'): {list:?}");
+    debug!("{glob_pattern}");
+    trace!("{list:?}");
     list
 }
 
@@ -164,7 +165,6 @@ pub fn list_all_checks_from(checks_dir: &str) -> Vec<String> {
     } else {
         format!("{}/{}/**/*.json", krecik_root_dir, checks_dir)
     };
-    debug!("list_all_checks_from(): {glob_pattern}");
     produce_list_absolute(&glob_pattern)
 }
 
@@ -181,20 +181,20 @@ pub fn read_text_file(name: &str) -> Result<String, Error> {
 pub fn write_append(file_path: &str, contents: &str) {
     // NOTE: since file is written in "write only, all at once" mode, we have to be sure not to write empty buffer
     if !contents.is_empty() {
-        let mut options = OpenOptions::new();
-        match options.create(true).append(true).open(&file_path) {
+        match OpenOptions::new()
+            .create(true)
+            .append(true)
+            .open(&file_path)
+        {
             Ok(mut file) => {
-                file.write_all(contents.as_bytes()).unwrap_or_else(|_| {
-                    panic!("Access denied? File can't be written: {}", file_path)
-                });
+                file.write_all(contents.as_bytes())
+                    .expect("Access denied? File can't be written: {file_path}");
                 debug!("Atomically written data to file: {file_path}");
+                trace!("Written data: {contents}");
             }
 
             Err(err) => {
-                error!(
-                    "Atomic write to: {file_path} has failed! Cause: {}",
-                    err.to_string()
-                )
+                error!("Atomic write to: {file_path} has failed! Cause: {err}")
             }
         }
     }

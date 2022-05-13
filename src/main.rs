@@ -158,16 +158,14 @@ async fn main() {
 
         let all_checks = [all_checks_pongo_merged(), all_checks_but_remotes()].concat();
         if all_checks.is_empty() {
-            warn!(
-                "No checks defined under root dir: '{}'! Iteration skipped…",
-                format!(
-                    "{}/{}",
-                    Config::load()
-                        .krecik_root
-                        .unwrap_or_else(|| ".".to_string()),
-                    CHECKS_DIR
-                )
+            let root_dir = format!(
+                "{}/{}",
+                Config::load()
+                    .krecik_root
+                    .unwrap_or_else(|| ".".to_string()),
+                CHECKS_DIR
             );
+            warn!("No checks defined under root dir: '{root_dir}'! Iteration skipped…");
             thread::sleep(Duration::from_secs(60));
         } else {
             let stories = multi_checker

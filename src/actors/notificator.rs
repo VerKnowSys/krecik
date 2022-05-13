@@ -146,12 +146,13 @@ impl Handler<Notify> for Notificator {
                 .collect::<String>();
 
             if failure_messages.is_empty() {
-                debug!("No new failure messages!");
+                debug!("No new failure messages for notifier {notifier_name}!");
             } else {
                 let messages = failure_messages.join("");
-                debug!(
-                    "Sending failure notification: '{messages}' to notifier id: {notifier_name}, webhook: '{webhook}'"
+                info!(
+                    "Sending failure notification: '{messages}' to notifier id: {notifier_name}"
                 );
+                trace!("webhook: {webhook}");
                 utilities::notify_failure(&webhook, &messages);
 
                 drop(history);

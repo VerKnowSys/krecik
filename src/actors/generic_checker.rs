@@ -509,24 +509,21 @@ pub trait GenericChecker {
         notifier: Option<String>,
     ) -> Stories {
         let page_expectations = page_check.clone().expects;
+        let url = &page_check.url;
 
         // take control over curl handler, perform validations, produce stories…
         let a_handler = match handler {
             Ok(handle) => {
                 if handle.get_ref().0.is_empty() {
-                    let fail = format!("Site is down: {}", page_check.url);
-                    error!("{}", fail);
+                    let fail = format!("Site is down: {url}");
+                    error!(target: "checks", "{fail}");
                     return vec![Story::error(Unexpected::HandlerFailed(fail), notifier)];
                 } else {
                     handle
                 }
             }
             Err(err) => {
-                error!(
-                    "Couldn't connect to: {}. Error details: {:?}",
-                    page_check.url,
-                    err.to_string()
-                );
+                error!("Couldn't connect to: {url}. Error details: {err}",);
                 return vec![Story::error(
                     Unexpected::HandlerFailed(err.description().to_string()),
                     notifier,
