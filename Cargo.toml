@@ -1,6 +1,6 @@
 [package]
 name = "krecik"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["Daniel (dmilith) Dettlaff <dmilith@me.com>"]
 description = "Asynchronous, parallel external service checker (and reporter), using industry standard libraries: Curl, ngHTTP2 and OpenSSL."
 keywords = ["curl", "web", "check", "tls-expire", "openssl"]
@@ -24,7 +24,7 @@ tracing = { version = "0.1.32", features = ["log", "attributes", "std"] }
 tracing-subscriber = { version = "0.3.9", features = ["registry", "fmt", "env-filter"] }
 
 mimalloc = { version = "0.1.28", features = ["local_dynamic_tls", "secure"] }
-curl = { version = "0.4.42", features = ["http2", "mesalink"] }
+curl = { version = "0.4.42", features = ["http2", "ssl"] }
 
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.79"
