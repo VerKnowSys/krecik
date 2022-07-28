@@ -131,4 +131,5 @@ pub mod actors;
 //
 
 /// Tests:
+#[cfg(test)]
 mod tests;
