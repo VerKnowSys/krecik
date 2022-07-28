@@ -1,6 +1,6 @@
 use glob::glob;
 use retry::{delay::Fixed, retry_with_index, OperationResult};
-use slack_hook::{AttachmentBuilder, PayloadBuilder, Slack};
+use slack_hooked::{AttachmentBuilder, PayloadBuilder, Slack};
 use std::{
     fs::{self, OpenOptions},
     io::{prelude::*, Error, ErrorKind},
