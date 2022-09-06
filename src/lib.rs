@@ -4,7 +4,6 @@
 
 #![forbid(unsafe_code)]
 #![deny(
-    missing_docs,
     unstable_features,
     missing_debug_implementations,
     missing_copy_implementations,
