@@ -9,7 +9,7 @@ homepage = "https://github.com/VerKnowSys/krecik"
 license = "MIT"
 edition = "2021"
 build = "build.rs"
-
+links = "ssl"
 
 [lib]
 name = "krecik"
