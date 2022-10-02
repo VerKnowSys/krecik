@@ -1,35 +1,37 @@
 use crate::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(
+    Debug, Clone, Serialize, Deserialize, Error, PartialEq, Eq, Hash, PartialOrd, Ord,
+)]
 /// Describes all supported page expectations
 pub enum PageExpectation {
     /// Valid error code
-    #[fail(display = "ValidCode: {}.", _0)]
+    #[error("ValidCode: {0}.")]
     ValidCode(u32),
 
     /// Valid no-content check
-    #[fail(display = "ValidNoContent.")]
+    #[error("ValidNoContent.")]
     ValidNoContent,
 
     /// Valid content regex match
-    #[fail(display = "ValidContent: {}.", _0)]
+    #[error("ValidContent: {0}.")]
     ValidContent(String),
 
     /// Valid content length
-    #[fail(display = "ValidLength: {} bytes.", _0)]
+    #[error("ValidLength: {0} bytes.")]
     ValidLength(usize),
 
     /// Valid no-content-length check
-    #[fail(display = "ValidNoLength.")]
+    #[error("ValidNoLength.")]
     ValidNoLength,
 
     /// Valid final address (after all redirections)
-    #[fail(display = "ValidAddress: {}", _0)]
+    #[error("ValidAddress: {0}")]
     ValidAddress(String),
 
     /// Valid no-address check
-    #[fail(display = "ValidNoAddress.")]
+    #[error("ValidNoAddress.")]
     ValidNoAddress,
 }
 
@@ -38,11 +40,13 @@ pub enum PageExpectation {
 pub type PageExpectations = Vec<PageExpectation>;
 
 
-#[derive(Debug, Copy, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(
+    Debug, Copy, Clone, Serialize, Deserialize, Error, PartialEq, Eq, PartialOrd, Ord,
+)]
 /// Describes all supported domain expectations
 pub enum DomainExpectation {
     /// Domain expiry minimum period in days
-    #[fail(display = "ValidExpiryPeriod: {} days.", _0)]
+    #[error("ValidExpiryPeriod: {0} days.")]
     ValidExpiryPeriod(i32),
 }
 
@@ -51,40 +55,36 @@ pub enum DomainExpectation {
 pub type DomainExpectations = Vec<DomainExpectation>;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, Fail, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, Error, PartialEq, Eq, Hash)]
 /// All response types for all supported expectations
 pub enum Expected {
     /// Check returned expected Address
-    #[fail(display = "URL: {} returns expected final-address: \"{}\".", _0, _1)]
+    #[error("URL: \"{0}\" returns expected final-address: \"{1}\".")]
     Address(String, String),
 
     /// Check returned expected HTTP error code
-    #[fail(display = "URL: {} returns expected error-code: {}.", _0, _1)]
+    #[error("URL: \"{0}\" returns expected error-code: {1}.")]
     HttpCode(String, u32),
 
     /// Check returned expected page contents
-    #[fail(display = "URL: {} contains expected literal: \"{}\".", _0, _1)]
+    #[error("URL: \"{0}\" contains expected literal: \"{1}\".")]
     Content(String, String),
 
     /// NoContentLength
-    #[fail(display = "URL: {} no content-length validation.", _0)]
+    #[error("URL: \"{0}\" no content-length validation.")]
     NoContentLength(String),
 
     /// EmptyContent
-    #[fail(display = "URL: {} no content validation.", _0)]
+    #[error("URL: \"{0}\" no content validation.")]
     EmptyContent(String),
 
     /// Check returned expected page content length
-    #[fail(
-        display = "URL: {} has minimum content-length at least: {} bytes long.",
-        _0, _1
-    )]
+    #[error("URL: \"{0}\" has minimum content-length at least: {1} bytes long.")]
     ContentLength(String, usize),
 
     /// Check TLS certificate expiration time
-    #[fail(
-        display = "TLS certificate for domain: {}, will be valid for: {} more days. Requested minimum: {} days.",
-        _0, _1, _2
+    #[error(
+        "TLS certificate for domain: \"{0}\", will be valid for: {1} more days. Requested minimum: {2} days."
     )]
     TLSCertificateFresh(String, i32, i32),
 }

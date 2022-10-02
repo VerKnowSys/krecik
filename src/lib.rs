@@ -48,9 +48,6 @@ static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
 
 // Load all useful macros:
 
-#[macro_use]
-pub extern crate failure;
-
 pub use crate::actors::notificator::*;
 pub use crate::api::*;
 pub use crate::checks::check::*;
@@ -67,6 +64,7 @@ use core::fmt::{Debug, Formatter};
 use curl::easy::{Handler, WriteError};
 pub use serde::{Deserialize, Serialize};
 use std::fmt;
+pub use thiserror::Error;
 pub use tracing::{debug, error, event, info, instrument, span, trace, warn, Level};
 
 

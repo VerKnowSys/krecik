@@ -1,7 +1,7 @@
 use crate::*;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 /// History is list of Stories
 pub struct History(Stories);
 

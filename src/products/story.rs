@@ -8,7 +8,7 @@ use crate::*;
 pub type Stories = Vec<Story>;
 
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Message)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Message)]
 #[rtype(result = "Story")]
 /// Story holds the story of a check. It can be either: success, error or minor
 pub struct Story {
