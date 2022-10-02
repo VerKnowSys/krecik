@@ -124,7 +124,7 @@ pub trait GenericChecker {
                                 domain_name.to_string(),
                                 ssl_validator.days(),
                             ),
-                            notifier.clone(),
+                            notifier,
                         )
                     }
 

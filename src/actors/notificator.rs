@@ -33,7 +33,7 @@ impl Handler<Notify> for Notificator {
 
     fn handle(&mut self, stories: Notify, _ctx: &mut Self::Context) -> Self::Result {
         let notifiers = Config::load().notifiers.unwrap_or_default();
-        trace!("Defined notifiers: {:#?}", notifiers);
+        trace!("Defined notifiers: {notifiers:#?}");
 
         let ok_message = Config::load()
             .ok_message
