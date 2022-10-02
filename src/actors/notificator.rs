@@ -46,7 +46,7 @@ impl Handler<Notify> for Notificator {
                 .iter()
                 .filter_map(|story| {
                     if notifier_name == story.notifier.to_owned().unwrap_or_default() {
-                        Some(story.error.to_owned().unwrap().to_string())
+                        story.error.to_owned().map(|error| error.to_string())
                     } else {
                         None
                     }
