@@ -143,7 +143,7 @@ pub fn pongo_page_expectations() -> PageExpectations {
         PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),
         // PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT),
         PageExpectation::ValidAddress("https://".to_string()),
-        PageExpectation::ValidContent("Login".to_string()),
+        PageExpectation::ValidContent("SIGN IN".to_string()),
     ]
 }
 
