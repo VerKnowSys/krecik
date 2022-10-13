@@ -17,11 +17,11 @@ Daniel ([@dmilith](https://twitter.com/dmilith)) Dettlaff
 
 - Asynchronous and multithreaded by default.
 
-- JSON format used for both checks (input) and products (output).
+- The JSON format is used for both checks (input) and products (output).
 
-- Uses OpenSSL 1.1.1a+ to provide "TLS-cert expiration check" functionality.
+- Uses OpenSSL 1.1.1+ to provide "TLS-cert expiration check" functionality.
 
-- HTTP2 used as default.
+- HTTP2 is used as default.
 
 
 # How it works
