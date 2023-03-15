@@ -36,6 +36,9 @@ pub const CHECK_MINIMUM_DAYS_OF_TLSCERT_VALIDITY: i32 = 14;
 /// Default successful HTTP code: 200
 pub const CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE: u32 = 200;
 
+/// Unauthorized HTTP error code: 403
+pub const CHECK_UNAUTHORIZED_HTTP_CODE: u32 = 403;
+
 /// Default minimum length of HTTP content
 pub const CHECK_HTTP_MINIMUM_LENGHT: usize = 128;
 
