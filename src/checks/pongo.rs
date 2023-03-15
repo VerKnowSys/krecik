@@ -54,13 +54,11 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
         ..PageOptions::default()
     });
 
+    let pongo_host_data = check.data.host.clone().unwrap_or_default();
     [
         // AMSes:
-        check
-            .data
-            .host
-            .clone()
-            .unwrap_or_default()
+        pongo_host_data
+            .to_owned()
             .vhosts
             .and_then(|vhosts| {
                 vhosts
@@ -87,11 +85,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
             })
             .unwrap_or_default(),
         // Showrooms
-        check
-            .data
-            .host
-            .clone()
-            .unwrap_or_default()
+        pongo_host_data
             .showroom_urls
             .and_then(|showrooms| {
                 showrooms
@@ -112,11 +106,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
             })
             .unwrap_or_default(),
         // /graphql API
-        check
-            .data
-            .host
-            .clone()
-            .unwrap_or_default()
+        pongo_host_data
             .vhosts
             .and_then(|vhosts| {
                 vhosts
