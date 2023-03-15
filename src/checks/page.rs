@@ -46,7 +46,7 @@ pub struct PageOptions {
 
     /// HTTP POST data (body)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub post_data: Option<Vec<String>>,
+    pub post_data: Option<String>,
 
     /// HTTP cookies
     #[serde(skip_serializing_if = "Option::is_none")]
