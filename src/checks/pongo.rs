@@ -39,16 +39,27 @@ pub fn collect_pongo_domains(check: &PongoCheck) -> Vec<Domain> {
 /// Collect pongo page checks by host
 #[instrument]
 pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Vec<Page> {
-    let ams = check.clone().data.ams.unwrap_or_default();
+    let ams = check.data.ams.to_owned().unwrap_or_default();
     let active = check.active.unwrap_or(false);
-    let client = check.clone().client.unwrap_or_default();
-    let options = check.clone().options;
+    let client = check.client.to_owned().unwrap_or_default();
+
+    // default Curl options
+    let options = &check.options;
+
+    // override options for API checks
+    let api_options: Option<PageOptions> = Some(PageOptions {
+        // XXX: FIXME: TODO: /graphql returns 400 for POST w/o body set!
+        // method: Some(Method::Post),
+        post_data: Some(String::from("{}")),
+        ..PageOptions::default()
+    });
+
     [
-        // merge two lists for URLs: "vhosts" and "showrooms":
+        // AMSes:
         check
-            .clone()
             .data
             .host
+            .clone()
             .unwrap_or_default()
             .vhosts
             .and_then(|vhosts| {
@@ -65,7 +76,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                             Some(Page {
                                 url: format!("{}{}/{}/", CHECK_DEFAULT_PROTOCOL, vhost, ams),
                                 expects: pongo_page_expectations(),
-                                options: options.clone(),
+                                options: options.to_owned(),
                             })
                         } else {
                             debug!("Skipping not active client: {}", &client);
@@ -75,10 +86,11 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                     .collect::<Option<Pages>>()
             })
             .unwrap_or_default(),
+        // Showrooms
         check
             .data
-            .clone()
             .host
+            .clone()
             .unwrap_or_default()
             .showroom_urls
             .and_then(|showrooms| {
@@ -89,7 +101,38 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                             Some(Page {
                                 url: vhost.to_string(),
                                 expects: showroom_page_expectations(),
-                                options: options.clone(),
+                                options: options.to_owned(),
+                            })
+                        } else {
+                            debug!("Skipping not active client: {}", &client);
+                            None
+                        }
+                    })
+                    .collect::<Option<Pages>>()
+            })
+            .unwrap_or_default(),
+        // /graphql API
+        check
+            .data
+            .host
+            .clone()
+            .unwrap_or_default()
+            .vhosts
+            .and_then(|vhosts| {
+                vhosts
+                    .par_iter()
+                    .filter(|vhost| {
+                        !vhost.starts_with("*.")
+                            && vhost.contains(
+                                &mapper.only_vhost_contains.clone().unwrap_or_default(),
+                            )
+                    }) // filter out wildcard domains and pick only these matching value of only_vhost_contains field
+                    .map(|vhost| {
+                        if active {
+                            Some(Page {
+                                url: format!("{CHECK_DEFAULT_PROTOCOL}{vhost}/graphql"),
+                                expects: pongo_api_expectations(),
+                                options: api_options.to_owned(),
                             })
                         } else {
                             debug!("Skipping not active client: {}", &client);
