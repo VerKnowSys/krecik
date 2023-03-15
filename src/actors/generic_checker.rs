@@ -78,8 +78,8 @@ pub trait GenericChecker {
                     let mut multi = Multi::new();
                     multi.pipelining(false, true).unwrap_or_default(); // disable http1.1, enable http2-multiplex
 
+                    // #[allow(clippy::needless_collect)] // Clippy BUG: not needless!
                     // collect tuple of page-checks and Curl handler:
-                    #[allow(clippy::needless_collect)] // Clippy BUG: not needless!
                     let process_handlers: Vec<_> = all_pages
                         .iter()
                         .map(|check| (check, Self::load_handler_for(check, &multi)))
@@ -157,7 +157,7 @@ pub trait GenericChecker {
         notifier: Option<String>,
     ) -> Story {
         match expected_content_length {
-            &PageExpectation::ValidLength(ref requested_length)
+            PageExpectation::ValidLength(requested_length)
                 if raw_page_content.len() >= *requested_length =>
             {
                 Story::success(
@@ -166,7 +166,7 @@ pub trait GenericChecker {
                 )
             }
 
-            &PageExpectation::ValidLength(ref requested_length) => {
+            PageExpectation::ValidLength(requested_length) => {
                 Story::error(
                     Unexpected::ContentLengthInvalid(
                         url.to_string(),
@@ -391,14 +391,14 @@ pub trait GenericChecker {
         notifier: Option<String>,
     ) -> Story {
         match expected_address {
-            &PageExpectation::ValidAddress(ref an_address) if address.contains(an_address) => {
+            PageExpectation::ValidAddress(an_address) if address.contains(an_address) => {
                 Story::success(
                     Expected::Address(url.to_string(), address.to_string()),
                     notifier,
                 )
             }
 
-            &PageExpectation::ValidAddress(ref an_address) => {
+            PageExpectation::ValidAddress(an_address) => {
                 Story::error(
                     Unexpected::AddressInvalid(
                         url.to_string(),

@@ -14,7 +14,7 @@ use crate::*;
 #[instrument]
 pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
     read_text_file(check_path).and_then(|file_contents| {
-        serde_json::from_str(&*file_contents)
+        serde_json::from_str(&file_contents)
             .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
     })
 }
@@ -24,7 +24,7 @@ pub fn read_single_check_result(check_path: &str) -> Result<Check, Error> {
 #[instrument]
 pub fn read_single_check(check_path: &str) -> Option<Check> {
     let result = read_text_file(check_path).and_then(|file_contents| {
-        serde_json::from_str(&*file_contents)
+        serde_json::from_str(&file_contents)
             .map_err(|err| Error::new(ErrorKind::InvalidInput, err.to_string()))
     });
     match result {
@@ -181,11 +181,7 @@ pub fn read_text_file(name: &str) -> Result<String, Error> {
 pub fn write_append(file_path: &str, contents: &str) {
     // NOTE: since file is written in "write only, all at once" mode, we have to be sure not to write empty buffer
     if !contents.is_empty() {
-        match OpenOptions::new()
-            .create(true)
-            .append(true)
-            .open(&file_path)
-        {
+        match OpenOptions::new().create(true).append(true).open(file_path) {
             Ok(mut file) => {
                 file.write_all(contents.as_bytes())
                     .expect("Access denied? File can't be written: {file_path}");

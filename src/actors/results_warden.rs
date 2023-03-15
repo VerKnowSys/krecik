@@ -63,7 +63,7 @@ impl Handler<ValidateResults> for ResultsWarden {
                 .collect::<Vec<String>>();
             for old_file in &old_files_list {
                 trace!("Wiping out old stories: {old_files_list:?}");
-                fs::remove_file(&old_file).unwrap_or_default();
+                fs::remove_file(old_file).unwrap_or_default();
             }
 
             let previous_stories: Stories =
