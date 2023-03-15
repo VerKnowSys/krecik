@@ -685,6 +685,7 @@ pub trait GenericChecker {
                 curl.get(false).unwrap_or_default();
                 curl.post(false).unwrap_or_default();
                 curl.put(true).unwrap_or_default();
+                trace!("Curl PUT data: {}", post_data);
                 curl.post_fields_copy(post_data.as_bytes())
                     .unwrap_or_default();
             }
@@ -693,6 +694,7 @@ pub trait GenericChecker {
                 curl.get(false).unwrap_or_default();
                 curl.put(false).unwrap_or_default();
                 curl.post(true).unwrap_or_default();
+                trace!("Curl POST data: {}", post_data);
                 curl.post_fields_copy(post_data.as_bytes())
                     .unwrap_or_default();
             }
