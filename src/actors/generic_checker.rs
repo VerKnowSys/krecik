@@ -678,23 +678,22 @@ pub trait GenericChecker {
         }
 
         // Setup Curl configuration based on given options
+        let post_data = curl_options.post_data.unwrap_or_default();
         match curl_options.method {
             Some(Method::Put) => {
                 trace!("Curl method: {}", "PUT");
-                let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();
                 curl.post(false).unwrap_or_default();
                 curl.put(true).unwrap_or_default();
-                curl.post_field_size(post_data.len() as u64)
+                curl.post_fields_copy(post_data.as_bytes())
                     .unwrap_or_default();
             }
             Some(Method::Post) => {
                 trace!("Curl method: {}", "POST");
-                let post_data = curl_options.post_data.unwrap_or_default();
                 curl.get(false).unwrap_or_default();
                 curl.put(false).unwrap_or_default();
                 curl.post(true).unwrap_or_default();
-                curl.post_field_size(post_data.len() as u64)
+                curl.post_fields_copy(post_data.as_bytes())
                     .unwrap_or_default();
             }
 
@@ -704,6 +703,7 @@ pub trait GenericChecker {
                 curl.put(false).unwrap_or_default();
                 curl.post(false).unwrap_or_default();
                 curl.get(true).unwrap_or_default();
+                curl.post_fields_copy(&[]).unwrap_or_default();
             }
         };
 
