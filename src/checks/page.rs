@@ -118,6 +118,7 @@ impl Default for PageOptions {
 
 #[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 /// HTTP methods allowed
+#[derive(Default)]
 pub enum Method {
     /// HTTP HEAD
     Head,
@@ -126,6 +127,7 @@ pub enum Method {
     Put,
 
     /// HTTP GET
+    #[default]
     Get,
 
     /// HTTP POST
@@ -133,11 +135,4 @@ pub enum Method {
 
     /// HTTP DELETE
     Delete,
-}
-
-
-impl Default for Method {
-    fn default() -> Method {
-        Method::Get
-    }
 }
