@@ -148,6 +148,18 @@ pub fn pongo_page_expectations() -> PageExpectations {
 }
 
 
+/// Provide pongo API expectations:
+#[instrument]
+pub fn pongo_api_expectations() -> PageExpectations {
+    vec![
+        PageExpectation::ValidCode(CHECK_UNAUTHORIZED_HTTP_CODE),
+        // PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT),
+        PageExpectation::ValidAddress("https://".to_string()),
+        PageExpectation::ValidContent("Access denied".to_string()),
+    ]
+}
+
+
 /// Provide pongo showroom page expectations:
 #[instrument]
 pub fn showroom_page_expectations() -> PageExpectations {
