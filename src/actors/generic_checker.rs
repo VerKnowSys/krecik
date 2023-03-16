@@ -705,7 +705,6 @@ pub trait GenericChecker {
                 curl.put(false).unwrap_or_default();
                 curl.post(false).unwrap_or_default();
                 curl.get(true).unwrap_or_default();
-                curl.post_fields_copy(&[]).unwrap_or_default();
             }
         };
 
