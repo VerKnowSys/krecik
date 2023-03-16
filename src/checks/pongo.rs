@@ -72,12 +72,12 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                     .map(|vhost| {
                         if active {
                             Some(Page {
-                                url: format!("{}{}/{}/", CHECK_DEFAULT_PROTOCOL, vhost, ams),
+                                url: format!("{CHECK_DEFAULT_PROTOCOL}{vhost}/{ams}/"),
                                 expects: pongo_page_expectations(),
                                 options: options.to_owned(),
                             })
                         } else {
-                            debug!("Skipping not active client: {}", &client);
+                            debug!("Skipping not active client: {client}");
                             None
                         }
                     })
@@ -98,7 +98,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                                 options: options.to_owned(),
                             })
                         } else {
-                            debug!("Skipping not active client: {}", &client);
+                            debug!("Skipping not active client: {client}");
                             None
                         }
                     })
