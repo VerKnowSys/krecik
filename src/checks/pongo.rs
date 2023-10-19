@@ -120,7 +120,7 @@ pub fn collect_pongo_hosts(check: &PongoCheck, mapper: &PongoRemoteMapper) -> Ve
                     .map(|vhost| {
                         if active {
                             Some(Page {
-                                url: format!("{CHECK_DEFAULT_PROTOCOL}{vhost}/graphql"),
+                                url: format!("{CHECK_DEFAULT_PROTOCOL}{vhost}/graphql?health"),
                                 expects: pongo_api_expectations(),
                                 options: api_options.to_owned(),
                             })
@@ -185,10 +185,9 @@ pub fn pongo_page_expectations() -> PageExpectations {
 #[instrument]
 pub fn pongo_api_expectations() -> PageExpectations {
     vec![
-        PageExpectation::ValidCode(CHECK_UNAUTHORIZED_HTTP_CODE),
+        PageExpectation::ValidCode(CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE),
         // PageExpectation::ValidLength(CHECK_HTTP_MINIMUM_LENGHT),
         PageExpectation::ValidAddress("https://".to_string()),
-        PageExpectation::ValidContent("Access denied".to_string()),
     ]
 }
 
