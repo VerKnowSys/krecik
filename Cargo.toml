@@ -20,32 +20,32 @@ name = "krecikd"
 path = "src/main.rs"
 
 [dependencies]
-tracing = { version = "0.1.36", features = ["log", "attributes", "std"] }
-tracing-subscriber = { version = "0.3.15", features = ["registry", "fmt", "env-filter"] }
+tracing = { version = "0.1.44", features = ["log", "attributes", "std"] }
+tracing-subscriber = { version = "=0.3.19", features = ["registry", "fmt", "env-filter"] }
 
-mimalloc = { version = "0.1.29", features = ["local_dynamic_tls", "secure"] }
-curl = { version = "0.4.44", features = ["http2", "ssl"] }
+mimalloc = { version = "0.1.48", features = ["local_dynamic_tls", "secure"] }
+curl = { version = "0.4.49", features = ["http2", "ssl"] }
 
-serde = { version = "1.0.145", features = ["derive"] }
-serde_json = "1.0.85"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.148"
 
 ssl-expiration2 = "0.4.0"
 # ssl-expiration2 = { path = "../ssl-expiration" }
 slack-hooked = "0.9.0"
 
-lazy_static = "1.4.0"
-rayon = "1.5.3"
-glob = "0.3.0"
-chrono = "0.4.22"
+lazy_static = "1.5.0"
+rayon = "1.11.0"
+glob = "0.3.3"
+chrono = "0.4.42"
 addy = "0.1.1"
 retry = "1.3.1"
-thiserror = "1.0.37"
+thiserror = "1.0.69"
 
 ###  FROZEN  ###actix = "0.13.0"
-actix = "0.13.0"
-actix-macros = "0.2.3"
-actix-rt = "2.7.0"
-actix_derive = "0.6.0"
+actix = "0.13.5"
+actix-macros = "0.2.4"
+actix-rt = "2.11.0"
+actix_derive = "0.6.2"
 
 ###   ###    ###
 
