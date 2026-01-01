@@ -66,11 +66,15 @@ impl History {
 }
 
 
-/// Implement JSON serialization on .to_string():
-impl ToString for History {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self.0).unwrap_or_else(|_| {
-            String::from("{\"status\": \"History serialization failure\"}")
-        })
+/// Implement JSON Display for History
+impl fmt::Display for History {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string(&self.0).unwrap_or_else(|_| {
+                String::from("{\"status\": \"History serialization failure\"}")
+            })
+        )
     }
 }

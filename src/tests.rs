@@ -49,7 +49,7 @@ mod all_tests {
         let mut easy = Easy2::new(CollectorForTests(Vec::new()));
         easy.get(true)?;
         // easy.verbose(true)?;
-        easy.url("https://www.rust-lang.org/")?;
+        easy.url("https://rust-lang.org/")?;
         easy.perform()?;
         assert_eq!(easy.response_code()?, CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         let contents = easy.get_ref();
@@ -127,17 +127,17 @@ mod all_tests {
         // 3
         let handler3 = easy3handle.get_ref();
         let raw_page = String::from_utf8_lossy(&handler3.0);
-        assert!(raw_page.len() == 0);
+        assert!(raw_page.is_empty());
 
-        let mut handler1after = multi.remove2(easy1handle)?;
+        let handler1after = multi.remove2(easy1handle)?;
         assert!(handler1after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         assert!(handler1after.download_size().unwrap() > 0f64);
 
-        let mut handler2after = multi.remove2(easy2handle)?;
+        let handler2after = multi.remove2(easy2handle)?;
         assert!(handler2after.response_code().unwrap() == CHECK_DEFAULT_SUCCESSFUL_HTTP_CODE);
         assert!(handler2after.download_size().unwrap() > 0f64);
 
-        let mut handler3after = multi.remove2(easy3handle)?;
+        let handler3after = multi.remove2(easy3handle)?;
         assert!(handler3after.response_code().unwrap() == 0); // NOTE: 0 since no connection is possible to non existing server
         assert!(handler2after.download_size().unwrap() > 0f64); // even if connection failed, we sent some bytes
 

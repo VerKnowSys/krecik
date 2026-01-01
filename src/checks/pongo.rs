@@ -286,11 +286,15 @@ pub struct PongoRemoteMapper {
 }
 
 
-/// Implement JSON serialization on .to_string():
-impl ToString for PongoRemoteMapper {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self).unwrap_or_else(|_| {
-            String::from("{\"status\": \"PongoRemoteMapper serialization failure\"}")
-        })
+/// Implement Display for PongoRemoteMapper
+impl fmt::Display for PongoRemoteMapper {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string(&self).unwrap_or_else(|_| {
+                String::from("{\"status\": \"PongoRemoteMapper serialization failure\"}")
+            })
+        )
     }
 }

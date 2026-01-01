@@ -1,5 +1,5 @@
 use crate::*;
-use curl::{multi::Easy2Handle, MultiError};
+use curl::{MultiError, multi::Easy2Handle};
 
 
 /// Type alias for long type name:
@@ -86,12 +86,16 @@ pub struct PageOptions {
 }
 
 
-/// Implement JSON serialization on .to_string():
-impl ToString for PageOptions {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self).unwrap_or_else(|_| {
-            String::from("{\"status\": \"PageOptions serialization failure\"}")
-        })
+/// Implement JSON Display for PageOptions
+impl fmt::Display for PageOptions {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string(&self).unwrap_or_else(|_| {
+                String::from("{\"status\": \"PageOptions serialization failure\"}")
+            })
+        )
     }
 }
 

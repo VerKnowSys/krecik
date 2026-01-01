@@ -1,9 +1,9 @@
 use glob::glob;
-use retry::{delay::Fixed, retry_with_index, OperationResult};
+use retry::{OperationResult, delay::Fixed, retry_with_index};
 use slack_hooked::{AttachmentBuilder, PayloadBuilder, Slack};
 use std::{
     fs::{self, OpenOptions},
-    io::{prelude::*, Error, ErrorKind},
+    io::{Error, ErrorKind, prelude::*},
     path::Path,
 };
 
@@ -47,8 +47,8 @@ pub fn warn_for_undefined_notifiers(stories: &[Story]) {
         .collect::<Vec<_>>();
     let mut undefined = stories
         .iter()
+        .filter(|&elem| !notifier_names.contains(&elem.notifier.clone().unwrap_or_default()))
         .cloned()
-        .filter(|elem| !notifier_names.contains(&elem.notifier.clone().unwrap_or_default()))
         .filter_map(|elem| elem.notifier)
         .collect::<Vec<String>>();
     undefined.dedup();

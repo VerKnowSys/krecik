@@ -12,17 +12,13 @@ use crate::{
     *,
 };
 use curl::{
+    Error as CurlError,
     easy::{Easy2, List},
     multi::Multi,
-    Error as CurlError,
 };
 use rayon::prelude::*;
 use ssl_expiration2::SslExpiration;
-use std::{
-    env,
-    io::{Error, ErrorKind},
-    time::Duration,
-};
+use std::{env, io::Error, time::Duration};
 
 
 /// Trait implementing all helper functions for Curl-driven checks
@@ -328,7 +324,7 @@ pub trait GenericChecker {
             reason = "CURLE_HTTP2"
         } // Returns whether this error corresponds to CURLE_HTTP2.
 
-        Error::new(ErrorKind::Other, format!("{} ({})", err, reason))
+        Error::other(format!("{err} ({reason})"))
     }
 
 
@@ -552,7 +548,7 @@ pub trait GenericChecker {
             notifier.clone(),
         )];
 
-        let mut result_handler = match multi.remove2(a_handler) {
+        let result_handler = match multi.remove2(a_handler) {
             Ok(res_handler) => res_handler,
             Err(err) => {
                 error!(

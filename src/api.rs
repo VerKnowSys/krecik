@@ -5,7 +5,6 @@ use rayon::prelude::*;
 /**
    Public library API for Krecik remote-checks functionality
 **/
-
 /// Return checks from path, excluding remotes
 #[instrument]
 pub fn all_checks_but_remotes() -> Vec<Check> {

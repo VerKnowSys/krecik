@@ -1,4 +1,4 @@
-/// Actors module
+//! Actors module
 
 /// Generic trait definition for curl checkers
 pub mod generic_checker;

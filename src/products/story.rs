@@ -74,10 +74,15 @@ impl Story {
 }
 
 
-/// Implement JSON serialization on .to_string():
-impl ToString for Story {
-    fn to_string(&self) -> String {
-        serde_json::to_string(&self)
-            .unwrap_or_else(|_| String::from("{\"status\": \"Story serialization failure\"}"))
+/// Implement Display for Story
+impl fmt::Display for Story {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            serde_json::to_string(&self).unwrap_or_else(|_| {
+                String::from("{\"status\": \"Story serialization failure\"}")
+            })
+        )
     }
 }

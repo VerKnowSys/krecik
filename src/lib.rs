@@ -19,20 +19,14 @@
     overflowing_literals,
     path_statements,
     patterns_in_fns_without_body,
-    private_in_public,
     unconditional_recursion,
     unused,
     unused_allocation,
     unused_comparisons,
     unused_parens,
     while_true,
-    missing_debug_implementations,
     missing_docs,
-    trivial_casts,
-    trivial_numeric_casts,
-    unused_extern_crates,
-    unused_import_braces,
-    unused_qualifications
+    unused_extern_crates
 )]
 #![warn(dead_code, unused_imports, unused_variables)]
 
@@ -64,7 +58,7 @@ use curl::easy::{Handler, WriteError};
 pub use serde::{Deserialize, Serialize};
 use std::fmt;
 pub use thiserror::Error;
-pub use tracing::{debug, error, event, info, instrument, span, trace, warn, Level};
+pub use tracing::{Level, debug, error, event, info, instrument, span, trace, warn};
 
 
 /// Collects async content from Curl:
@@ -81,18 +75,24 @@ impl Handler for Collector {
 
 impl Debug for Collector {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_struct(&format!(
-            "Collector buffer (first 50 in hex): {}…",
-            self.to_string()
-        ))
-        .finish()
+        f.debug_struct(&format!("Collector buffer (first 50 in hex): {self}…"))
+            .finish()
     }
 }
 
 
-impl ToString for Collector {
-    fn to_string(&self) -> String {
-        self.0.iter().take(50).map(|c| format!("{:x}", c)).collect()
+/// Implement Display for Collector
+impl fmt::Display for Collector {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            self.0
+                .iter()
+                .take(50)
+                .map(|c| format!("{:x}", c))
+                .collect::<String>()
+        )
     }
 }
 
